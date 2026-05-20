@@ -167,16 +167,42 @@
       `;
     }
 
+    function renderMatchCardSmall(p, zona, fechaNum) {
+      const jugada = (p.golesL !== undefined && p.golesV !== undefined);
+      const isWinnerL = jugada && p.golesL > p.golesV;
+      const isWinnerV = jugada && p.golesV > p.golesL;
+      const clsL = jugada ? (isWinnerL ? 'winner' : (isWinnerV ? 'loser' : '')) : '';
+      const clsV = jugada ? (isWinnerV ? 'winner' : (isWinnerL ? 'loser' : '')) : '';
+      const centerHtml = jugada
+        ? `<span class="mc-score">${p.golesL} - ${p.golesV}</span>`
+        : `<span class="mc-vs">VS</span>`;
+      return `
+        <a href="ficha.html?fecha=${fechaNum}&local=${p.local}" class="match-card-sm">
+          <span class="mc-zone ${zona===2?'zona-2':''}"></span>
+          <div class="mc-team home ${clsL}">
+            ${teamAvatar(p.local, 24)}
+            <span class="mc-name">${getEquipoNombre(p.local)}</span>
+          </div>
+          <div class="mc-center">${centerHtml}</div>
+          <div class="mc-team away ${clsV}">
+            <span class="mc-name">${getEquipoNombre(p.visitante)}</span>
+            ${teamAvatar(p.visitante, 24)}
+          </div>
+        </a>
+      `;
+    }
+
     const proxima = FIXTURE.find(f => f.estado === 'pendiente');
     if (proxima) {
       document.getElementById('proxima-title').innerHTML =
         `Próxima fecha · Fecha ${proxima.fecha} <small>· ${proxima.fechaTexto}</small>`;
       const partidos = [
-        ...proxima.zona1.slice(0,2).map(p => ({...p, zona:1})),
-        ...proxima.zona2.slice(0,2).map(p => ({...p, zona:2}))
+        ...proxima.zona1.map(p => ({...p, zona:1})),
+        ...proxima.zona2.map(p => ({...p, zona:2}))
       ];
+      document.getElementById('proxima-grid').className = 'match-grid-sm';
       document.getElementById('proxima-grid').innerHTML =
-        partidos.map(p => renderMatchCard(p, p.zona, proxima.fecha)).join('');
+        partidos.map(p => renderMatchCardSmall(p, p.zona, proxima.fecha)).join('');
     }
 
     const ultimas = FIXTURE.filter(f => f.estado === 'jugada');

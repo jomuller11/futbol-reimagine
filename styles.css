@@ -372,6 +372,96 @@ img {
   margin-bottom: 28px;
 }
 
+/* Grilla compacta para home (todos los partidos de la fecha) */
+.match-grid-sm {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 6px;
+  margin-bottom: 28px;
+}
+
+/* Card compacta: fila horizontal */
+.match-card-sm {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 8px 12px;
+  background: var(--surface);
+  border: 0.5px solid var(--border);
+  border-radius: var(--radius-md);
+  text-decoration: none;
+  color: inherit;
+  transition: border-color 0.15s, background 0.15s;
+  min-width: 0;
+}
+
+.match-card-sm:hover {
+  border-color: var(--border-strong);
+  background: var(--surface-2);
+}
+
+.match-card-sm .mc-team {
+  flex: 1;
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  min-width: 0;
+}
+
+.match-card-sm .mc-team.away {
+  flex-direction: row-reverse;
+}
+
+.match-card-sm .mc-name {
+  font-size: 12px;
+  font-weight: 500;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  color: var(--text);
+}
+
+.match-card-sm .mc-team.loser .mc-name {
+  color: var(--text-tertiary);
+  font-weight: 400;
+}
+
+.match-card-sm .mc-team.winner .mc-name {
+  font-weight: 700;
+}
+
+.match-card-sm .mc-center {
+  flex-shrink: 0;
+  text-align: center;
+  min-width: 40px;
+}
+
+.match-card-sm .mc-score {
+  font-size: 14px;
+  font-weight: 800;
+  letter-spacing: 1px;
+  color: var(--text);
+}
+
+.match-card-sm .mc-vs {
+  font-size: 10px;
+  font-weight: 700;
+  color: var(--text-tertiary);
+  letter-spacing: 0.5px;
+}
+
+.match-card-sm .mc-zone {
+  width: 6px;
+  height: 6px;
+  border-radius: 50%;
+  flex-shrink: 0;
+  background: var(--primary);
+}
+
+.match-card-sm .mc-zone.zona-2 {
+  background: var(--accent);
+}
+
 .match-card {
   background: var(--surface);
   border: 0.5px solid var(--border);
@@ -1214,6 +1304,9 @@ img {
     grid-template-columns: repeat(2, 1fr);
   }
   .match-grid {
+    grid-template-columns: 1fr;
+  }
+  .match-grid-sm {
     grid-template-columns: 1fr;
   }
   .two-col {
