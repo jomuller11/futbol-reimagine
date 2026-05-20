@@ -140,11 +140,11 @@
       function renderPlantelFicha(plantel, equipoId, detalles) {
         const detallesEq = (detalles && detalles[equipoId]) || [];
         const statsMap = {};
-        detallesEq.forEach(d => { statsMap[d.jugador] = d; });
+        detallesEq.forEach(d => { statsMap[d.jugador.toUpperCase()] = d; });
 
         return plantel.map((nombre, idx) => {
           const esArquero = idx === 0;
-          const st = statsMap[nombre];
+          const st = statsMap[nombre.toUpperCase()];
           let iconos = '';
           if (st) {
             for (let g = 0; g < st.goles; g++) iconos += '<span title="Gol">⚽</span>';
