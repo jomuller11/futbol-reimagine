@@ -6,10 +6,6 @@ on:
     # Lunes 23:00 ARG = martes 02:00 UTC
     - cron: '0 2 * * 2'
   workflow_dispatch:
-  push:
-    paths:
-      - 'scraper/**'
-      - '.github/workflows/update.yml'
 
 # Permisos necesarios para hacer commit al repo
 permissions:
