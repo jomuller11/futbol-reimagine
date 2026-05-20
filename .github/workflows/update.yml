@@ -2,15 +2,14 @@ name: Actualizar datos del torneo
 
 # Cuándo se ejecuta:
 on:
-  # Solo manual por ahora — el scraper aún no parsea bien el sitio oficial.
-  # Cuando esté validado, descomentar el schedule y el push trigger.
+  schedule:
+    # Cada 6 horas (00:00, 06:00, 12:00, 18:00 UTC = 21:00, 03:00, 09:00, 15:00 ARG)
+    - cron: '0 */6 * * *'
   workflow_dispatch:
-  # schedule:
-  #   - cron: '0 */6 * * *'
-  # push:
-  #   paths:
-  #     - 'scraper/**'
-  #     - '.github/workflows/update.yml'
+  push:
+    paths:
+      - 'scraper/**'
+      - '.github/workflows/update.yml'
 
 # Permisos necesarios para hacer commit al repo
 permissions:

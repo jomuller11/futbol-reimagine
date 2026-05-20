@@ -364,68 +364,74 @@ def parse_fixture(soup):
 
 
 def parse_partidos_bloque(texto):
-    """Parsea un bloque de texto que contiene partidos. Patrón observado:
+    """Parsea un bloque de texto con partidos del sitio oficial.
 
-        Cancha N
-        XX EQUIPO_LOCAL
-        R - R  (o '-' si no jugado)
-        YY EQUIPO_VISIT
+    El sitio usa dos formatos según si el partido fue jugado o no:
 
-    Devuelve lista de partidos con cancha, local, visitante y goles si los hay.
+    Jugado (3 líneas + "Ficha"):
+        01 MOBRICI
+        1 - 3
+        12 MACIEL
+        Ficha
+
+    Pendiente (1 línea inline o 3 líneas con guion):
+        02 VENTRICELI - 03 MEYER
+        — o —
+        02 VENTRICELI
+        -
+        03 MEYER
+
+    No hay info de cancha/turno en el texto del sitio.
     """
     partidos = []
-    # Dividir por "Cancha N" como separador
-    bloques = re.split(r"\n(?=Cancha\s+\d)", texto)
-    turno_actual = None
+    # Descartar líneas de ruido conocido
+    RUIDO = {"ficha", "ver ficha", "resultado"}
+    lines = [
+        l.strip() for l in texto.strip().split("\n")
+        if l.strip() and l.strip().lower() not in RUIDO
+    ]
 
-    for bloque in bloques:
-        lines = [l.strip() for l in bloque.strip().split("\n") if l.strip()]
-        if not lines:
-            continue
+    i = 0
+    while i < len(lines):
+        line = lines[i]
 
-        # Detectar si arranca con un encabezado de turno (ej. "Turno 1 14:00")
-        turno_match = re.match(r"^Turno\s+\d+\s+(\d{1,2}:\d{2})", lines[0])
-        if turno_match:
-            turno_actual = turno_match.group(1)
-            lines = lines[1:]
-            if not lines:
+        # --- Formato inline pendiente: "NN EQUIPO - NN EQUIPO" ---
+        # Ejemplo: "02 VENTRICELI - 03 MEYER"
+        # Distinguimos de un score "1 - 3" porque empieza con dos dígitos + espacio + letra
+        inline = re.match(
+            r"^(\d{2}\s+[A-ZÁÉÍÓÚÑ].+?)\s+-\s+(\d{2}\s+[A-ZÁÉÍÓÚÑ].+)$",
+            line
+        )
+        if inline:
+            local_id, _ = parse_team_label(inline.group(1))
+            visit_id, _ = parse_team_label(inline.group(2))
+            if local_id and visit_id:
+                partidos.append({"local": local_id, "visitante": visit_id})
+                i += 1
                 continue
 
-        # La primera línea debería ser "Cancha N"
-        cancha_match = re.match(r"^Cancha\s+(\d)", lines[0])
-        if not cancha_match:
-            continue
-        cancha = int(cancha_match.group(1))
-
-        # Buscar las 3-4 líneas siguientes: equipo local, resultado, equipo visitante, (zona)
-        siguientes = lines[1:5]
-        if len(siguientes) < 3:
+        # --- Formato multilínea: local / score-o-guion / visitante ---
+        local_id, _ = parse_team_label(line)
+        if not local_id or i + 2 >= len(lines):
+            i += 1
             continue
 
-        local_id, _ = parse_team_label(siguientes[0])
-        if not local_id:
+        score_raw = clean_text(lines[i + 1])
+        visit_id, _ = parse_team_label(lines[i + 2])
+        if not visit_id:
+            i += 1
             continue
 
-        resultado_raw = clean_text(siguientes[1])
-        visitante_id, _ = parse_team_label(siguientes[2])
-        if not visitante_id:
-            continue
+        partido = {"local": local_id, "visitante": visit_id}
 
-        partido = {
-            "local": local_id,
-            "visitante": visitante_id,
-            "cancha": cancha,
-        }
-        if turno_actual:
-            partido["turno"] = turno_actual
-
-        # Resultado: "N - M" si fue jugado, "-" o "vs" si pendiente
-        score_match = re.match(r"^(\d+)\s*-\s*(\d+)$", resultado_raw)
+        score_match = re.match(r"^(\d+)\s*-\s*(\d+)$", score_raw)
         if score_match:
             partido["golesL"] = int(score_match.group(1))
             partido["golesV"] = int(score_match.group(2))
+        # Si score_raw == "-" es pendiente, no agregamos goles
 
         partidos.append(partido)
+        i += 3
 
     return partidos
 
