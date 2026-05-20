@@ -137,14 +137,28 @@
         badgeVisit = '<span style="font-size: 11px; color: var(--text-tertiary);">PRÓXIMO</span>';
       }
 
-      // Render plantel: solo alineación, sin stats de torneo mezcladas
-      function renderPlantelFicha(plantel, equipoId) {
+      function renderPlantelFicha(plantel, equipoId, detalles) {
+        const detallesEq = (detalles && detalles[equipoId]) || [];
+        const statsMap = {};
+        detallesEq.forEach(d => { statsMap[d.jugador] = d; });
+
         return plantel.map((nombre, idx) => {
           const esArquero = idx === 0;
+          const st = statsMap[nombre];
+          let iconos = '';
+          if (st) {
+            for (let g = 0; g < st.goles; g++) iconos += '<span title="Gol">⚽</span>';
+            st.tarjetas.forEach(t => {
+              if (t === 'amarilla') iconos += '<span title="Tarjeta amarilla" style="display:inline-block;width:10px;height:14px;background:#f5c518;border-radius:2px;vertical-align:middle;margin-left:2px;"></span>';
+              else if (t === 'azul')    iconos += '<span title="Tarjeta azul"    style="display:inline-block;width:10px;height:14px;background:#4a90d9;border-radius:2px;vertical-align:middle;margin-left:2px;"></span>';
+              else if (t === 'roja')   iconos += '<span title="Tarjeta roja"    style="display:inline-block;width:10px;height:14px;background:#e03c31;border-radius:2px;vertical-align:middle;margin-left:2px;"></span>';
+            });
+          }
           return `
             <div style="display:flex; align-items:center; gap:8px; padding:7px 0; border-bottom:0.5px dashed var(--border); font-size:13px;">
               ${esArquero ? '<strong style="font-size:10px; color:var(--primary); min-width:28px;">ARQ</strong>' : '<span style="min-width:28px;"></span>'}
-              <span>${nombre}</span>
+              <span style="flex:1;">${nombre}</span>
+              ${iconos ? `<span style="display:flex;align-items:center;gap:3px;font-size:13px;">${iconos}</span>` : ''}
             </div>
           `;
         }).join('');
@@ -194,7 +208,7 @@
               <span class="team-avatar" style="background:${colorL}; width:24px; height:24px; font-size:10px;">${partido.local}</span>
               ${eqLocal.nombre} · alineación (${plantelL.length})
             </div>
-            ${renderPlantelFicha(plantelL, partido.local)}
+            ${renderPlantelFicha(plantelL, partido.local, partido.detalles)}
             <div style="margin-top:14px; text-align:center;">
               <a href="equipo.html?id=${partido.local}" style="font-size:12px; color:var(--primary); font-weight:600;">Ver equipo completo →</a>
             </div>
@@ -205,7 +219,7 @@
               <span class="team-avatar" style="background:${colorV}; width:24px; height:24px; font-size:10px;">${partido.visitante}</span>
               ${eqVisit.nombre} · alineación (${plantelV.length})
             </div>
-            ${renderPlantelFicha(plantelV, partido.visitante)}
+            ${renderPlantelFicha(plantelV, partido.visitante, partido.detalles)}
             <div style="margin-top:14px; text-align:center;">
               <a href="equipo.html?id=${partido.visitante}" style="font-size:12px; color:var(--primary); font-weight:600;">Ver equipo completo →</a>
             </div>

@@ -360,7 +360,106 @@ def parse_fixture(soup):
         })
 
     log(f"  Fixture parseado: {len(fixture)} fechas")
+
+    # Agregar partido_id a cada partido jugado (para poder bajar la ficha)
+    partido_map = extract_partido_ids_map(soup)
+    for f in fixture:
+        for p in f["zona1"] + f["zona2"]:
+            key = (p["local"], p["visitante"])
+            if key in partido_map:
+                p["partido_id"] = partido_map[key]
+
     return fixture
+
+
+def extract_partido_ids_map(soup):
+    """Extrae el mapeo (local_id, visitante_id) -> partido_id desde los onclick
+    de los botones 'Ficha' en el fixture de la home."""
+    partido_map = {}
+    for linea in soup.find_all("div", id="proximaLinea"):
+        cols = [d for d in linea.find_all("div") if "col-md-5" in (d.get("class") or [])]
+        font = linea.find("font", onclick=True)
+        if len(cols) < 2 or not font:
+            continue
+        local_id, _ = parse_team_label(cols[0].get_text(strip=True))
+        visit_id, _ = parse_team_label(cols[1].get_text(strip=True))
+        m = re.search(r"partido=(\d+)", font.get("onclick", ""))
+        if local_id and visit_id and m:
+            partido_map[(local_id, visit_id)] = m.group(1)
+    log(f"  IDs de partido mapeados: {len(partido_map)}", verbose_only=True)
+    return partido_map
+
+
+def classify_card(img_src):
+    """Determina el tipo de tarjeta según el nombre de la imagen."""
+    src = img_src.lower()
+    if "amarilla" in src or "yellow" in src:
+        return "amarilla"
+    if "azul" in src or "blue" in src:
+        return "azul"
+    if "roja" in src or "red" in src:
+        return "roja"
+    return None
+
+
+def parse_ficha_partido(html):
+    """Parsea una página fichaPartido y devuelve goles y tarjetas por jugador.
+
+    Retorna dict: { equipo_id: [ {jugador, goles, tarjetas}, ... ], ... }
+    Solo incluye jugadores con al menos 1 gol o 1 tarjeta.
+    """
+    soup = BeautifulSoup(html, "lxml")
+    detalles = {}
+
+    for player_row in soup.find_all(id="fichaJugador1"):
+        font = player_row.find("font")
+        if not font:
+            continue
+        nombre = clean_text(font.get_text())
+
+        stats_row = player_row.find_next_sibling("div")
+        if not stats_row:
+            continue
+
+        goles_div = stats_row.find(id="fichaGolesJugador")
+        sanciones_div = stats_row.find(id="fichaSanciones")
+
+        goles = 0
+        tarjetas = []
+
+        if goles_div:
+            goles = len(goles_div.find_all(
+                "img", src=lambda s: s and "goles" in s.lower()
+            ))
+
+        if sanciones_div:
+            for img in sanciones_div.find_all("img"):
+                tipo = classify_card(img.get("src", ""))
+                if tipo:
+                    tarjetas.append(tipo)
+
+        if goles <= 0 and not tarjetas:
+            continue
+
+        # Determinar a qué equipo pertenece el jugador
+        col = player_row.find_parent(
+            "div",
+            class_=lambda c: c and "col-lg-6" in c and "col-md-6" in c
+        )
+        equipo_id = None
+        if col:
+            eq_div = col.find(id="fichaEquipo")
+            if eq_div:
+                equipo_id, _ = parse_team_label(eq_div.get_text(strip=True))
+
+        if equipo_id:
+            detalles.setdefault(equipo_id, []).append({
+                "jugador": nombre,
+                "goles": goles,
+                "tarjetas": tarjetas,
+            })
+
+    return detalles
 
 
 def parse_partidos_bloque(texto):
@@ -434,6 +533,32 @@ def parse_partidos_bloque(texto):
         i += 3
 
     return partidos
+
+
+# ============================================================
+# DESCARGA DE FICHAS INDIVIDUALES (goles y tarjetas por partido)
+# ============================================================
+
+def fetch_detalles_fichas(fixture):
+    """Para cada partido jugado que tenga partido_id, descarga su ficha
+    y agrega los eventos (goles y tarjetas) al objeto del partido."""
+    jugados = [
+        p for f in fixture if f["estado"] == "jugada"
+        for p in f["zona1"] + f["zona2"]
+        if p.get("partido_id")
+    ]
+    total = len(jugados)
+    log(f"  Descargando fichas: {total} partidos jugados")
+    for idx, p in enumerate(jugados, 1):
+        pid = p["partido_id"]
+        url = f"{BASE_URL}/index.php?r=torneos/fichaPartido&partido={pid}"
+        log(f"  [{idx}/{total}] Ficha partido {pid}", verbose_only=True)
+        try:
+            html = fetch(url)
+            p["detalles"] = parse_ficha_partido(html)
+        except SystemExit:
+            log(f"  ⚠️  No se pudo descargar ficha {pid}, se omite")
+        time.sleep(SLEEP_BETWEEN_REQUESTS)
 
 
 # ============================================================
@@ -663,6 +788,10 @@ def main():
     # 2. Parsear
     log("🔍 Parseando home (estadísticas y fixture)...")
     home_data = parse_home(home_html)
+
+    log("")
+    log("📥 Descargando fichas de partidos jugados...")
+    fetch_detalles_fichas(home_data["fixture"])
 
     log("")
     log("🔍 Parseando equipos (planteles)...")
