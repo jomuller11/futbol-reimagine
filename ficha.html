@@ -137,23 +137,14 @@
         badgeVisit = '<span style="font-size: 11px; color: var(--text-tertiary);">PRÓXIMO</span>';
       }
 
-      // Render plantel para la ficha (compacto, todos los jugadores)
+      // Render plantel: solo alineación, sin stats de torneo mezcladas
       function renderPlantelFicha(plantel, equipoId) {
         return plantel.map((nombre, idx) => {
-          const stats = getStatsJugador(nombre, equipoId);
           const esArquero = idx === 0;
-          const pills = [];
-          if (stats.goles > 0) pills.push(`<span class="stat-pill stat-goles">⚽ ${stats.goles}</span>`);
-          if (stats.amarillas > 0) pills.push(`<span class="stat-pill stat-amarilla">🟨 ${stats.amarillas}</span>`);
-          if (stats.azules > 0) pills.push(`<span class="stat-pill stat-azul">🟦 ${stats.azules}</span>`);
-          if (stats.rojas > 0) pills.push(`<span class="stat-pill stat-roja">🟥 ${stats.rojas}</span>`);
           return `
-            <div style="display:flex; justify-content:space-between; align-items:center; padding:7px 0; border-bottom:0.5px dashed var(--border); font-size:13px;">
-              <span>
-                ${esArquero ? '<strong style="font-size:10px; color:var(--primary); margin-right:6px;">ARQ</strong>' : ''}
-                ${nombre}
-              </span>
-              <div style="display:flex; gap:4px; flex-wrap:wrap; justify-content:flex-end;">${pills.join('')}</div>
+            <div style="display:flex; align-items:center; gap:8px; padding:7px 0; border-bottom:0.5px dashed var(--border); font-size:13px;">
+              ${esArquero ? '<strong style="font-size:10px; color:var(--primary); min-width:28px;">ARQ</strong>' : '<span style="min-width:28px;"></span>'}
+              <span>${nombre}</span>
             </div>
           `;
         }).join('');
@@ -195,18 +186,13 @@
           </div>
         </div>
 
-        ${jugada ? `
-        <div class="data-notice">
-          <strong>Nota:</strong> El sitio oficial publica los goleadores como totales del torneo, no por partido. La sección de planteles muestra los goles y tarjetas acumulados de cada jugador en lo que va del campeonato.
-        </div>
-        ` : ''}
 
         <!-- PLANTELES -->
         <div class="two-col">
           <div class="ficha-section" style="margin: 0;">
             <div class="ficha-section-title" style="display:flex; align-items:center; gap:8px;">
               <span class="team-avatar" style="background:${colorL}; width:24px; height:24px; font-size:10px;">${partido.local}</span>
-              ${eqLocal.nombre} · plantel (${plantelL.length})
+              ${eqLocal.nombre} · alineación (${plantelL.length})
             </div>
             ${renderPlantelFicha(plantelL, partido.local)}
             <div style="margin-top:14px; text-align:center;">
@@ -217,7 +203,7 @@
           <div class="ficha-section" style="margin: 0;">
             <div class="ficha-section-title" style="display:flex; align-items:center; gap:8px;">
               <span class="team-avatar" style="background:${colorV}; width:24px; height:24px; font-size:10px;">${partido.visitante}</span>
-              ${eqVisit.nombre} · plantel (${plantelV.length})
+              ${eqVisit.nombre} · alineación (${plantelV.length})
             </div>
             ${renderPlantelFicha(plantelV, partido.visitante)}
             <div style="margin-top:14px; text-align:center;">
