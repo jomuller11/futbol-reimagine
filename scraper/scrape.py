@@ -97,9 +97,10 @@ def fetch(url, retries=3):
 
 
 def clean_text(s):
-    """Normaliza espacios en blanco."""
+    """Normaliza espacios en blanco y elimina entidades HTML no decodificadas."""
     if s is None:
         return ""
+    s = re.sub(r"&[a-zA-Z][a-zA-Z0-9]*;", "", s)
     return re.sub(r"\s+", " ", s).strip()
 
 
@@ -612,7 +613,7 @@ def parse_equipos(html):
             # Filtrar líneas que tengan caracteres extraños
             if re.search(r"https?://|@|\.com|powered by", line, re.I):
                 continue
-            jugadores.append(line.title())
+            jugadores.append(clean_text(line).title())
 
         if jugadores:
             equipos[equipo_id] = equipo_nombre
