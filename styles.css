@@ -417,14 +417,14 @@ img {
 }
 
 .match-body {
-  display: grid;
-  grid-template-columns: 1fr auto 1fr;
+  display: flex;
   align-items: center;
   gap: 8px;
   padding: 6px 0 2px;
 }
 
 .match-team {
+  flex: 1;
   display: flex;
   flex-direction: column;
   align-items: center;
@@ -433,7 +433,7 @@ img {
 }
 
 .match-team.away {
-  /* identical to home — both centred vertically */
+  /* identical to home — both centred */
 }
 
 .team-avatar {
@@ -479,6 +479,7 @@ img {
 }
 
 .match-score {
+  flex-shrink: 0;
   font-size: 22px;
   font-weight: 800;
   letter-spacing: 2px;
@@ -488,6 +489,7 @@ img {
 }
 
 .match-vs {
+  flex-shrink: 0;
   font-size: 11px;
   color: var(--text-tertiary);
   font-weight: 700;
