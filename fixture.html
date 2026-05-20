@@ -35,12 +35,17 @@
 
       <div class="page-header">
         <h1 class="page-title">Fixture del torneo</h1>
-        <p class="page-sub">Primera fase · 11 fechas · 24 equipos divididos en 2 zonas</p>
+        <p class="page-sub">Primera fase · 11 fechas · 24 equipos · 2 zonas</p>
       </div>
 
-      <div class="fecha-selector" id="fecha-selector"></div>
+      <!-- Filtro jugada / pendiente -->
+      <div class="fixture-filter" id="fixture-filter">
+        <button class="fixture-filter-btn active" data-filter="all">Todas las fechas</button>
+        <button class="fixture-filter-btn" data-filter="jugada">Resultados</button>
+        <button class="fixture-filter-btn" data-filter="pendiente">Próximas</button>
+      </div>
 
-      <div id="fecha-content"></div>
+      <div id="fixture-all"></div>
 
     </div>
   </main>
@@ -64,19 +69,6 @@
 
   <script src="data/torneo.js"></script>
   <script>
-    // Construir selector de fechas
-    const selector = document.getElementById('fecha-selector');
-    // Por defecto mostramos la última jugada
-    const ultimasJugadas = FIXTURE.filter(f => f.estado === 'jugada');
-    let fechaActiva = ultimasJugadas.length > 0 ? ultimasJugadas[ultimasJugadas.length-1].fecha : 1;
-
-    selector.innerHTML = FIXTURE.map(f => `
-      <button class="fecha-btn ${f.fecha===fechaActiva?'active':''}" data-fecha="${f.fecha}">
-        Fecha ${f.fecha}
-        ${f.estado === 'jugada' ? '<span style="opacity:0.7; font-size:10px; margin-left:4px;">✓</span>' : ''}
-      </button>
-    `).join('');
-
     function renderMatchCard(p, zona, fechaNum) {
       const jugada = (p.golesL !== undefined && p.golesV !== undefined);
       const isWinnerL = jugada && p.golesL > p.golesV;
@@ -86,7 +78,7 @@
       const center = jugada
         ? `<span class="match-score">${p.golesL} - ${p.golesV}</span>`
         : `<span class="match-vs">VS</span>`;
-      const canchaInfo = p.cancha ? `Cancha ${p.cancha} · ${p.turno}` : (jugada ? 'Final' : 'Pendiente');
+      const canchaInfo = (p.cancha && p.turno) ? `Cancha ${p.cancha} · ${p.turno}` : (jugada ? '' : 'Por confirmar');
       return `
         <a href="ficha.html?fecha=${fechaNum}&local=${p.local}" class="match-card">
           <div class="match-head">
@@ -108,66 +100,72 @@
       `;
     }
 
-    function renderFecha(numero) {
-      const f = FIXTURE.find(x => x.fecha === numero);
-      if (!f) return;
+    function renderAll(filter) {
+      const fechas = filter === 'all'
+        ? FIXTURE
+        : FIXTURE.filter(f => f.estado === filter);
 
-      const estadoBadge = f.estado === 'jugada'
-        ? '<span class="badge badge-success">Jugada</span>'
-        : '<span class="badge badge-warning">Pendiente</span>';
+      if (fechas.length === 0) {
+        document.getElementById('fixture-all').innerHTML =
+          '<p style="color:var(--text-secondary); text-align:center; padding:40px 0;">No hay fechas para mostrar.</p>';
+        return;
+      }
 
-      const html = `
-        <div style="display:flex; align-items:center; gap:12px; margin-bottom:20px;">
-          <h2 style="font-size: 22px; font-weight: 700;">Fecha ${f.fecha}</h2>
-          <span style="color: var(--text-secondary); font-size: 14px;">· ${f.fechaTexto}</span>
-          ${estadoBadge}
-        </div>
+      document.getElementById('fixture-all').innerHTML = fechas.map(f => {
+        const esJugada = f.estado === 'jugada';
+        const badge = esJugada
+          ? '<span class="badge badge-success">Jugada</span>'
+          : '<span class="badge badge-warning">Próxima</span>';
 
-        <div class="fixture-zone">
-          <div class="fixture-zone-head">
-            <h2 class="fixture-zone-title">
-              <span class="match-zone"></span>
-              Zona 1
-            </h2>
-          </div>
-          <div class="match-grid">
-            ${f.zona1.map(p => renderMatchCard(p, 1, f.fecha)).join('')}
-          </div>
-        </div>
+        return `
+          <div class="fixture-fecha" id="fecha-${f.fecha}">
+            <div class="fixture-fecha-head">
+              <div style="display:flex; align-items:center; gap:10px;">
+                <span class="fixture-fecha-num">Fecha ${f.fecha}</span>
+                <span class="fixture-fecha-dia">${f.fechaTexto}</span>
+                ${badge}
+              </div>
+            </div>
 
-        <div class="fixture-zone">
-          <div class="fixture-zone-head">
-            <h2 class="fixture-zone-title">
-              <span class="match-zone zona-2"></span>
-              Zona 2
-            </h2>
+            <div class="fixture-zona-bloque">
+              <div class="fixture-zona-label zona-1-label">Zona 1</div>
+              <div class="match-grid">
+                ${f.zona1.map(p => renderMatchCard(p, 1, f.fecha)).join('')}
+              </div>
+            </div>
+
+            <div class="fixture-zona-bloque">
+              <div class="fixture-zona-label zona-2-label">Zona 2</div>
+              <div class="match-grid">
+                ${f.zona2.map(p => renderMatchCard(p, 2, f.fecha)).join('')}
+              </div>
+            </div>
           </div>
-          <div class="match-grid">
-            ${f.zona2.map(p => renderMatchCard(p, 2, f.fecha)).join('')}
-          </div>
-        </div>
-      `;
-      document.getElementById('fecha-content').innerHTML = html;
+        `;
+      }).join('');
+
+      // Scroll automático a la próxima fecha al cargar "todas"
+      if (filter === 'all') {
+        const proxima = FIXTURE.find(f => f.estado === 'pendiente');
+        if (proxima) {
+          setTimeout(() => {
+            const el = document.getElementById(`fecha-${proxima.fecha}`);
+            if (el) el.scrollIntoView({ behavior: 'smooth', block: 'start' });
+          }, 200);
+        }
+      }
     }
 
-    selector.addEventListener('click', e => {
-      const btn = e.target.closest('.fecha-btn');
+    // Filtro
+    document.getElementById('fixture-filter').addEventListener('click', e => {
+      const btn = e.target.closest('.fixture-filter-btn');
       if (!btn) return;
-      const fecha = parseInt(btn.dataset.fecha);
-      document.querySelectorAll('.fecha-btn').forEach(b => b.classList.remove('active'));
+      document.querySelectorAll('.fixture-filter-btn').forEach(b => b.classList.remove('active'));
       btn.classList.add('active');
-      fechaActiva = fecha;
-      renderFecha(fecha);
-      window.scrollTo({top: 0, behavior: 'smooth'});
+      renderAll(btn.dataset.filter);
     });
 
-    renderFecha(fechaActiva);
-
-    // Scroll del selector hasta la fecha activa
-    setTimeout(() => {
-      const activeBtn = selector.querySelector('.fecha-btn.active');
-      if (activeBtn) activeBtn.scrollIntoView({inline: 'center', block: 'nearest', behavior: 'instant'});
-    }, 100);
+    renderAll('all');
   </script>
 
 </body>

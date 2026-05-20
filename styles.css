@@ -949,6 +949,90 @@ img {
   color: var(--text-secondary);
 }
 
+/* Filtro de fixture */
+.fixture-filter {
+  display: flex;
+  gap: 8px;
+  margin-bottom: 28px;
+  flex-wrap: wrap;
+}
+
+.fixture-filter-btn {
+  padding: 8px 18px;
+  border-radius: var(--radius-md);
+  background: var(--surface);
+  border: 0.5px solid var(--border);
+  font-size: 13px;
+  font-weight: 600;
+  cursor: pointer;
+  color: var(--text-secondary);
+  font-family: inherit;
+  transition: background 0.15s, color 0.15s;
+}
+
+.fixture-filter-btn.active {
+  background: var(--primary);
+  color: #fff;
+  border-color: var(--primary);
+}
+
+.fixture-filter-btn:not(.active):hover {
+  background: var(--surface-2);
+  color: var(--text);
+}
+
+/* Bloque de cada fecha */
+.fixture-fecha {
+  margin-bottom: 40px;
+  scroll-margin-top: 80px;
+}
+
+.fixture-fecha-head {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding-bottom: 12px;
+  border-bottom: 2px solid var(--border);
+  margin-bottom: 20px;
+}
+
+.fixture-fecha-num {
+  font-size: 18px;
+  font-weight: 700;
+  color: var(--text);
+}
+
+.fixture-fecha-dia {
+  font-size: 14px;
+  color: var(--text-secondary);
+}
+
+/* Bloque por zona dentro de cada fecha */
+.fixture-zona-bloque {
+  margin-bottom: 20px;
+}
+
+.fixture-zona-label {
+  font-size: 12px;
+  font-weight: 700;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  padding: 4px 10px;
+  border-radius: var(--radius-sm);
+  display: inline-block;
+  margin-bottom: 10px;
+}
+
+.zona-1-label {
+  background: rgba(30, 120, 220, 0.12);
+  color: #1E78DC;
+}
+
+.zona-2-label {
+  background: rgba(138, 60, 180, 0.12);
+  color: #8A3CB4;
+}
+
 /* ============================================
    EQUIPOS PAGE
    ============================================ */
