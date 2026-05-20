@@ -3,8 +3,8 @@ name: Actualizar datos del torneo
 # Cuándo se ejecuta:
 on:
   schedule:
-    # Cada 6 horas (00:00, 06:00, 12:00, 18:00 UTC = 21:00, 03:00, 09:00, 15:00 ARG)
-    - cron: '0 */6 * * *'
+    # Lunes 23:00 ARG = martes 02:00 UTC
+    - cron: '0 2 * * 2'
   workflow_dispatch:
   push:
     paths:
