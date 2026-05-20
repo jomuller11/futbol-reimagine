@@ -169,25 +169,16 @@
 
     function renderMatchCardSmall(p, zona, fechaNum) {
       const jugada = (p.golesL !== undefined && p.golesV !== undefined);
-      const isWinnerL = jugada && p.golesL > p.golesV;
-      const isWinnerV = jugada && p.golesV > p.golesL;
-      const clsL = jugada ? (isWinnerL ? 'winner' : (isWinnerV ? 'loser' : '')) : '';
-      const clsV = jugada ? (isWinnerV ? 'winner' : (isWinnerL ? 'loser' : '')) : '';
-      const centerHtml = jugada
-        ? `<span class="mc-score">${p.golesL} - ${p.golesV}</span>`
-        : `<span class="mc-vs">VS</span>`;
+      const score = jugada ? `${p.golesL} - ${p.golesV}` : 'VS';
+      const scoreCls = jugada ? '' : ' pending';
       return `
         <a href="ficha.html?fecha=${fechaNum}&local=${p.local}" class="match-card-sm">
-          <span class="mc-zone ${zona===2?'zona-2':''}"></span>
-          <div class="mc-team home ${clsL}">
-            ${teamAvatar(p.local, 24)}
-            <span class="mc-name">${getEquipoNombre(p.local)}</span>
-          </div>
-          <div class="mc-center">${centerHtml}</div>
-          <div class="mc-team away ${clsV}">
-            <span class="mc-name">${getEquipoNombre(p.visitante)}</span>
-            ${teamAvatar(p.visitante, 24)}
-          </div>
+          <span class="mc-dot ${zona===2?'zona-2':''}"></span>
+          ${teamAvatar(p.local, 24)}
+          <span class="mc-l">${getEquipoNombre(p.local)}</span>
+          <span class="mc-sc${scoreCls}">${score}</span>
+          <span class="mc-r">${getEquipoNombre(p.visitante)}</span>
+          ${teamAvatar(p.visitante, 24)}
         </a>
       `;
     }
