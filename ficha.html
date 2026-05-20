@@ -1,0 +1,266 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Ficha del partido · Papi Fútbol San José Morón</title>
+  <link rel="icon" type="image/png" href="logo.png">
+  <link rel="stylesheet" href="styles.css">
+  <style>
+    .data-notice {
+      background: var(--accent-light);
+      border-left: 3px solid var(--accent);
+      padding: 12px 16px;
+      border-radius: var(--radius-md);
+      font-size: 13px;
+      color: var(--accent-dark);
+      margin-bottom: 16px;
+    }
+    .data-notice strong { font-weight: 700; }
+  </style>
+</head>
+<body>
+
+  <header class="header">
+    <div class="container header-inner">
+      <a href="index.html" class="brand">
+        <div class="brand-logo"></div>
+        <div class="brand-text">
+          <div class="brand-name">Papi Fútbol</div>
+          <div class="brand-sub">Colegio Marista San José · Morón</div>
+        </div>
+      </a>
+      <nav class="nav" id="nav">
+        <a href="index.html">Inicio</a>
+        <a href="fixture.html">Fixture</a>
+        <a href="equipos.html">Equipos</a>
+        <a href="estadisticas.html">Estadísticas</a>
+        <a href="#">Noticias</a>
+        <a href="#">Inscripción</a>
+      </nav>
+      <button class="mobile-toggle" onclick="document.getElementById('nav').classList.toggle('open')">☰</button>
+    </div>
+  </header>
+
+  <main class="page">
+    <div class="container">
+
+      <div style="margin-bottom: 16px;">
+        <a href="fixture.html" style="font-size: 13px; color: var(--text-secondary);">← Volver al fixture</a>
+      </div>
+
+      <div id="ficha-content">
+        <p style="text-align:center; padding:40px; color:var(--text-secondary);">Cargando...</p>
+      </div>
+
+    </div>
+  </main>
+
+  <footer class="footer">
+    <div class="container footer-inner">
+      <div class="footer-brand">
+        <div class="brand-logo small"></div>
+        <div>
+          <div style="font-weight: 600; color: var(--text);">Papi Fútbol Morón</div>
+          <div>Colegio Marista San José</div>
+        </div>
+      </div>
+      <div class="footer-social">
+        <a href="https://www.facebook.com/papifutbolmoron" title="Facebook">f</a>
+        <a href="#" title="Instagram">ig</a>
+        <a href="#" title="WhatsApp">wa</a>
+      </div>
+    </div>
+  </footer>
+
+  <script src="data/torneo.js"></script>
+  <script>
+    const params = new URLSearchParams(window.location.search);
+    const fechaNum = parseInt(params.get('fecha')) || 5;
+    const localId = params.get('local') || '05';
+
+    function findPartido(fechaNum, localId) {
+      const fecha = FIXTURE.find(f => f.fecha === fechaNum);
+      if (!fecha) return null;
+      let p = fecha.zona1.find(x => x.local === localId);
+      let zona = 1;
+      if (!p) {
+        p = fecha.zona2.find(x => x.local === localId);
+        zona = 2;
+      }
+      if (!p) {
+        // Quizás el equipo aparece como visitante
+        p = fecha.zona1.find(x => x.visitante === localId);
+        if (p) zona = 1;
+        else {
+          p = fecha.zona2.find(x => x.visitante === localId);
+          if (p) zona = 2;
+        }
+      }
+      if (!p) return null;
+      return { ...p, fecha: fechaNum, fechaTexto: fecha.fechaTexto, estado: fecha.estado, zona };
+    }
+
+    function renderFicha() {
+      const partido = findPartido(fechaNum, localId);
+      if (!partido) {
+        document.getElementById('ficha-content').innerHTML = '<p>Partido no encontrado</p>';
+        return;
+      }
+
+      const eqLocal = EQUIPOS[partido.local];
+      const eqVisit = EQUIPOS[partido.visitante];
+      const colorL = getEquipoColor(partido.local);
+      const colorV = getEquipoColor(partido.visitante);
+      const jugada = partido.estado === 'jugada';
+
+      const plantelL = PLANTELES[partido.local] || [];
+      const plantelV = PLANTELES[partido.visitante] || [];
+
+      // Resultado
+      let scoreHtml, badgeLocal, badgeVisit;
+      if (jugada) {
+        scoreHtml = `<div class="ficha-score">${partido.golesL} - ${partido.golesV}</div>`;
+        if (partido.golesL > partido.golesV) {
+          badgeLocal = '<span class="badge badge-success">GANADOR</span>';
+          badgeVisit = '<span style="font-size: 11px; color: var(--text-tertiary);">FINAL</span>';
+        } else if (partido.golesV > partido.golesL) {
+          badgeLocal = '<span style="font-size: 11px; color: var(--text-tertiary);">FINAL</span>';
+          badgeVisit = '<span class="badge badge-success">GANADOR</span>';
+        } else {
+          badgeLocal = '<span class="badge badge-warning">EMPATE</span>';
+          badgeVisit = '<span class="badge badge-warning">EMPATE</span>';
+        }
+      } else {
+        scoreHtml = `<div class="ficha-score" style="color:var(--text-tertiary);">VS</div>`;
+        badgeLocal = '<span style="font-size: 11px; color: var(--text-tertiary);">PRÓXIMO</span>';
+        badgeVisit = '<span style="font-size: 11px; color: var(--text-tertiary);">PRÓXIMO</span>';
+      }
+
+      // Render plantel para la ficha (compacto, todos los jugadores)
+      function renderPlantelFicha(plantel, equipoId) {
+        return plantel.map((nombre, idx) => {
+          const stats = getStatsJugador(nombre, equipoId);
+          const esArquero = idx === 0;
+          const pills = [];
+          if (stats.goles > 0) pills.push(`<span class="stat-pill stat-goles">⚽ ${stats.goles}</span>`);
+          if (stats.amarillas > 0) pills.push(`<span class="stat-pill stat-amarilla">🟨 ${stats.amarillas}</span>`);
+          if (stats.azules > 0) pills.push(`<span class="stat-pill stat-azul">🟦 ${stats.azules}</span>`);
+          if (stats.rojas > 0) pills.push(`<span class="stat-pill stat-roja">🟥 ${stats.rojas}</span>`);
+          return `
+            <div style="display:flex; justify-content:space-between; align-items:center; padding:7px 0; border-bottom:0.5px dashed var(--border); font-size:13px;">
+              <span>
+                ${esArquero ? '<strong style="font-size:10px; color:var(--primary); margin-right:6px;">ARQ</strong>' : ''}
+                ${nombre}
+              </span>
+              <div style="display:flex; gap:4px; flex-wrap:wrap; justify-content:flex-end;">${pills.join('')}</div>
+            </div>
+          `;
+        }).join('');
+      }
+
+      // Stats agregadas del equipo en el torneo (no del partido)
+      function statsEquipoTotal(equipoId) {
+        let goles = 0, amarillas = 0, azules = 0, rojas = 0;
+        PLANTELES[equipoId].forEach(nombre => {
+          const s = getStatsJugador(nombre, equipoId);
+          goles += s.goles; amarillas += s.amarillas; azules += s.azules; rojas += s.rojas;
+        });
+        return { goles, amarillas, azules, rojas };
+      }
+      const statsL = statsEquipoTotal(partido.local);
+      const statsV = statsEquipoTotal(partido.visitante);
+
+      const html = `
+        <!-- HEADER -->
+        <div class="ficha-header">
+          <div class="ficha-meta">
+            <span>📅 ${partido.fechaTexto}</span>
+            <span>🏟️ Cancha ${partido.cancha}</span>
+            <span>⏰ ${partido.turno}</span>
+            <span><span class="match-zone ${partido.zona===2?'zona-2':''}">Zona ${partido.zona} · Fecha ${partido.fecha}</span></span>
+          </div>
+          <div class="ficha-result">
+            <div class="ficha-team">
+              <div class="team-avatar" style="background:${colorL};">${partido.local}</div>
+              <div class="ficha-team-name">${eqLocal.nombre}</div>
+              ${badgeLocal}
+            </div>
+            ${scoreHtml}
+            <div class="ficha-team">
+              <div class="team-avatar" style="background:${colorV};">${partido.visitante}</div>
+              <div class="ficha-team-name" ${jugada && partido.golesV < partido.golesL ? 'style="color: var(--text-secondary);"' : ''}>${eqVisit.nombre}</div>
+              ${badgeVisit}
+            </div>
+          </div>
+        </div>
+
+        ${jugada ? `
+        <div class="data-notice">
+          <strong>Nota:</strong> El sitio oficial publica los goleadores como totales del torneo, no por partido. La sección de planteles muestra los goles y tarjetas acumulados de cada jugador en lo que va del campeonato.
+        </div>
+        ` : ''}
+
+        <!-- PLANTELES -->
+        <div class="two-col">
+          <div class="ficha-section" style="margin: 0;">
+            <div class="ficha-section-title" style="display:flex; align-items:center; gap:8px;">
+              <span class="team-avatar" style="background:${colorL}; width:24px; height:24px; font-size:10px;">${partido.local}</span>
+              ${eqLocal.nombre} · plantel (${plantelL.length})
+            </div>
+            ${renderPlantelFicha(plantelL, partido.local)}
+            <div style="margin-top:14px; text-align:center;">
+              <a href="equipo.html?id=${partido.local}" style="font-size:12px; color:var(--primary); font-weight:600;">Ver equipo completo →</a>
+            </div>
+          </div>
+
+          <div class="ficha-section" style="margin: 0;">
+            <div class="ficha-section-title" style="display:flex; align-items:center; gap:8px;">
+              <span class="team-avatar" style="background:${colorV}; width:24px; height:24px; font-size:10px;">${partido.visitante}</span>
+              ${eqVisit.nombre} · plantel (${plantelV.length})
+            </div>
+            ${renderPlantelFicha(plantelV, partido.visitante)}
+            <div style="margin-top:14px; text-align:center;">
+              <a href="equipo.html?id=${partido.visitante}" style="font-size:12px; color:var(--primary); font-weight:600;">Ver equipo completo →</a>
+            </div>
+          </div>
+        </div>
+
+        <!-- COMPARATIVA DE EQUIPOS EN EL TORNEO -->
+        <div class="ficha-section" style="margin-top: 16px;">
+          <div class="ficha-section-title">📊 Comparativa en el torneo</div>
+          ${renderBarra('Goles convertidos', statsL.goles, statsV.goles, colorL, colorV)}
+          ${renderBarra('Amarillas recibidas', statsL.amarillas, statsV.amarillas, colorL, colorV, true)}
+          ${(statsL.azules + statsV.azules > 0) ? renderBarra('Azules recibidas', statsL.azules, statsV.azules, colorL, colorV, true) : ''}
+          ${(statsL.rojas + statsV.rojas > 0) ? renderBarra('Rojas recibidas', statsL.rojas, statsV.rojas, colorL, colorV, true) : ''}
+        </div>
+      `;
+
+      document.getElementById('ficha-content').innerHTML = html;
+      document.title = `${eqLocal.nombre} ${jugada ? partido.golesL+'-'+partido.golesV : 'vs'} ${eqVisit.nombre} · Papi Fútbol`;
+    }
+
+    function renderBarra(label, valL, valV, colorL, colorV, lessIsBetter) {
+      const total = valL + valV;
+      const pctL = total > 0 ? (valL / total) * 100 : 50;
+      const pctV = total > 0 ? (valV / total) * 100 : 50;
+      return `
+        <div style="margin-bottom: 14px;">
+          <div style="display: flex; justify-content: space-between; font-size: 13px; margin-bottom: 6px;">
+            <strong>${valL}</strong>
+            <span style="color: var(--text-secondary);">${label}${lessIsBetter ? ' (menos es mejor)' : ''}</span>
+            <strong>${valV}</strong>
+          </div>
+          <div style="display: flex; height: 8px; border-radius: 4px; overflow: hidden; background: var(--surface-2);">
+            <div style="width: ${pctL}%; background: ${colorL};"></div>
+            <div style="width: ${pctV}%; background: ${colorV};"></div>
+          </div>
+        </div>
+      `;
+    }
+
+    renderFicha();
+  </script>
+
+</body>
+</html>

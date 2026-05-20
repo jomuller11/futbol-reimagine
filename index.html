@@ -1,0 +1,285 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="description" content="Torneo Papi Fútbol San José Morón 2026 — Colegio Marista San José. Fixture, resultados, posiciones y goleadores.">
+  <title>Papi Fútbol San José Morón — Torneo 2026</title>
+  <link rel="icon" type="image/png" href="logo.png">
+  <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+
+  <header class="header">
+    <div class="container header-inner">
+      <a href="index.html" class="brand">
+        <div class="brand-logo"></div>
+        <div class="brand-text">
+          <div class="brand-name">Papi Fútbol</div>
+          <div class="brand-sub">Colegio Marista San José · Morón</div>
+        </div>
+      </a>
+      <nav class="nav" id="nav">
+        <a href="index.html" class="active">Inicio</a>
+        <a href="fixture.html">Fixture</a>
+        <a href="equipos.html">Equipos</a>
+        <a href="estadisticas.html">Estadísticas</a>
+        <a href="#">Noticias</a>
+        <a href="#">Inscripción</a>
+      </nav>
+      <button class="mobile-toggle" onclick="document.getElementById('nav').classList.toggle('open')">☰</button>
+    </div>
+  </header>
+
+  <main class="page">
+    <div class="container">
+
+      <section class="hero">
+        <div class="hero-tag" id="hero-tag">Temporada 2026</div>
+        <h1 class="hero-title">Torneo Papi Fútbol San José</h1>
+        <p class="hero-sub" id="hero-sub">Cargando...</p>
+        <div class="hero-actions">
+          <a href="fixture.html" class="btn btn-primary">Ver próxima fecha</a>
+          <a href="#" class="btn btn-ghost">Inscribirme al torneo</a>
+        </div>
+      </section>
+
+      <section class="stats-grid" id="stats-grid"></section>
+
+      <div class="section-head">
+        <h2 class="section-title" id="proxima-title">Próxima fecha</h2>
+        <a href="fixture.html" class="section-link">Ver fixture completo →</a>
+      </div>
+      <div class="match-grid" id="proxima-grid"></div>
+
+      <div class="section-head">
+        <h2 class="section-title" id="ultima-title">Última fecha</h2>
+        <a href="fixture.html" class="section-link">Ver todos los resultados →</a>
+      </div>
+      <div class="match-grid" id="ultima-grid"></div>
+
+      <div class="two-col">
+        <div>
+          <div class="section-head">
+            <h2 class="section-title">Tabla de posiciones</h2>
+            <div class="tabs">
+              <button class="tab active" onclick="showZone(1, this)">Zona 1</button>
+              <button class="tab" onclick="showZone(2, this)">Zona 2</button>
+            </div>
+          </div>
+          <div id="zone-1"></div>
+          <div id="zone-2" style="display:none;"></div>
+        </div>
+        <div>
+          <div class="section-head">
+            <h2 class="section-title">Goleadores <small>· Top 8</small></h2>
+            <a href="estadisticas.html" class="section-link">Ver todos →</a>
+          </div>
+          <div class="scorers" id="scorers-top"></div>
+        </div>
+      </div>
+
+      <div class="two-col" style="grid-template-columns: 1fr 1fr;">
+        <div class="card">
+          <div class="card-label">Fair Play · Top 5 equipos</div>
+          <div id="fairplay-top"></div>
+          <a href="estadisticas.html" class="card-link">Ver ranking completo →</a>
+        </div>
+        <div class="card">
+          <div class="card-label">Valla menos vencida · Top 5 arqueros</div>
+          <div id="valla-top"></div>
+          <a href="estadisticas.html" class="card-link">Ver todos →</a>
+        </div>
+      </div>
+
+      <section class="sponsors">
+        <div class="sponsors-label">Auspician el torneo</div>
+        <div class="sponsors-grid">
+          <div class="sponsor-logo">Sponsor 1</div>
+          <div class="sponsor-logo">Sponsor 2</div>
+          <div class="sponsor-logo">Sponsor 3</div>
+          <div class="sponsor-logo">Sponsor 4</div>
+          <div class="sponsor-logo">Sponsor 5</div>
+          <div class="sponsor-logo">Sponsor 6</div>
+        </div>
+      </section>
+
+    </div>
+  </main>
+
+  <footer class="footer">
+    <div class="container footer-inner">
+      <div class="footer-brand">
+        <div class="brand-logo small"></div>
+        <div>
+          <div style="font-weight: 600; color: var(--text);">Papi Fútbol Morón</div>
+          <div>Colegio Marista San José</div>
+        </div>
+      </div>
+      <div class="footer-social">
+        <a href="https://www.facebook.com/papifutbolmoron" title="Facebook">f</a>
+        <a href="#" title="Instagram">ig</a>
+        <a href="#" title="WhatsApp">wa</a>
+      </div>
+    </div>
+  </footer>
+
+  <script src="data/torneo.js"></script>
+  <script>
+    document.getElementById('hero-sub').textContent =
+      `${STATS_GLOBALES.equipos} equipos · 2 zonas · Fecha ${STATS_GLOBALES.fechaActual} de ${STATS_GLOBALES.totalFechas} jugada · Próxima fecha ${STATS_GLOBALES.proximaFechaTexto}`;
+
+    document.getElementById('stats-grid').innerHTML = `
+      <div class="stat-card"><div class="stat-label">Equipos</div><div class="stat-value">${STATS_GLOBALES.equipos}</div></div>
+      <div class="stat-card"><div class="stat-label">Partidos jugados</div><div class="stat-value">${STATS_GLOBALES.partidosJugados}</div></div>
+      <div class="stat-card"><div class="stat-label">Goles convertidos</div><div class="stat-value">${STATS_GLOBALES.totalGoles}</div></div>
+      <div class="stat-card"><div class="stat-label">Fecha actual</div><div class="stat-value">${STATS_GLOBALES.fechaActual}<small>/${STATS_GLOBALES.totalFechas}</small></div></div>
+    `;
+
+    function renderMatchCard(p, zona, fechaNum) {
+      const jugada = (p.golesL !== undefined && p.golesV !== undefined);
+      const isWinnerL = jugada && p.golesL > p.golesV;
+      const isWinnerV = jugada && p.golesV > p.golesL;
+      const clsL = jugada ? (isWinnerL ? 'winner' : (isWinnerV ? 'loser' : '')) : '';
+      const clsV = jugada ? (isWinnerV ? 'winner' : (isWinnerL ? 'loser' : '')) : '';
+      const center = jugada
+        ? `<span class="match-score">${p.golesL} - ${p.golesV}</span>`
+        : `<span class="match-vs">VS</span>`;
+      const canchaInfo = p.cancha ? `Cancha ${p.cancha} · ${p.turno}` : (jugada ? 'Final' : 'Pendiente');
+      return `
+        <a href="ficha.html?fecha=${fechaNum}&local=${p.local}" class="match-card">
+          <div class="match-head">
+            <span class="match-zone ${zona===2?'zona-2':''}">Zona ${zona}</span>
+            <span>${canchaInfo}</span>
+          </div>
+          <div class="match-body">
+            <div class="match-team home ${clsL}">
+              ${teamAvatar(p.local, 32)}
+              <span class="team-name">${getEquipoNombre(p.local)}</span>
+            </div>
+            ${center}
+            <div class="match-team away ${clsV}">
+              <span class="team-name">${getEquipoNombre(p.visitante)}</span>
+              ${teamAvatar(p.visitante, 32)}
+            </div>
+          </div>
+        </a>
+      `;
+    }
+
+    const proxima = FIXTURE.find(f => f.estado === 'pendiente');
+    if (proxima) {
+      document.getElementById('proxima-title').innerHTML =
+        `Próxima fecha · Fecha ${proxima.fecha} <small>· ${proxima.fechaTexto}</small>`;
+      const partidos = [
+        ...proxima.zona1.slice(0,2).map(p => ({...p, zona:1})),
+        ...proxima.zona2.slice(0,2).map(p => ({...p, zona:2}))
+      ];
+      document.getElementById('proxima-grid').innerHTML =
+        partidos.map(p => renderMatchCard(p, p.zona, proxima.fecha)).join('');
+    }
+
+    const ultimas = FIXTURE.filter(f => f.estado === 'jugada');
+    const ultima = ultimas[ultimas.length - 1];
+    if (ultima) {
+      document.getElementById('ultima-title').innerHTML =
+        `Última fecha · Fecha ${ultima.fecha} <small>· ${ultima.fechaTexto}</small>`;
+      const partidos = [
+        ...ultima.zona1.slice(0,2).map(p => ({...p, zona:1})),
+        ...ultima.zona2.slice(0,2).map(p => ({...p, zona:2}))
+      ];
+      document.getElementById('ultima-grid').innerHTML =
+        partidos.map(p => renderMatchCard(p, p.zona, ultima.fecha)).join('');
+    }
+
+    function renderStandings(rows, total) {
+      const items = rows.slice(0, 6).map((r, i) => {
+        const dg = r.gf - r.gc;
+        const dgClass = dg > 0 ? 'dg-pos' : (dg < 0 ? 'dg-neg' : '');
+        const dgText = dg > 0 ? `+${dg}` : `${dg}`;
+        const nameTag = i === 0 ? 'strong' : 'span';
+        return `
+          <div class="standings-row ${i===0?'top-1':''}">
+            <span class="standings-pos">${i+1}</span>
+            <span class="standings-team">${teamAvatar(r.id, 24)}<${nameTag}>${getEquipoNombre(r.id)}</${nameTag}></span>
+            <span class="standings-num">${r.pj}</span>
+            <span class="standings-num ${dgClass}">${dgText}</span>
+            <span class="standings-pts">${r.pts}</span>
+          </div>
+        `;
+      }).join('');
+      return `
+        <div class="standings">
+          <div class="standings-header">
+            <span>#</span><span>Equipo</span>
+            <span class="standings-num">PJ</span>
+            <span class="standings-num">DG</span>
+            <span class="standings-num">Pts</span>
+          </div>
+          ${items}
+          <div class="standings-footer">Ver tabla completa (${total} equipos) →</div>
+        </div>
+      `;
+    }
+    document.getElementById('zone-1').innerHTML = renderStandings(POSICIONES.zona1, POSICIONES.zona1.length);
+    document.getElementById('zone-2').innerHTML = renderStandings(POSICIONES.zona2, POSICIONES.zona2.length);
+
+    function showZone(zone, btn) {
+      document.getElementById('zone-1').style.display = zone === 1 ? 'block' : 'none';
+      document.getElementById('zone-2').style.display = zone === 2 ? 'block' : 'none';
+      document.querySelectorAll('.tab').forEach(t => t.classList.remove('active'));
+      btn.classList.add('active');
+    }
+
+    function shortName(full) {
+      const parts = full.split(' ');
+      return parts.length > 1 ? `${parts[0][0]}. ${parts.slice(1).join(' ')}` : full;
+    }
+
+    document.getElementById('scorers-top').innerHTML = GOLEADORES.slice(0, 8).map((g, i) => {
+      const medalClass = i === 0 ? 'gold' : (i === 1 ? 'silver' : (i === 2 ? 'bronze' : 'normal'));
+      const equipoTxt = g.equipo ? getEquipoLabel(g.equipo) : 'Sin equipo';
+      return `
+        <div class="scorer-row">
+          <div class="scorer-left">
+            <div class="scorer-medal ${medalClass}">${i+1}</div>
+            <div class="scorer-info">
+              <div class="scorer-name">${shortName(g.nombre)}</div>
+              <div class="scorer-team">${equipoTxt}</div>
+            </div>
+          </div>
+          <div class="scorer-goals">${g.goles}</div>
+        </div>
+      `;
+    }).join('');
+
+    document.getElementById('fairplay-top').innerHTML = FAIRPLAY.slice(0, 5).map((f, i) => {
+      const badgeClass = f.puntos <= 2 ? 'badge-success' : (f.puntos <= 4 ? 'badge-warning' : 'badge-danger');
+      const nameTag = i === 0 ? 'strong' : 'span';
+      return `
+        <div class="fairplay-row">
+          <div class="fairplay-team">
+            ${teamAvatar(f.equipo, 24)}
+            <${nameTag}>${getEquipoNombre(f.equipo)}</${nameTag}>
+          </div>
+          <span class="badge ${badgeClass}">${f.puntos} pt${f.puntos===1?'':'s'}</span>
+        </div>
+      `;
+    }).join('');
+
+    document.getElementById('valla-top').innerHTML = VALLA.slice(0, 5).map((v, i) => `
+      <div class="fairplay-row">
+        <div class="fairplay-team">
+          ${teamAvatar(v.equipo, 24)}
+          <div style="line-height:1.2;">
+            <div style="font-size:13px; font-weight:${i===0?600:500};">${shortName(v.arquero)}</div>
+            <div style="font-size:11px; color:var(--text-secondary);">${getEquipoNombre(v.equipo)}</div>
+          </div>
+        </div>
+        <span style="font-size:14px; font-weight:700;">${v.gc} <small style="font-weight:400; color:var(--text-secondary);">GC</small></span>
+      </div>
+    `).join('');
+  </script>
+
+</body>
+</html>

@@ -1,0 +1,411 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Estadísticas · Papi Fútbol San José Morón</title>
+  <link rel="icon" type="image/png" href="logo.png">
+  <link rel="stylesheet" href="styles.css">
+  <style>
+    /* Estilos específicos de estadísticas */
+    .stats-tabs {
+      display: flex;
+      gap: 4px;
+      background: var(--surface-2);
+      padding: 4px;
+      border-radius: var(--radius-md);
+      margin-bottom: 20px;
+      flex-wrap: wrap;
+    }
+    .stats-tabs .tab {
+      flex: 1;
+      min-width: 110px;
+      padding: 10px 14px;
+      font-size: 13px;
+    }
+    .data-table {
+      width: 100%;
+      border-collapse: collapse;
+      background: var(--surface);
+      border: 0.5px solid var(--border);
+      border-radius: var(--radius-lg);
+      overflow: hidden;
+    }
+    .data-table th {
+      text-align: left;
+      padding: 12px 14px;
+      font-size: 11px;
+      color: var(--text-secondary);
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+      font-weight: 600;
+      border-bottom: 0.5px solid var(--border);
+      background: var(--surface-2);
+    }
+    .data-table th.center { text-align: center; }
+    .data-table td {
+      padding: 11px 14px;
+      font-size: 13px;
+      border-bottom: 0.5px solid var(--border);
+      vertical-align: middle;
+    }
+    .data-table tr:last-child td { border-bottom: none; }
+    .data-table tr:hover { background: var(--surface-2); }
+    .data-table tr.top-row { background: rgba(15, 60, 95, 0.05); font-weight: 600; }
+    .data-table td.center { text-align: center; }
+    .data-table td.pts { text-align: center; font-weight: 700; }
+    .data-table .team-cell {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+    }
+    .search-box {
+      width: 100%;
+      max-width: 400px;
+      padding: 10px 14px;
+      border: 0.5px solid var(--border-strong);
+      border-radius: var(--radius-md);
+      font-size: 14px;
+      font-family: inherit;
+      margin-bottom: 16px;
+      background: var(--surface);
+    }
+    .search-box:focus {
+      outline: none;
+      border-color: var(--primary);
+    }
+    .table-wrapper {
+      overflow-x: auto;
+    }
+    .panel { display: none; }
+    .panel.active { display: block; }
+  </style>
+</head>
+<body>
+
+  <header class="header">
+    <div class="container header-inner">
+      <a href="index.html" class="brand">
+        <div class="brand-logo"></div>
+        <div class="brand-text">
+          <div class="brand-name">Papi Fútbol</div>
+          <div class="brand-sub">Colegio Marista San José · Morón</div>
+        </div>
+      </a>
+      <nav class="nav" id="nav">
+        <a href="index.html">Inicio</a>
+        <a href="fixture.html">Fixture</a>
+        <a href="equipos.html">Equipos</a>
+        <a href="estadisticas.html" class="active">Estadísticas</a>
+        <a href="#">Noticias</a>
+        <a href="#">Inscripción</a>
+      </nav>
+      <button class="mobile-toggle" onclick="document.getElementById('nav').classList.toggle('open')">☰</button>
+    </div>
+  </header>
+
+  <main class="page">
+    <div class="container">
+
+      <div class="page-header">
+        <h1 class="page-title">Estadísticas del torneo</h1>
+        <p class="page-sub">Toda la información actualizada al cierre de la fecha 5 · 02/05/2026</p>
+      </div>
+
+      <!-- Tabs -->
+      <div class="stats-tabs">
+        <button class="tab active" data-panel="posiciones">Posiciones</button>
+        <button class="tab" data-panel="goleadores">Goleadores</button>
+        <button class="tab" data-panel="fairplay">Fair Play</button>
+        <button class="tab" data-panel="valla">Valla menos vencida</button>
+        <button class="tab" data-panel="sanciones">Sanciones</button>
+      </div>
+
+      <!-- Panel: POSICIONES -->
+      <div class="panel active" id="panel-posiciones">
+        <div class="tabs" style="display:inline-flex; margin-bottom: 16px;">
+          <button class="tab active" onclick="switchZone(1, this)">Zona 1</button>
+          <button class="tab" onclick="switchZone(2, this)">Zona 2</button>
+        </div>
+        <div id="tabla-posiciones-1"></div>
+        <div id="tabla-posiciones-2" style="display:none;"></div>
+      </div>
+
+      <!-- Panel: GOLEADORES -->
+      <div class="panel" id="panel-goleadores">
+        <input type="text" class="search-box" placeholder="Buscar jugador o equipo..." id="search-goleadores">
+        <div class="table-wrapper">
+          <table class="data-table" id="tabla-goleadores"></table>
+        </div>
+      </div>
+
+      <!-- Panel: FAIR PLAY -->
+      <div class="panel" id="panel-fairplay">
+        <p style="font-size: 13px; color: var(--text-secondary); margin-bottom: 14px;">
+          Puntaje fair play: cada amarilla suma 1 pt, azul 2 pts, roja 3 pts. Ordenado de menor a mayor.
+        </p>
+        <div class="table-wrapper">
+          <table class="data-table" id="tabla-fairplay"></table>
+        </div>
+      </div>
+
+      <!-- Panel: VALLA -->
+      <div class="panel" id="panel-valla">
+        <p style="font-size: 13px; color: var(--text-secondary); margin-bottom: 14px;">
+          Ranking de arqueros con menos goles recibidos en el torneo.
+        </p>
+        <div class="table-wrapper">
+          <table class="data-table" id="tabla-valla"></table>
+        </div>
+      </div>
+
+      <!-- Panel: SANCIONES -->
+      <div class="panel" id="panel-sanciones">
+        <p style="font-size: 13px; color: var(--text-secondary); margin-bottom: 14px;">
+          Jugadores con tarjetas acumuladas en el torneo.
+        </p>
+        <input type="text" class="search-box" placeholder="Buscar jugador..." id="search-sanciones">
+        <div class="table-wrapper">
+          <table class="data-table" id="tabla-sanciones"></table>
+        </div>
+      </div>
+
+    </div>
+  </main>
+
+  <footer class="footer">
+    <div class="container footer-inner">
+      <div class="footer-brand">
+        <div class="brand-logo small"></div>
+        <div>
+          <div style="font-weight: 600; color: var(--text);">Papi Fútbol Morón</div>
+          <div>Colegio Marista San José</div>
+        </div>
+      </div>
+      <div class="footer-social">
+        <a href="https://www.facebook.com/papifutbolmoron" title="Facebook">f</a>
+        <a href="#" title="Instagram">ig</a>
+        <a href="#" title="WhatsApp">wa</a>
+      </div>
+    </div>
+  </footer>
+
+  <script src="data/torneo.js"></script>
+  <script>
+    // Tab switching principal
+    document.querySelectorAll('.stats-tabs .tab').forEach(btn => {
+      btn.addEventListener('click', () => {
+        document.querySelectorAll('.stats-tabs .tab').forEach(b => b.classList.remove('active'));
+        btn.classList.add('active');
+        document.querySelectorAll('.panel').forEach(p => p.classList.remove('active'));
+        document.getElementById('panel-' + btn.dataset.panel).classList.add('active');
+      });
+    });
+
+    // ===========================================
+    // POSICIONES (tabla completa con todas las columnas)
+    // ===========================================
+    function renderTablaPosicionesCompleta(zona, contenedorId) {
+      const rows = POSICIONES['zona' + zona];
+      const body = rows.map((r, i) => {
+        const dg = r.gf - r.gc;
+        const dgClass = dg > 0 ? 'dg-pos' : (dg < 0 ? 'dg-neg' : '');
+        const dgText = dg > 0 ? `+${dg}` : `${dg}`;
+        return `
+          <tr ${i===0?'class="top-row"':''}>
+            <td class="center"><strong>${i+1}</strong></td>
+            <td>
+              <div class="team-cell">
+                ${teamAvatar(r.id, 26)}
+                <span>${getEquipoNombre(r.id)}</span>
+              </div>
+            </td>
+            <td class="center">${r.pj}</td>
+            <td class="center">${r.pg}</td>
+            <td class="center">${r.pe}</td>
+            <td class="center">${r.pp}</td>
+            <td class="center">${r.gf}</td>
+            <td class="center">${r.gc}</td>
+            <td class="center ${dgClass}">${dgText}</td>
+            <td class="pts">${r.pts}</td>
+          </tr>
+        `;
+      }).join('');
+
+      document.getElementById(contenedorId).innerHTML = `
+        <table class="data-table">
+          <thead>
+            <tr>
+              <th class="center">#</th>
+              <th>Equipo</th>
+              <th class="center">PJ</th>
+              <th class="center">PG</th>
+              <th class="center">PE</th>
+              <th class="center">PP</th>
+              <th class="center">GF</th>
+              <th class="center">GC</th>
+              <th class="center">DG</th>
+              <th class="center">Pts</th>
+            </tr>
+          </thead>
+          <tbody>${body}</tbody>
+        </table>
+      `;
+    }
+    renderTablaPosicionesCompleta(1, 'tabla-posiciones-1');
+    renderTablaPosicionesCompleta(2, 'tabla-posiciones-2');
+
+    function switchZone(zona, btn) {
+      document.getElementById('tabla-posiciones-1').style.display = zona === 1 ? 'block' : 'none';
+      document.getElementById('tabla-posiciones-2').style.display = zona === 2 ? 'block' : 'none';
+      btn.parentElement.querySelectorAll('.tab').forEach(t => t.classList.remove('active'));
+      btn.classList.add('active');
+    }
+
+    // ===========================================
+    // GOLEADORES (con búsqueda)
+    // ===========================================
+    function renderGoleadores(filter) {
+      filter = (filter || '').toLowerCase().trim();
+      const rows = GOLEADORES.filter(g => {
+        if (!filter) return true;
+        const equipoNombre = (g.equipo ? getEquipoNombre(g.equipo) : '').toLowerCase();
+        return g.nombre.toLowerCase().includes(filter) || equipoNombre.includes(filter);
+      });
+
+      const body = rows.map((g, i) => {
+        const equipoCell = g.equipo
+          ? `<div class="team-cell">${teamAvatar(g.equipo, 22)}<span>${getEquipoNombre(g.equipo)}</span></div>`
+          : '<span style="color: var(--text-tertiary);">Sin equipo</span>';
+        return `
+          <tr>
+            <td class="center"><strong>${g.pos}</strong></td>
+            <td>${g.nombre}</td>
+            <td>${equipoCell}</td>
+            <td class="pts">${g.goles}</td>
+          </tr>
+        `;
+      }).join('');
+
+      document.getElementById('tabla-goleadores').innerHTML = `
+        <thead>
+          <tr>
+            <th class="center" style="width:60px;">#</th>
+            <th>Jugador</th>
+            <th>Equipo</th>
+            <th class="center" style="width:80px;">Goles</th>
+          </tr>
+        </thead>
+        <tbody>${body || '<tr><td colspan="4" style="text-align:center; padding:24px; color:var(--text-secondary);">Sin resultados</td></tr>'}</tbody>
+      `;
+    }
+    renderGoleadores();
+    document.getElementById('search-goleadores').addEventListener('input', e => renderGoleadores(e.target.value));
+
+    // ===========================================
+    // FAIR PLAY
+    // ===========================================
+    const fairplayBody = FAIRPLAY.map(f => {
+      const badgeClass = f.puntos <= 2 ? 'badge-success' : (f.puntos <= 4 ? 'badge-warning' : 'badge-danger');
+      return `
+        <tr>
+          <td class="center"><strong>${f.pos}</strong></td>
+          <td>
+            <div class="team-cell">
+              ${teamAvatar(f.equipo, 26)}
+              <span>${getEquipoNombre(f.equipo)}</span>
+            </div>
+          </td>
+          <td class="center">${f.amarillas}</td>
+          <td class="center">${f.azules}</td>
+          <td class="center">${f.rojas}</td>
+          <td class="center"><span class="badge ${badgeClass}">${f.puntos} pt${f.puntos===1?'':'s'}</span></td>
+        </tr>
+      `;
+    }).join('');
+    document.getElementById('tabla-fairplay').innerHTML = `
+      <thead>
+        <tr>
+          <th class="center" style="width:60px;">#</th>
+          <th>Equipo</th>
+          <th class="center">🟨</th>
+          <th class="center">🟦</th>
+          <th class="center">🟥</th>
+          <th class="center">Total</th>
+        </tr>
+      </thead>
+      <tbody>${fairplayBody}</tbody>
+    `;
+
+    // ===========================================
+    // VALLA MENOS VENCIDA
+    // ===========================================
+    const vallaBody = VALLA.map(v => `
+      <tr ${v.pos===1?'class="top-row"':''}>
+        <td class="center"><strong>${v.pos}</strong></td>
+        <td>${v.arquero}</td>
+        <td>
+          <div class="team-cell">
+            ${teamAvatar(v.equipo, 22)}
+            <span>${getEquipoNombre(v.equipo)}</span>
+          </div>
+        </td>
+        <td class="pts">${v.gc}</td>
+      </tr>
+    `).join('');
+    document.getElementById('tabla-valla').innerHTML = `
+      <thead>
+        <tr>
+          <th class="center" style="width:60px;">#</th>
+          <th>Arquero</th>
+          <th>Equipo</th>
+          <th class="center" style="width:100px;">Goles recibidos</th>
+        </tr>
+      </thead>
+      <tbody>${vallaBody}</tbody>
+    `;
+
+    // ===========================================
+    // SANCIONES (con búsqueda)
+    // ===========================================
+    function renderSanciones(filter) {
+      filter = (filter || '').toLowerCase().trim();
+      const rows = SANCIONES.filter(s => {
+        if (!filter) return true;
+        return s.jugador.toLowerCase().includes(filter) || getEquipoNombre(s.equipo).toLowerCase().includes(filter);
+      });
+
+      const body = rows.map(s => `
+        <tr>
+          <td>${s.jugador}</td>
+          <td>
+            <div class="team-cell">
+              ${teamAvatar(s.equipo, 22)}
+              <span>${getEquipoNombre(s.equipo)}</span>
+            </div>
+          </td>
+          <td class="center">${s.amarillas}</td>
+          <td class="center">${s.azules}</td>
+          <td class="center">${s.rojas}</td>
+        </tr>
+      `).join('');
+
+      document.getElementById('tabla-sanciones').innerHTML = `
+        <thead>
+          <tr>
+            <th>Jugador</th>
+            <th>Equipo</th>
+            <th class="center">🟨</th>
+            <th class="center">🟦</th>
+            <th class="center">🟥</th>
+          </tr>
+        </thead>
+        <tbody>${body || '<tr><td colspan="5" style="text-align:center; padding:24px; color:var(--text-secondary);">Sin resultados</td></tr>'}</tbody>
+      `;
+    }
+    renderSanciones();
+    document.getElementById('search-sanciones').addEventListener('input', e => renderSanciones(e.target.value));
+  </script>
+
+</body>
+</html>

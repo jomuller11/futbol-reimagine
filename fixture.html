@@ -1,0 +1,174 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Fixture · Papi Fútbol San José Morón</title>
+  <link rel="icon" type="image/png" href="logo.png">
+  <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+
+  <header class="header">
+    <div class="container header-inner">
+      <a href="index.html" class="brand">
+        <div class="brand-logo"></div>
+        <div class="brand-text">
+          <div class="brand-name">Papi Fútbol</div>
+          <div class="brand-sub">Colegio Marista San José · Morón</div>
+        </div>
+      </a>
+      <nav class="nav" id="nav">
+        <a href="index.html">Inicio</a>
+        <a href="fixture.html" class="active">Fixture</a>
+        <a href="equipos.html">Equipos</a>
+        <a href="estadisticas.html">Estadísticas</a>
+        <a href="#">Noticias</a>
+        <a href="#">Inscripción</a>
+      </nav>
+      <button class="mobile-toggle" onclick="document.getElementById('nav').classList.toggle('open')">☰</button>
+    </div>
+  </header>
+
+  <main class="page">
+    <div class="container">
+
+      <div class="page-header">
+        <h1 class="page-title">Fixture del torneo</h1>
+        <p class="page-sub">Primera fase · 11 fechas · 24 equipos divididos en 2 zonas</p>
+      </div>
+
+      <div class="fecha-selector" id="fecha-selector"></div>
+
+      <div id="fecha-content"></div>
+
+    </div>
+  </main>
+
+  <footer class="footer">
+    <div class="container footer-inner">
+      <div class="footer-brand">
+        <div class="brand-logo small"></div>
+        <div>
+          <div style="font-weight: 600; color: var(--text);">Papi Fútbol Morón</div>
+          <div>Colegio Marista San José</div>
+        </div>
+      </div>
+      <div class="footer-social">
+        <a href="https://www.facebook.com/papifutbolmoron" title="Facebook">f</a>
+        <a href="#" title="Instagram">ig</a>
+        <a href="#" title="WhatsApp">wa</a>
+      </div>
+    </div>
+  </footer>
+
+  <script src="data/torneo.js"></script>
+  <script>
+    // Construir selector de fechas
+    const selector = document.getElementById('fecha-selector');
+    // Por defecto mostramos la última jugada
+    const ultimasJugadas = FIXTURE.filter(f => f.estado === 'jugada');
+    let fechaActiva = ultimasJugadas.length > 0 ? ultimasJugadas[ultimasJugadas.length-1].fecha : 1;
+
+    selector.innerHTML = FIXTURE.map(f => `
+      <button class="fecha-btn ${f.fecha===fechaActiva?'active':''}" data-fecha="${f.fecha}">
+        Fecha ${f.fecha}
+        ${f.estado === 'jugada' ? '<span style="opacity:0.7; font-size:10px; margin-left:4px;">✓</span>' : ''}
+      </button>
+    `).join('');
+
+    function renderMatchCard(p, zona, fechaNum) {
+      const jugada = (p.golesL !== undefined && p.golesV !== undefined);
+      const isWinnerL = jugada && p.golesL > p.golesV;
+      const isWinnerV = jugada && p.golesV > p.golesL;
+      const clsL = jugada ? (isWinnerL ? 'winner' : (isWinnerV ? 'loser' : '')) : '';
+      const clsV = jugada ? (isWinnerV ? 'winner' : (isWinnerL ? 'loser' : '')) : '';
+      const center = jugada
+        ? `<span class="match-score">${p.golesL} - ${p.golesV}</span>`
+        : `<span class="match-vs">VS</span>`;
+      const canchaInfo = p.cancha ? `Cancha ${p.cancha} · ${p.turno}` : (jugada ? 'Final' : 'Pendiente');
+      return `
+        <a href="ficha.html?fecha=${fechaNum}&local=${p.local}" class="match-card">
+          <div class="match-head">
+            <span class="match-zone ${zona===2?'zona-2':''}">Zona ${zona}</span>
+            <span>${canchaInfo}</span>
+          </div>
+          <div class="match-body">
+            <div class="match-team home ${clsL}">
+              ${teamAvatar(p.local, 32)}
+              <span class="team-name">${getEquipoNombre(p.local)}</span>
+            </div>
+            ${center}
+            <div class="match-team away ${clsV}">
+              <span class="team-name">${getEquipoNombre(p.visitante)}</span>
+              ${teamAvatar(p.visitante, 32)}
+            </div>
+          </div>
+        </a>
+      `;
+    }
+
+    function renderFecha(numero) {
+      const f = FIXTURE.find(x => x.fecha === numero);
+      if (!f) return;
+
+      const estadoBadge = f.estado === 'jugada'
+        ? '<span class="badge badge-success">Jugada</span>'
+        : '<span class="badge badge-warning">Pendiente</span>';
+
+      const html = `
+        <div style="display:flex; align-items:center; gap:12px; margin-bottom:20px;">
+          <h2 style="font-size: 22px; font-weight: 700;">Fecha ${f.fecha}</h2>
+          <span style="color: var(--text-secondary); font-size: 14px;">· ${f.fechaTexto}</span>
+          ${estadoBadge}
+        </div>
+
+        <div class="fixture-zone">
+          <div class="fixture-zone-head">
+            <h2 class="fixture-zone-title">
+              <span class="match-zone"></span>
+              Zona 1
+            </h2>
+          </div>
+          <div class="match-grid">
+            ${f.zona1.map(p => renderMatchCard(p, 1, f.fecha)).join('')}
+          </div>
+        </div>
+
+        <div class="fixture-zone">
+          <div class="fixture-zone-head">
+            <h2 class="fixture-zone-title">
+              <span class="match-zone zona-2"></span>
+              Zona 2
+            </h2>
+          </div>
+          <div class="match-grid">
+            ${f.zona2.map(p => renderMatchCard(p, 2, f.fecha)).join('')}
+          </div>
+        </div>
+      `;
+      document.getElementById('fecha-content').innerHTML = html;
+    }
+
+    selector.addEventListener('click', e => {
+      const btn = e.target.closest('.fecha-btn');
+      if (!btn) return;
+      const fecha = parseInt(btn.dataset.fecha);
+      document.querySelectorAll('.fecha-btn').forEach(b => b.classList.remove('active'));
+      btn.classList.add('active');
+      fechaActiva = fecha;
+      renderFecha(fecha);
+      window.scrollTo({top: 0, behavior: 'smooth'});
+    });
+
+    renderFecha(fechaActiva);
+
+    // Scroll del selector hasta la fecha activa
+    setTimeout(() => {
+      const activeBtn = selector.querySelector('.fecha-btn.active');
+      if (activeBtn) activeBtn.scrollIntoView({inline: 'center', block: 'nearest', behavior: 'instant'});
+    }, 100);
+  </script>
+
+</body>
+</html>

@@ -1,0 +1,395 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Equipo · Papi Fútbol San José Morón</title>
+  <link rel="icon" type="image/png" href="logo.png">
+  <link rel="stylesheet" href="styles.css">
+  <style>
+    .equipo-hero {
+      background: var(--surface);
+      border: 0.5px solid var(--border);
+      border-radius: var(--radius-xl);
+      padding: 28px;
+      margin-bottom: 20px;
+      display: flex;
+      align-items: center;
+      gap: 24px;
+    }
+    .equipo-hero-avatar {
+      width: 96px;
+      height: 96px;
+      border-radius: 50%;
+      color: #fff;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-weight: 700;
+      font-size: 32px;
+      flex-shrink: 0;
+    }
+    .equipo-hero-info { flex: 1; min-width: 0; }
+    .equipo-hero-zone {
+      font-size: 11px;
+      color: var(--text-secondary);
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+      font-weight: 600;
+      margin-bottom: 6px;
+    }
+    .equipo-hero-name {
+      font-size: 32px;
+      font-weight: 700;
+      line-height: 1.1;
+      margin-bottom: 10px;
+    }
+    .equipo-hero-stats {
+      display: flex;
+      gap: 20px;
+      flex-wrap: wrap;
+      font-size: 13px;
+      color: var(--text-secondary);
+    }
+    .equipo-hero-stats strong { color: var(--text); font-weight: 700; font-size: 16px; margin-right: 4px; }
+
+    .equipo-stats-grid {
+      display: grid;
+      grid-template-columns: repeat(6, 1fr);
+      gap: 8px;
+      margin-bottom: 24px;
+    }
+    .equipo-mini-stat {
+      background: var(--surface);
+      border: 0.5px solid var(--border);
+      border-radius: var(--radius-md);
+      padding: 12px;
+      text-align: center;
+    }
+    .equipo-mini-stat .label {
+      font-size: 10px;
+      color: var(--text-secondary);
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+      font-weight: 600;
+      margin-bottom: 4px;
+    }
+    .equipo-mini-stat .value {
+      font-size: 20px;
+      font-weight: 700;
+    }
+
+    .plantel-list {
+      background: var(--surface);
+      border: 0.5px solid var(--border);
+      border-radius: var(--radius-lg);
+      overflow: hidden;
+    }
+    .plantel-row {
+      display: grid;
+      grid-template-columns: 32px 1fr auto;
+      align-items: center;
+      gap: 12px;
+      padding: 12px 16px;
+      border-bottom: 0.5px solid var(--border);
+      font-size: 14px;
+    }
+    .plantel-row:last-child { border-bottom: none; }
+    .plantel-row.arquero {
+      background: rgba(15, 60, 95, 0.03);
+    }
+    .plantel-num {
+      width: 26px;
+      height: 26px;
+      border-radius: 50%;
+      background: var(--surface-2);
+      color: var(--text-secondary);
+      font-size: 11px;
+      font-weight: 700;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+    .plantel-row.arquero .plantel-num {
+      background: var(--primary);
+      color: #fff;
+    }
+    .plantel-name { font-weight: 500; }
+    .plantel-name small { color: var(--text-secondary); font-weight: 400; margin-left: 6px; font-size: 11px; }
+    .plantel-stats {
+      display: flex;
+      gap: 6px;
+      align-items: center;
+      flex-wrap: wrap;
+      justify-content: flex-end;
+    }
+    .stat-pill {
+      padding: 2px 8px;
+      border-radius: 999px;
+      font-size: 11px;
+      font-weight: 600;
+      display: inline-flex;
+      align-items: center;
+      gap: 3px;
+    }
+    .stat-goles { background: var(--accent-light); color: var(--accent-dark); }
+    .stat-amarilla { background: #FFF4D6; color: #8B6B00; }
+    .stat-azul { background: #DCEAFE; color: #1A4E8E; }
+    .stat-roja { background: var(--danger-bg); color: var(--danger); }
+    .stat-valla { background: var(--primary-light); color: var(--primary); }
+
+    .fixture-equipo {
+      background: var(--surface);
+      border: 0.5px solid var(--border);
+      border-radius: var(--radius-lg);
+      overflow: hidden;
+    }
+    .fixture-equipo-row {
+      display: grid;
+      grid-template-columns: 60px 1fr auto 1fr 80px;
+      align-items: center;
+      gap: 12px;
+      padding: 12px 16px;
+      border-bottom: 0.5px solid var(--border);
+      font-size: 13px;
+      cursor: pointer;
+    }
+    .fixture-equipo-row:hover { background: var(--surface-2); }
+    .fixture-equipo-row:last-child { border-bottom: none; }
+    .fixture-equipo-fecha { color: var(--text-secondary); font-size: 11px; }
+    .fixture-equipo-result {
+      font-weight: 700;
+      font-size: 15px;
+      text-align: center;
+      padding: 3px 10px;
+      border-radius: var(--radius-sm);
+      background: var(--surface-2);
+      min-width: 44px;
+    }
+    .fixture-equipo-result.win { background: rgba(39, 80, 10, 0.1); color: var(--success); }
+    .fixture-equipo-result.loss { background: var(--danger-bg); color: var(--danger); }
+    .fixture-equipo-result.draw { background: var(--warning-bg); color: var(--warning); }
+    .fixture-equipo-result.pending { background: transparent; color: var(--text-tertiary); font-weight: 400; }
+    .fixture-equipo-vs { text-align: center; }
+    .fixture-equipo-team { display: flex; align-items: center; gap: 8px; }
+    .fixture-equipo-team.away { justify-content: flex-end; }
+    .fixture-equipo-self { color: var(--text-tertiary); font-style: italic; }
+
+    .two-col-equipo {
+      display: grid;
+      grid-template-columns: 1.3fr 1fr;
+      gap: 20px;
+    }
+
+    @media (max-width: 820px) {
+      .equipo-hero { flex-direction: column; text-align: center; }
+      .equipo-hero-stats { justify-content: center; }
+      .equipo-stats-grid { grid-template-columns: repeat(3, 1fr); }
+      .two-col-equipo { grid-template-columns: 1fr; }
+      .fixture-equipo-row { grid-template-columns: 50px 1fr auto 1fr; font-size: 12px; }
+    }
+  </style>
+</head>
+<body>
+
+  <header class="header">
+    <div class="container header-inner">
+      <a href="index.html" class="brand">
+        <div class="brand-logo"></div>
+        <div class="brand-text">
+          <div class="brand-name">Papi Fútbol</div>
+          <div class="brand-sub">Colegio Marista San José · Morón</div>
+        </div>
+      </a>
+      <nav class="nav" id="nav">
+        <a href="index.html">Inicio</a>
+        <a href="fixture.html">Fixture</a>
+        <a href="equipos.html" class="active">Equipos</a>
+        <a href="estadisticas.html">Estadísticas</a>
+        <a href="#">Noticias</a>
+        <a href="#">Inscripción</a>
+      </nav>
+      <button class="mobile-toggle" onclick="document.getElementById('nav').classList.toggle('open')">☰</button>
+    </div>
+  </header>
+
+  <main class="page">
+    <div class="container">
+
+      <div style="margin-bottom: 16px;">
+        <a href="equipos.html" style="font-size: 13px; color: var(--text-secondary);">← Volver al listado de equipos</a>
+      </div>
+
+      <div id="equipo-content">
+        <p style="text-align: center; padding: 40px; color: var(--text-secondary);">Cargando...</p>
+      </div>
+
+    </div>
+  </main>
+
+  <footer class="footer">
+    <div class="container footer-inner">
+      <div class="footer-brand">
+        <div class="brand-logo small"></div>
+        <div>
+          <div style="font-weight: 600; color: var(--text);">Papi Fútbol Morón</div>
+          <div>Colegio Marista San José</div>
+        </div>
+      </div>
+      <div class="footer-social">
+        <a href="https://www.facebook.com/papifutbolmoron" title="Facebook">f</a>
+        <a href="#" title="Instagram">ig</a>
+        <a href="#" title="WhatsApp">wa</a>
+      </div>
+    </div>
+  </footer>
+
+  <script src="data/torneo.js"></script>
+  <script>
+    // Obtener ID del equipo desde el query string
+    const params = new URLSearchParams(window.location.search);
+    const equipoId = params.get('id') || '05'; // default Funaro
+
+    function renderEquipo(id) {
+      const equipo = EQUIPOS[id];
+      if (!equipo) {
+        document.getElementById('equipo-content').innerHTML = '<p style="text-align:center; padding:40px;">Equipo no encontrado</p>';
+        return;
+      }
+
+      const plantel = PLANTELES[id] || [];
+      const color = getEquipoColor(id);
+      const zona = equipo.zona;
+      const posicionData = POSICIONES['zona' + zona].find(p => p.id === id);
+      const posIndex = POSICIONES['zona' + zona].findIndex(p => p.id === id);
+      const fairplay = FAIRPLAY.find(f => f.equipo === id);
+      const dg = posicionData.gf - posicionData.gc;
+      const dgText = dg > 0 ? `+${dg}` : `${dg}`;
+
+      // Partidos del equipo
+      const partidosDelEquipo = [];
+      FIXTURE.forEach(f => {
+        [...f.zona1, ...f.zona2].forEach(p => {
+          if (p.local === id || p.visitante === id) {
+            partidosDelEquipo.push({
+              ...p,
+              fecha: f.fecha,
+              fechaTexto: f.fechaTexto,
+              estado: f.estado,
+              esLocal: p.local === id
+            });
+          }
+        });
+      });
+
+      // Título del documento
+      document.title = `${equipo.nombre} · Papi Fútbol San José Morón`;
+
+      const html = `
+        <!-- HERO DEL EQUIPO -->
+        <div class="equipo-hero" style="border-top: 4px solid ${color};">
+          <div class="equipo-hero-avatar" style="background:${color};">${id}</div>
+          <div class="equipo-hero-info">
+            <div class="equipo-hero-zone">Zona ${zona} · Posición ${posIndex+1}°</div>
+            <div class="equipo-hero-name">${equipo.nombre}</div>
+            <div class="equipo-hero-stats">
+              <span><strong>${posicionData.pts}</strong>pts</span>
+              <span><strong>${posicionData.pj}</strong>PJ</span>
+              <span><strong>${posicionData.pg}</strong>PG</span>
+              <span><strong>${posicionData.pe}</strong>PE</span>
+              <span><strong>${posicionData.pp}</strong>PP</span>
+              <span><strong>${posicionData.gf}:${posicionData.gc}</strong></span>
+              <span>DG <strong style="color:${dg>0?'var(--success)':(dg<0?'var(--danger)':'inherit')}">${dgText}</strong></span>
+            </div>
+          </div>
+        </div>
+
+        <!-- MINI STATS -->
+        <div class="equipo-stats-grid">
+          <div class="equipo-mini-stat"><div class="label">Puntos</div><div class="value">${posicionData.pts}</div></div>
+          <div class="equipo-mini-stat"><div class="label">Goles a favor</div><div class="value">${posicionData.gf}</div></div>
+          <div class="equipo-mini-stat"><div class="label">Goles en contra</div><div class="value">${posicionData.gc}</div></div>
+          <div class="equipo-mini-stat"><div class="label">Dif. de gol</div><div class="value" style="color:${dg>0?'var(--success)':(dg<0?'var(--danger)':'inherit')}">${dgText}</div></div>
+          <div class="equipo-mini-stat"><div class="label">Fair Play</div><div class="value">${fairplay ? fairplay.puntos : 0}</div></div>
+          <div class="equipo-mini-stat"><div class="label">Jugadores</div><div class="value">${plantel.length}</div></div>
+        </div>
+
+        <!-- PLANTEL + FIXTURE -->
+        <div class="two-col-equipo">
+
+          <!-- PLANTEL -->
+          <div>
+            <div class="section-head">
+              <h2 class="section-title">Plantel <small>· ${plantel.length} jugadores</small></h2>
+            </div>
+            <div class="plantel-list">
+              ${plantel.map((nombre, idx) => {
+                const stats = getStatsJugador(nombre, id);
+                const esArquero = idx === 0; // primer jugador siempre es el arquero
+                const pills = [];
+                if (stats.goles > 0) pills.push(`<span class="stat-pill stat-goles">⚽ ${stats.goles}</span>`);
+                if (stats.amarillas > 0) pills.push(`<span class="stat-pill stat-amarilla">🟨 ${stats.amarillas}</span>`);
+                if (stats.azules > 0) pills.push(`<span class="stat-pill stat-azul">🟦 ${stats.azules}</span>`);
+                if (stats.rojas > 0) pills.push(`<span class="stat-pill stat-roja">🟥 ${stats.rojas}</span>`);
+                if (esArquero && stats.golesRecibidos !== null) pills.push(`<span class="stat-pill stat-valla">${stats.golesRecibidos} GC</span>`);
+                return `
+                  <div class="plantel-row ${esArquero ? 'arquero' : ''}">
+                    <div class="plantel-num">${esArquero ? 'ARQ' : (idx+1)}</div>
+                    <div class="plantel-name">
+                      ${nombre}
+                      ${esArquero ? '<small>Arquero</small>' : ''}
+                    </div>
+                    <div class="plantel-stats">${pills.join('')}</div>
+                  </div>
+                `;
+              }).join('')}
+            </div>
+          </div>
+
+          <!-- FIXTURE DEL EQUIPO -->
+          <div>
+            <div class="section-head">
+              <h2 class="section-title">Fixture del equipo</h2>
+            </div>
+            <div class="fixture-equipo">
+              ${partidosDelEquipo.map(p => {
+                const jugada = p.estado === 'jugada';
+                let resultClass = 'pending';
+                let resultText = '-';
+                if (jugada) {
+                  const golesP = p.esLocal ? p.golesL : p.golesV;
+                  const golesR = p.esLocal ? p.golesV : p.golesL;
+                  resultText = `${golesP}-${golesR}`;
+                  if (golesP > golesR) resultClass = 'win';
+                  else if (golesP < golesR) resultClass = 'loss';
+                  else resultClass = 'draw';
+                }
+                const rival = p.esLocal ? p.visitante : p.local;
+                return `
+                  <a href="ficha.html?fecha=${p.fecha}&local=${p.local}" class="fixture-equipo-row" style="text-decoration:none; color:inherit;">
+                    <div class="fixture-equipo-fecha">F${p.fecha}<br>${p.fechaTexto.substring(0,5)}</div>
+                    <div class="fixture-equipo-team">
+                      ${p.esLocal ? teamAvatar(id, 22) + '<strong>' + equipo.nombre + '</strong>' : teamAvatar(rival, 22) + '<span>' + getEquipoNombre(rival) + '</span>'}
+                    </div>
+                    <div class="fixture-equipo-result ${resultClass}">${resultText}</div>
+                    <div class="fixture-equipo-team away">
+                      ${!p.esLocal ? '<strong>' + equipo.nombre + '</strong>' + teamAvatar(id, 22) : '<span>' + getEquipoNombre(rival) + '</span>' + teamAvatar(rival, 22)}
+                    </div>
+                    <div style="text-align:right; font-size:11px; color:var(--text-tertiary);">${p.esLocal ? 'Local' : 'Visit.'}</div>
+                  </a>
+                `;
+              }).join('')}
+            </div>
+          </div>
+
+        </div>
+      `;
+
+      document.getElementById('equipo-content').innerHTML = html;
+    }
+
+    renderEquipo(equipoId);
+  </script>
+
+</body>
+</html>

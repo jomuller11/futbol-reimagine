@@ -1,0 +1,106 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Equipos · Papi Fútbol San José Morón</title>
+  <link rel="icon" type="image/png" href="logo.png">
+  <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+
+  <header class="header">
+    <div class="container header-inner">
+      <a href="index.html" class="brand">
+        <div class="brand-logo"></div>
+        <div class="brand-text">
+          <div class="brand-name">Papi Fútbol</div>
+          <div class="brand-sub">Colegio Marista San José · Morón</div>
+        </div>
+      </a>
+      <nav class="nav" id="nav">
+        <a href="index.html">Inicio</a>
+        <a href="fixture.html">Fixture</a>
+        <a href="equipos.html" class="active">Equipos</a>
+        <a href="estadisticas.html">Estadísticas</a>
+        <a href="#">Noticias</a>
+        <a href="#">Inscripción</a>
+      </nav>
+      <button class="mobile-toggle" onclick="document.getElementById('nav').classList.toggle('open')">☰</button>
+    </div>
+  </header>
+
+  <main class="page">
+    <div class="container">
+
+      <div class="page-header">
+        <h1 class="page-title">Equipos del torneo</h1>
+        <p class="page-sub">24 equipos compitiendo · Click en cada equipo para ver su plantel y estadísticas</p>
+      </div>
+
+      <div class="section-head" style="margin-top: 16px;">
+        <h2 class="section-title">
+          <span class="match-zone" style="margin-right:6px;"></span>
+          Zona 1
+        </h2>
+        <span style="font-size: 13px; color: var(--text-secondary);">12 equipos</span>
+      </div>
+      <div class="equipos-grid" id="equipos-zona1" style="margin-bottom: 32px;"></div>
+
+      <div class="section-head">
+        <h2 class="section-title">
+          <span class="match-zone zona-2" style="margin-right:6px;"></span>
+          Zona 2
+        </h2>
+        <span style="font-size: 13px; color: var(--text-secondary);">12 equipos</span>
+      </div>
+      <div class="equipos-grid" id="equipos-zona2"></div>
+
+    </div>
+  </main>
+
+  <footer class="footer">
+    <div class="container footer-inner">
+      <div class="footer-brand">
+        <div class="brand-logo small"></div>
+        <div>
+          <div style="font-weight: 600; color: var(--text);">Papi Fútbol Morón</div>
+          <div>Colegio Marista San José</div>
+        </div>
+      </div>
+      <div class="footer-social">
+        <a href="https://www.facebook.com/papifutbolmoron" title="Facebook">f</a>
+        <a href="#" title="Instagram">ig</a>
+        <a href="#" title="WhatsApp">wa</a>
+      </div>
+    </div>
+  </footer>
+
+  <script src="data/torneo.js"></script>
+  <script>
+    function renderEquipos(zonaNum, contenedorId) {
+      const tabla = POSICIONES['zona' + zonaNum];
+      const html = tabla.map((row, idx) => {
+        const e = EQUIPOS[row.id];
+        const dg = row.gf - row.gc;
+        const dgText = dg > 0 ? `+${dg}` : `${dg}`;
+        const posMarker = idx === 0 ? ' · 1°' : '';
+        return `
+          <a href="equipo.html?id=${row.id}" class="equipo-card">
+            <div class="equipo-avatar" style="background:${getEquipoColor(row.id)};">${row.id}</div>
+            <div class="equipo-info">
+              <div class="equipo-name">${e.nombre}${posMarker ? `<span style="color:var(--accent); font-weight:700;">${posMarker}</span>` : ''}</div>
+              <div class="equipo-meta">PJ ${row.pj} · ${row.pts} pts · DG ${dgText}</div>
+            </div>
+          </a>
+        `;
+      }).join('');
+      document.getElementById(contenedorId).innerHTML = html;
+    }
+
+    renderEquipos(1, 'equipos-zona1');
+    renderEquipos(2, 'equipos-zona2');
+  </script>
+
+</body>
+</html>
