@@ -370,7 +370,74 @@ def parse_fixture(soup):
             if key in partido_map:
                 p["partido_id"] = partido_map[key]
 
+    # Agregar cancha/turno/hora a los partidos de la próxima fecha pendiente
+    cancha_map = extract_cancha_turno_map(soup)
+    for f in fixture:
+        if f["estado"] != "pendiente":
+            continue
+        for p in f["zona1"] + f["zona2"]:
+            key = (p["local"], p["visitante"])
+            if key in cancha_map:
+                p.update(cancha_map[key])
+
     return fixture
+
+
+def extract_cancha_turno_map(soup):
+    """Extrae cancha, turno y hora para los partidos de la próxima fecha pendiente.
+
+    En la home, los partidos futuros están en la tab #proximaESTADISTICAS_GENERALES.
+    La estructura es:
+      <div id="proximaTurno">Turno N <span>...</span> HH:MM</div>
+      <div id="proximaLinea">
+        <div class="col-md-2"><span>Cancha N</span></div>
+        <div class="col-md-4">NN EQUIPO</div>
+        <div class="col-md-2">-</div>
+        <div class="col-md-4">NN EQUIPO</div>
+      </div>
+    """
+    from bs4 import Tag as BSTag
+    tab = soup.find("div", id="proximaESTADISTICAS_GENERALES")
+    if not tab:
+        log("  ⚠️  No se encontró tab de próxima fecha (#proximaESTADISTICAS_GENERALES)")
+        return {}
+
+    cancha_map = {}
+    turno_actual = None
+    hora_actual = None
+
+    for child in tab.find_all(recursive=False):
+        if not isinstance(child, BSTag):
+            continue
+        cid = child.get("id", "")
+
+        if cid == "proximaTurno":
+            texto = child.get_text(" ", strip=True)
+            m_t = re.search(r"Turno\s+(\d+)", texto)
+            m_h = re.search(r"(\d{2}:\d{2})", texto)
+            turno_actual = f"Turno {m_t.group(1)}" if m_t else None
+            hora_actual = m_h.group(1) if m_h else None
+
+        elif cid == "proximaLinea":
+            cols = child.find_all("div", recursive=False)
+            if len(cols) < 4:
+                continue
+            center = clean_text(cols[2].get_text())
+            if center != "-":
+                continue  # solo partidos pendientes
+            cancha_text = clean_text(cols[0].get_text())
+            m_c = re.search(r"Cancha\s+(\d+)", cancha_text)
+            local_id, _ = parse_team_label(cols[1].get_text(strip=True))
+            visit_id, _ = parse_team_label(cols[3].get_text(strip=True))
+            if local_id and visit_id and m_c:
+                cancha_map[(local_id, visit_id)] = {
+                    "cancha": m_c.group(1),
+                    "turno": turno_actual,
+                    "hora": hora_actual,
+                }
+
+    log(f"  Cancha/turno mapeados: {len(cancha_map)} partidos pendientes", verbose_only=True)
+    return cancha_map
 
 
 def extract_partido_ids_map(soup):

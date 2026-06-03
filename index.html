@@ -171,6 +171,7 @@
       const jugada = (p.golesL !== undefined && p.golesV !== undefined);
       const score = jugada ? `${p.golesL} - ${p.golesV}` : 'VS';
       const scoreCls = jugada ? '' : ' pending';
+      const info = p.cancha ? `C${p.cancha} · ${p.hora}` : '';
       return `
         <a href="ficha.html?fecha=${fechaNum}&local=${p.local}" class="match-card-sm">
           <span class="mc-dot ${zona===2?'zona-2':''}"></span>
@@ -179,6 +180,7 @@
           <span class="mc-sc${scoreCls}">${score}</span>
           <span class="mc-r">${getEquipoNombre(p.visitante)}</span>
           ${teamAvatar(p.visitante, 24)}
+          ${info ? `<span class="mc-info">${info}</span>` : ''}
         </a>
       `;
     }
