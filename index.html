@@ -79,7 +79,7 @@
         </div>
       </div>
 
-      <div class="two-col" style="grid-template-columns: 1fr 1fr;">
+      <div class="two-col two-col-even">
         <div class="card">
           <div class="card-label">Fair Play · Top 5 equipos</div>
           <div id="fairplay-top"></div>
@@ -218,13 +218,13 @@
         const dgText = dg > 0 ? `+${dg}` : `${dg}`;
         const nameTag = i === 0 ? 'strong' : 'span';
         return `
-          <div class="standings-row ${i===0?'top-1':''}">
+          <a href="equipo.html?id=${r.id}" class="standings-row ${i===0?'top-1':''}">
             <span class="standings-pos">${i+1}</span>
             <span class="standings-team">${teamAvatar(r.id, 24)}<${nameTag}>${getEquipoNombre(r.id)}</${nameTag}></span>
             <span class="standings-num">${r.pj}</span>
             <span class="standings-num ${dgClass}">${dgText}</span>
             <span class="standings-pts">${r.pts}</span>
-          </div>
+          </a>
         `;
       }).join('');
       return `
@@ -236,7 +236,7 @@
             <span class="standings-num">Pts</span>
           </div>
           ${items}
-          <div class="standings-footer">Ver tabla completa (${total} equipos) →</div>
+          <a href="estadisticas.html" class="standings-footer">Ver tabla completa (${total} equipos) →</a>
         </div>
       `;
     }
@@ -258,8 +258,10 @@
     document.getElementById('scorers-top').innerHTML = GOLEADORES.slice(0, 8).map((g, i) => {
       const medalClass = i === 0 ? 'gold' : (i === 1 ? 'silver' : (i === 2 ? 'bronze' : 'normal'));
       const equipoTxt = g.equipo ? getEquipoLabel(g.equipo) : 'Sin equipo';
+      const tag = g.equipo ? 'a' : 'div';
+      const href = g.equipo ? ` href="equipo.html?id=${g.equipo}"` : '';
       return `
-        <div class="scorer-row">
+        <${tag}${href} class="scorer-row">
           <div class="scorer-left">
             <div class="scorer-medal ${medalClass}">${i+1}</div>
             <div class="scorer-info">
@@ -268,7 +270,7 @@
             </div>
           </div>
           <div class="scorer-goals">${g.goles}</div>
-        </div>
+        </${tag}>
       `;
     }).join('');
 
@@ -276,18 +278,18 @@
       const badgeClass = f.puntos <= 2 ? 'badge-success' : (f.puntos <= 4 ? 'badge-warning' : 'badge-danger');
       const nameTag = i === 0 ? 'strong' : 'span';
       return `
-        <div class="fairplay-row">
+        <a href="equipo.html?id=${f.equipo}" class="fairplay-row">
           <div class="fairplay-team">
             ${teamAvatar(f.equipo, 24)}
             <${nameTag}>${getEquipoNombre(f.equipo)}</${nameTag}>
           </div>
           <span class="badge ${badgeClass}">${f.puntos} pt${f.puntos===1?'':'s'}</span>
-        </div>
+        </a>
       `;
     }).join('');
 
     document.getElementById('valla-top').innerHTML = VALLA.slice(0, 5).map((v, i) => `
-      <div class="fairplay-row">
+      <a href="equipo.html?id=${v.equipo}" class="fairplay-row">
         <div class="fairplay-team">
           ${teamAvatar(v.equipo, 24)}
           <div style="line-height:1.2;">
@@ -296,7 +298,7 @@
           </div>
         </div>
         <span style="font-size:14px; font-weight:700;">${v.gc} <small style="font-weight:400; color:var(--text-secondary);">GC</small></span>
-      </div>
+      </a>
     `).join('');
   </script>
 

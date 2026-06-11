@@ -181,22 +181,22 @@
         <div class="ficha-header">
           <div class="ficha-meta">
             <span>📅 ${partido.fechaTexto}</span>
-            <span>🏟️ Cancha ${partido.cancha}</span>
-            <span>⏰ ${partido.turno}</span>
+            ${partido.cancha ? `<span>🏟️ Cancha ${partido.cancha}</span>` : ''}
+            ${partido.hora ? `<span>⏰ ${partido.hora}</span>` : (partido.turno ? `<span>⏰ ${partido.turno}</span>` : '')}
             <span><span class="match-zone ${partido.zona===2?'zona-2':''}">Zona ${partido.zona} · Fecha ${partido.fecha}</span></span>
           </div>
           <div class="ficha-result">
-            <div class="ficha-team">
+            <a href="equipo.html?id=${partido.local}" class="ficha-team">
               <div class="team-avatar" style="background:${colorL};">${partido.local}</div>
               <div class="ficha-team-name">${eqLocal.nombre}</div>
               ${badgeLocal}
-            </div>
+            </a>
             ${scoreHtml}
-            <div class="ficha-team">
+            <a href="equipo.html?id=${partido.visitante}" class="ficha-team">
               <div class="team-avatar" style="background:${colorV};">${partido.visitante}</div>
               <div class="ficha-team-name" ${jugada && partido.golesV < partido.golesL ? 'style="color: var(--text-secondary);"' : ''}>${eqVisit.nombre}</div>
               ${badgeVisit}
-            </div>
+            </a>
           </div>
         </div>
 

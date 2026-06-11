@@ -59,6 +59,10 @@
       align-items: center;
       gap: 10px;
     }
+    .data-table a.team-cell:hover span {
+      color: var(--primary);
+      text-decoration: underline;
+    }
     .search-box {
       width: 100%;
       max-width: 400px;
@@ -109,7 +113,7 @@
 
       <div class="page-header">
         <h1 class="page-title">Estadísticas del torneo</h1>
-        <p class="page-sub">Toda la información actualizada al cierre de la fecha 5 · 02/05/2026</p>
+        <p class="page-sub" id="stats-sub">Toda la información del torneo</p>
       </div>
 
       <!-- Tabs -->
@@ -192,6 +196,16 @@
 
   <script src="data/torneo.js"></script>
   <script>
+    // Subtítulo dinámico con la última fecha jugada
+    (function () {
+      const jugadas = FIXTURE.filter(f => f.estado === 'jugada');
+      const ultima = jugadas[jugadas.length - 1];
+      if (ultima) {
+        document.getElementById('stats-sub').textContent =
+          `Toda la información actualizada al cierre de la fecha ${ultima.fecha} · ${ultima.fechaTexto}`;
+      }
+    })();
+
     // Tab switching principal
     document.querySelectorAll('.stats-tabs .tab').forEach(btn => {
       btn.addEventListener('click', () => {
@@ -215,10 +229,10 @@
           <tr ${i===0?'class="top-row"':''}>
             <td class="center"><strong>${i+1}</strong></td>
             <td>
-              <div class="team-cell">
+              <a href="equipo.html?id=${r.id}" class="team-cell">
                 ${teamAvatar(r.id, 26)}
                 <span>${getEquipoNombre(r.id)}</span>
-              </div>
+              </a>
             </td>
             <td class="center">${r.pj}</td>
             <td class="center">${r.pg}</td>
@@ -275,7 +289,7 @@
 
       const body = rows.map((g, i) => {
         const equipoCell = g.equipo
-          ? `<div class="team-cell">${teamAvatar(g.equipo, 22)}<span>${getEquipoNombre(g.equipo)}</span></div>`
+          ? `<a href="equipo.html?id=${g.equipo}" class="team-cell">${teamAvatar(g.equipo, 22)}<span>${getEquipoNombre(g.equipo)}</span></a>`
           : '<span style="color: var(--text-tertiary);">Sin equipo</span>';
         return `
           <tr>
@@ -311,10 +325,10 @@
         <tr>
           <td class="center"><strong>${f.pos}</strong></td>
           <td>
-            <div class="team-cell">
+            <a href="equipo.html?id=${f.equipo}" class="team-cell">
               ${teamAvatar(f.equipo, 26)}
               <span>${getEquipoNombre(f.equipo)}</span>
-            </div>
+            </a>
           </td>
           <td class="center">${f.amarillas}</td>
           <td class="center">${f.azules}</td>
@@ -345,10 +359,10 @@
         <td class="center"><strong>${v.pos}</strong></td>
         <td>${v.arquero}</td>
         <td>
-          <div class="team-cell">
+          <a href="equipo.html?id=${v.equipo}" class="team-cell">
             ${teamAvatar(v.equipo, 22)}
             <span>${getEquipoNombre(v.equipo)}</span>
-          </div>
+          </a>
         </td>
         <td class="pts">${v.gc}</td>
       </tr>
@@ -379,10 +393,10 @@
         <tr>
           <td>${s.jugador}</td>
           <td>
-            <div class="team-cell">
+            <a href="equipo.html?id=${s.equipo}" class="team-cell">
               ${teamAvatar(s.equipo, 22)}
               <span>${getEquipoNombre(s.equipo)}</span>
-            </div>
+            </a>
           </td>
           <td class="center">${s.amarillas}</td>
           <td class="center">${s.azules}</td>
