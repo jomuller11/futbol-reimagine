@@ -31,10 +31,10 @@
         </div>
       </a>
       <nav class="nav" id="nav">
-        <a href="index.html">Inicio</a>
-        <a href="fixture.html">Fixture</a>
+        <a href="index.html" class="nav-primary">Inicio</a>
+        <a href="fixture.html" class="nav-primary">Fixture</a>
         <a href="equipos.html">Equipos</a>
-        <a href="estadisticas.html">Estadísticas</a>
+        <a href="estadisticas.html" class="nav-primary">Estadísticas</a>
         <a href="#">Noticias</a>
         <a href="#">Inscripción</a>
       </nav>
@@ -74,6 +74,7 @@
   </footer>
 
   <script src="data/torneo.js"></script>
+  <script src="js/site.js"></script>
   <script>
     const params = new URLSearchParams(window.location.search);
     const fechaNum = parseInt(params.get('fecha')) || 5;
@@ -260,6 +261,8 @@
     }
 
     renderFicha();
+
+    renderTabBar('fixture');
   </script>
 
 </body>

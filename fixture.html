@@ -19,10 +19,10 @@
         </div>
       </a>
       <nav class="nav" id="nav">
-        <a href="index.html">Inicio</a>
-        <a href="fixture.html" class="active">Fixture</a>
+        <a href="index.html" class="nav-primary">Inicio</a>
+        <a href="fixture.html" class="active nav-primary">Fixture</a>
         <a href="equipos.html">Equipos</a>
-        <a href="estadisticas.html">Estadísticas</a>
+        <a href="estadisticas.html" class="nav-primary">Estadísticas</a>
         <a href="#">Noticias</a>
         <a href="#">Inscripción</a>
       </nav>
@@ -39,6 +39,12 @@
       </div>
 
       <div class="fecha-selector" id="fecha-selector"></div>
+
+      <div class="seg" id="zona-filter">
+        <button data-zona="0" class="on">Todas</button>
+        <button data-zona="1">Zona 1</button>
+        <button data-zona="2">Zona 2</button>
+      </div>
 
       <div id="fecha-content"></div>
 
@@ -63,47 +69,48 @@
   </footer>
 
   <script src="data/torneo.js"></script>
+  <script src="js/site.js"></script>
   <script>
-    // Construir selector de fechas
+    // Chips de fechas, centrados en la fecha vigente
     const selector = document.getElementById('fecha-selector');
     const ultimasJugadas = FIXTURE.filter(f => f.estado === 'jugada');
     let fechaActiva = ultimasJugadas.length > 0 ? ultimasJugadas[ultimasJugadas.length-1].fecha : 1;
+    let zonaActiva = parseInt(localStorage.getItem('fixtureZona') || '0');
 
     selector.innerHTML = FIXTURE.map(f => `
       <button class="fecha-btn ${f.fecha===fechaActiva?'active':''}" data-fecha="${f.fecha}">
-        Fecha ${f.fecha}
-        ${f.estado === 'jugada' ? '<span style="opacity:0.7; font-size:10px; margin-left:4px;">✓</span>' : ''}
+        ${f.fecha===fechaActiva ? 'Fecha ' + f.fecha : 'F' + f.fecha}
+        <small>${f.fechaTexto.substring(0, 5)}</small>
       </button>
     `).join('');
 
-    function renderMatchCard(p, zona, fechaNum) {
+    // Fila de partido: ganador en negrita, perdedor atenuado, hora si está pendiente
+    function renderMatchRow(p, fechaNum) {
       const jugada = (p.golesL !== undefined && p.golesV !== undefined);
-      const isWinnerL = jugada && p.golesL > p.golesV;
-      const isWinnerV = jugada && p.golesV > p.golesL;
-      const clsL = jugada ? (isWinnerL ? 'winner' : (isWinnerV ? 'loser' : '')) : '';
-      const clsV = jugada ? (isWinnerV ? 'winner' : (isWinnerL ? 'loser' : '')) : '';
+      const winL = jugada && p.golesL > p.golesV;
+      const winV = jugada && p.golesV > p.golesL;
       const center = jugada
-        ? `<span class="match-score">${p.golesL} - ${p.golesV}</span>`
-        : `<span class="match-vs">VS</span>`;
-      const canchaInfo = p.cancha ? `Cancha ${p.cancha} · ${p.turno}` : (jugada ? 'Final' : 'Pendiente');
+        ? `<span class="mscore"><span class="${winV ? 'lose' : ''}">${p.golesL}</span>–<span class="${winL ? 'lose' : ''}">${p.golesV}</span></span>`
+        : `<span class="mscore muted">${p.hora || 'VS'}</span>`;
       return `
-        <a href="ficha.html?fecha=${fechaNum}&local=${p.local}" class="match-card">
-          <div class="match-head">
-            <span class="match-zone ${zona===2?'zona-2':''}">Zona ${zona}</span>
-            <span>${canchaInfo}</span>
-          </div>
-          <div class="match-body">
-            <div class="match-team home ${clsL}">
-              ${teamAvatar(p.local, 36)}
-              <span class="team-name">${getEquipoNombre(p.local)}</span>
-            </div>
-            ${center}
-            <div class="match-team away ${clsV}">
-              ${teamAvatar(p.visitante, 36)}
-              <span class="team-name">${getEquipoNombre(p.visitante)}</span>
-            </div>
-          </div>
+        <a href="ficha.html?fecha=${fechaNum}&local=${p.local}" class="match-row">
+          <span class="side">${teamAvatar(p.local, 30)}<b class="${winV ? 'lose' : ''}">${getEquipoNombre(p.local)}</b></span>
+          ${center}
+          <span class="side right"><span class="chevron">›</span>${teamAvatar(p.visitante, 30)}<b class="${winL ? 'lose' : ''}">${getEquipoNombre(p.visitante)}</b></span>
         </a>
+      `;
+    }
+
+    function renderZonaList(f, zona) {
+      const partidos = f['zona' + zona];
+      return `
+        <div class="match-list">
+          <div class="match-list-head">
+            <h3>${f.estado === 'jugada' ? 'Resultados' : 'Partidos'}</h3>
+            <span class="zona-pill">Zona ${zona}</span>
+          </div>
+          ${partidos.map(p => renderMatchRow(p, f.fecha)).join('')}
+        </div>
       `;
     }
 
@@ -115,36 +122,15 @@
         ? '<span class="badge badge-success">Jugada</span>'
         : '<span class="badge badge-warning">Pendiente</span>';
 
+      const zonas = zonaActiva === 0 ? [1, 2] : [zonaActiva];
+
       const html = `
-        <div style="display:flex; align-items:center; gap:12px; margin-bottom:20px;">
+        <div style="display:flex; align-items:center; gap:12px; margin-bottom:16px;">
           <h2 style="font-size: 22px; font-weight: 700;">Fecha ${f.fecha}</h2>
           <span style="color: var(--text-secondary); font-size: 14px;">· ${f.fechaTexto}</span>
           ${estadoBadge}
         </div>
-
-        <div class="fixture-zone">
-          <div class="fixture-zone-head">
-            <h2 class="fixture-zone-title">
-              <span class="match-zone"></span>
-              Zona 1
-            </h2>
-          </div>
-          <div class="match-grid">
-            ${f.zona1.map(p => renderMatchCard(p, 1, f.fecha)).join('')}
-          </div>
-        </div>
-
-        <div class="fixture-zone">
-          <div class="fixture-zone-head">
-            <h2 class="fixture-zone-title">
-              <span class="match-zone zona-2"></span>
-              Zona 2
-            </h2>
-          </div>
-          <div class="match-grid">
-            ${f.zona2.map(p => renderMatchCard(p, 2, f.fecha)).join('')}
-          </div>
-        </div>
+        ${zonas.map(z => renderZonaList(f, z)).join('')}
       `;
       document.getElementById('fecha-content').innerHTML = html;
     }
@@ -152,21 +138,43 @@
     selector.addEventListener('click', e => {
       const btn = e.target.closest('.fecha-btn');
       if (!btn) return;
-      const fecha = parseInt(btn.dataset.fecha);
-      document.querySelectorAll('.fecha-btn').forEach(b => b.classList.remove('active'));
-      btn.classList.add('active');
-      fechaActiva = fecha;
-      renderFecha(fecha);
-      window.scrollTo({top: 0, behavior: 'smooth'});
+      fechaActiva = parseInt(btn.dataset.fecha);
+      selector.innerHTML = FIXTURE.map(f => `
+        <button class="fecha-btn ${f.fecha===fechaActiva?'active':''}" data-fecha="${f.fecha}">
+          ${f.fecha===fechaActiva ? 'Fecha ' + f.fecha : 'F' + f.fecha}
+          <small>${f.fechaTexto.substring(0, 5)}</small>
+        </button>
+      `).join('');
+      renderFecha(fechaActiva);
+      const activeBtn = selector.querySelector('.fecha-btn.active');
+      if (activeBtn) activeBtn.scrollIntoView({inline: 'center', block: 'nearest', behavior: 'smooth'});
+    });
+
+    // Filtro de zona (persistente)
+    const zonaFilter = document.getElementById('zona-filter');
+    zonaFilter.querySelectorAll('button').forEach(b => {
+      if (parseInt(b.dataset.zona) === zonaActiva) {
+        zonaFilter.querySelectorAll('button').forEach(x => x.classList.remove('on'));
+        b.classList.add('on');
+      }
+      b.addEventListener('click', () => {
+        zonaActiva = parseInt(b.dataset.zona);
+        localStorage.setItem('fixtureZona', zonaActiva);
+        zonaFilter.querySelectorAll('button').forEach(x => x.classList.remove('on'));
+        b.classList.add('on');
+        renderFecha(fechaActiva);
+      });
     });
 
     renderFecha(fechaActiva);
 
-    // Scroll del selector hasta la fecha activa
+    // Centrar el chip activo
     setTimeout(() => {
       const activeBtn = selector.querySelector('.fecha-btn.active');
       if (activeBtn) activeBtn.scrollIntoView({inline: 'center', block: 'nearest', behavior: 'instant'});
     }, 100);
+
+    renderTabBar('fixture');
   </script>
 
 </body>

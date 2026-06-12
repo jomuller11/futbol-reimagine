@@ -20,10 +20,10 @@
         </div>
       </a>
       <nav class="nav" id="nav">
-        <a href="index.html" class="active">Inicio</a>
-        <a href="fixture.html">Fixture</a>
+        <a href="index.html" class="active nav-primary">Inicio</a>
+        <a href="fixture.html" class="nav-primary">Fixture</a>
         <a href="equipos.html">Equipos</a>
-        <a href="estadisticas.html">Estadísticas</a>
+        <a href="estadisticas.html" class="nav-primary">Estadísticas</a>
         <a href="#">Noticias</a>
         <a href="#">Inscripción</a>
       </nav>
@@ -35,22 +35,27 @@
     <div class="container">
 
       <section class="hero">
-        <div class="hero-tag" id="hero-tag">Temporada 2026</div>
-        <h1 class="hero-title">Torneo Papi Fútbol San José</h1>
-        <p class="hero-sub" id="hero-sub">Cargando...</p>
-        <div class="hero-actions">
-          <a href="fixture.html" class="btn btn-primary">Ver próxima fecha</a>
-          <a href="#" class="btn btn-ghost">Inscribirme al torneo</a>
+        <div class="hero-inner">
+          <div class="hero-main">
+            <div class="hero-tag" id="hero-tag">Temporada 2026</div>
+            <h1 class="hero-title">Torneo Papi Fútbol San José</h1>
+            <p class="hero-sub" id="hero-sub">Cargando...</p>
+            <div class="hero-actions">
+              <a href="fixture.html" class="btn btn-primary">Ver próxima fecha</a>
+              <a href="#" class="btn btn-ghost">Inscribirme al torneo</a>
+            </div>
+          </div>
+          <div class="hero-quick" id="hero-quick"></div>
         </div>
       </section>
 
-      <section class="stats-grid" id="stats-grid"></section>
+      <div id="miequipo-slot"></div>
 
       <div class="section-head">
         <h2 class="section-title" id="proxima-title">Próxima fecha</h2>
         <a href="fixture.html" class="section-link">Ver fixture completo →</a>
       </div>
-      <div class="match-grid" id="proxima-grid"></div>
+      <div class="hscroll" id="proxima-grid"></div>
 
       <div class="section-head">
         <h2 class="section-title" id="ultima-title">Última fecha</h2>
@@ -58,18 +63,19 @@
       </div>
       <div class="match-grid" id="ultima-grid"></div>
 
-      <div class="two-col">
-        <div>
-          <div class="section-head">
-            <h2 class="section-title">Tabla de posiciones</h2>
-            <div class="tabs">
-              <button class="tab active" onclick="showZone(1, this)">Zona 1</button>
-              <button class="tab" onclick="showZone(2, this)">Zona 2</button>
-            </div>
-          </div>
-          <div id="zone-1"></div>
-          <div id="zone-2" style="display:none;"></div>
+      <div class="section-head">
+        <h2 class="section-title">Tabla de posiciones</h2>
+        <div class="tabs zones-tabs">
+          <button class="tab active" onclick="showZone(1, this)">Zona 1</button>
+          <button class="tab" onclick="showZone(2, this)">Zona 2</button>
         </div>
+      </div>
+      <div class="zones-row" style="margin-bottom: 28px;">
+        <div id="zone-1" class="zone-block"></div>
+        <div id="zone-2" class="zone-block" style="display:none;"></div>
+      </div>
+
+      <div class="two-col">
         <div>
           <div class="section-head">
             <h2 class="section-title">Goleadores <small>· Top 8</small></h2>
@@ -77,18 +83,17 @@
           </div>
           <div class="scorers" id="scorers-top"></div>
         </div>
-      </div>
-
-      <div class="two-col two-col-even">
-        <div class="card">
-          <div class="card-label">Fair Play · Top 5 equipos</div>
-          <div id="fairplay-top"></div>
-          <a href="estadisticas.html" class="card-link">Ver ranking completo →</a>
-        </div>
-        <div class="card">
-          <div class="card-label">Valla menos vencida · Top 5 arqueros</div>
-          <div id="valla-top"></div>
-          <a href="estadisticas.html" class="card-link">Ver todos →</a>
+        <div>
+          <div class="card">
+            <div class="card-label">Fair Play · Top 5 equipos</div>
+            <div id="fairplay-top"></div>
+            <a href="estadisticas.html" class="card-link">Ver ranking completo →</a>
+          </div>
+          <div class="card" style="margin-top: 16px;">
+            <div class="card-label">Valla menos vencida · Top 5 arqueros</div>
+            <div id="valla-top"></div>
+            <a href="estadisticas.html" class="card-link">Ver todos →</a>
+          </div>
         </div>
       </div>
 
@@ -125,16 +130,83 @@
   </footer>
 
   <script src="data/torneo.js"></script>
+  <script src="js/site.js"></script>
   <script>
     document.getElementById('hero-sub').textContent =
-      `${STATS_GLOBALES.equipos} equipos · 2 zonas · Fecha ${STATS_GLOBALES.fechaActual} de ${STATS_GLOBALES.totalFechas} jugada · Próxima fecha ${STATS_GLOBALES.proximaFechaTexto}`;
+      `Fecha ${STATS_GLOBALES.fechaActual} de ${STATS_GLOBALES.totalFechas} jugada · Próxima fecha ${STATS_GLOBALES.proximaFechaTexto}`;
 
-    document.getElementById('stats-grid').innerHTML = `
-      <div class="stat-card"><div class="stat-label">Equipos</div><div class="stat-value">${STATS_GLOBALES.equipos}</div></div>
-      <div class="stat-card"><div class="stat-label">Partidos jugados</div><div class="stat-value">${STATS_GLOBALES.partidosJugados}</div></div>
-      <div class="stat-card"><div class="stat-label">Goles convertidos</div><div class="stat-value">${STATS_GLOBALES.totalGoles}</div></div>
-      <div class="stat-card"><div class="stat-label">Fecha actual</div><div class="stat-value">${STATS_GLOBALES.fechaActual}<small>/${STATS_GLOBALES.totalFechas}</small></div></div>
+    // Datos rápidos arriba del pliegue (propuesta desktop)
+    document.getElementById('hero-quick').innerHTML = `
+      <span class="q"><b>${STATS_GLOBALES.equipos}</b><span>EQUIPOS</span></span>
+      <span class="q"><b>${STATS_GLOBALES.partidosJugados}</b><span>JUGADOS</span></span>
+      <span class="q"><b>${STATS_GLOBALES.totalGoles}</b><span>GOLES</span></span>
+      <span class="q"><b>${STATS_GLOBALES.proximaFechaTexto}</b><span>PRÓXIMA FECHA</span></span>
     `;
+
+    // ===========================================
+    // MI EQUIPO (favorito, guardado en el teléfono)
+    // ===========================================
+    function renderMiEquipo() {
+      const slot = document.getElementById('miequipo-slot');
+      const id = getMiEquipo();
+
+      if (!id) {
+        const opciones = Object.keys(EQUIPOS).sort()
+          .map(eid => `<option value="${eid}">${getEquipoLabel(eid)}</option>`).join('');
+        slot.innerHTML = `
+          <div class="myteam-picker">
+            <span class="hint">⭐ Elegí tu equipo para verlo siempre primero</span>
+            <select id="miequipo-select">
+              <option value="">Mi equipo…</option>
+              ${opciones}
+            </select>
+          </div>
+        `;
+        document.getElementById('miequipo-select').addEventListener('change', e => {
+          if (e.target.value) { setMiEquipo(e.target.value); renderMiEquipo(); renderZones(); renderProxima(); }
+        });
+        return;
+      }
+
+      const equipo = EQUIPOS[id];
+      const zona = equipo.zona;
+      const tabla = POSICIONES['zona' + zona];
+      const pos = tabla.findIndex(p => p.id === id) + 1;
+      const row = tabla.find(p => p.id === id);
+      const dg = row.gf - row.gc;
+      const dgText = dg > 0 ? `+${dg}` : `${dg}`;
+      const prox = getProximoPartido(id);
+
+      const proxHtml = prox ? `
+        <a href="ficha.html?fecha=${prox.fecha}&local=${prox.local}" class="next">
+          <span class="vs">Próximo</span>
+          ${teamAvatar(prox.rival, 24)}
+          <b>vs ${getEquipoNombre(prox.rival)}</b>
+          <span class="when"><b>${prox.fechaTexto}</b>${prox.hora ? prox.hora + (prox.cancha ? ' · Cancha ' + prox.cancha : '') : 'Horario a confirmar'}</span>
+        </a>
+      ` : '';
+
+      slot.innerHTML = `
+        <div class="myteam">
+          <div class="top">
+            ${teamAvatar(id, 44)}
+            <a href="equipo.html?id=${id}" style="color:inherit;">
+              <b>${equipo.nombre}</b>
+              <span class="sub">Zona ${zona} · ${pos}° · ${row.pts} pts</span>
+            </a>
+            <button class="star" title="Cambiar equipo" onclick="setMiEquipo(null); renderMiEquipo(); renderZones(); renderProxima();">★</button>
+          </div>
+          <div class="stats">
+            <span class="stat"><b>${pos}°</b><span>POS</span></span>
+            <span class="stat"><b>${row.pts}</b><span>PTS</span></span>
+            <span class="stat"><b>${dgText}</b><span>DG</span></span>
+            <span class="stat"><b>${row.gf}</b><span>GF</span></span>
+          </div>
+          ${proxHtml}
+        </div>
+      `;
+    }
+    renderMiEquipo();
 
     function renderMatchCard(p, zona, fechaNum) {
       const jugada = (p.golesL !== undefined && p.golesV !== undefined);
@@ -167,36 +239,42 @@
       `;
     }
 
-    function renderMatchCardSmall(p, zona, fechaNum) {
+    // Carrusel de mini partidos (propuesta: la fecha entera sin estirar la página)
+    function renderMiniMatch(p, zona, fechaNum) {
       const jugada = (p.golesL !== undefined && p.golesV !== undefined);
-      const score = jugada ? `${p.golesL} - ${p.golesV}` : 'VS';
-      const scoreCls = jugada ? '' : ' pending';
-      const info = p.cancha ? `C${p.cancha} · ${p.hora}` : '';
+      const meta = jugada
+        ? 'Final · Zona ' + zona
+        : [(p.hora || ''), (p.cancha ? 'Cancha ' + p.cancha : ''), 'Z' + zona].filter(Boolean).join(' · ');
+      const gL = jugada ? `<span class="g${p.golesL < p.golesV ? ' lose' : ''}">${p.golesL}</span>` : '';
+      const gV = jugada ? `<span class="g${p.golesV < p.golesL ? ' lose' : ''}">${p.golesV}</span>` : '';
       return `
-        <a href="ficha.html?fecha=${fechaNum}&local=${p.local}" class="match-card-sm">
-          <span class="mc-dot ${zona===2?'zona-2':''}"></span>
-          ${teamAvatar(p.local, 24)}
-          <span class="mc-l">${getEquipoNombre(p.local)}</span>
-          <span class="mc-sc${scoreCls}">${score}</span>
-          <span class="mc-r">${getEquipoNombre(p.visitante)}</span>
-          ${teamAvatar(p.visitante, 24)}
-          ${info ? `<span class="mc-info">${info}</span>` : ''}
+        <a href="ficha.html?fecha=${fechaNum}&local=${p.local}" class="mini-match">
+          <span class="meta">${meta}</span>
+          <span class="row">${teamAvatar(p.local, 24)}<b>${getEquipoNombre(p.local)}</b>${gL}</span>
+          <span class="row">${teamAvatar(p.visitante, 24)}<b>${getEquipoNombre(p.visitante)}</b>${gV}</span>
         </a>
       `;
     }
 
-    const proxima = FIXTURE.find(f => f.estado === 'pendiente');
-    if (proxima) {
+    function renderProxima() {
+      const proxima = FIXTURE.find(f => f.estado === 'pendiente');
+      if (!proxima) return;
       document.getElementById('proxima-title').innerHTML =
         `Próxima fecha · Fecha ${proxima.fecha} <small>· ${proxima.fechaTexto}</small>`;
+      // El partido de "mi equipo" primero en el carrusel
+      const mi = getMiEquipo();
       const partidos = [
         ...proxima.zona1.map(p => ({...p, zona:1})),
         ...proxima.zona2.map(p => ({...p, zona:2}))
-      ];
-      document.getElementById('proxima-grid').className = 'match-grid-sm';
+      ].sort((a, b) => {
+        const am = (a.local === mi || a.visitante === mi) ? 0 : 1;
+        const bm = (b.local === mi || b.visitante === mi) ? 0 : 1;
+        return am - bm;
+      });
       document.getElementById('proxima-grid').innerHTML =
-        partidos.map(p => renderMatchCardSmall(p, p.zona, proxima.fecha)).join('');
+        partidos.map(p => renderMiniMatch(p, p.zona, proxima.fecha)).join('');
     }
+    renderProxima();
 
     const ultimas = FIXTURE.filter(f => f.estado === 'jugada');
     const ultima = ultimas[ultimas.length - 1];
@@ -211,16 +289,18 @@
         partidos.map(p => renderMatchCard(p, p.zona, ultima.fecha)).join('');
     }
 
-    function renderStandings(rows, total) {
+    function renderStandings(rows, total, zonaNum) {
+      const mi = getMiEquipo();
       const items = rows.slice(0, 6).map((r, i) => {
         const dg = r.gf - r.gc;
         const dgClass = dg > 0 ? 'dg-pos' : (dg < 0 ? 'dg-neg' : '');
         const dgText = dg > 0 ? `+${dg}` : `${dg}`;
-        const nameTag = i === 0 ? 'strong' : 'span';
+        const esFav = r.id === mi;
+        const nameTag = (i === 0 || esFav) ? 'strong' : 'span';
         return `
-          <a href="equipo.html?id=${r.id}" class="standings-row ${i===0?'top-1':''}">
+          <a href="equipo.html?id=${r.id}" class="standings-row ${i===0?'top-1':''} ${i<4?'pos-clasifica-band':''} ${esFav?'fav':''}">
             <span class="standings-pos">${i+1}</span>
-            <span class="standings-team">${teamAvatar(r.id, 24)}<${nameTag}>${getEquipoNombre(r.id)}</${nameTag}></span>
+            <span class="standings-team">${teamAvatar(r.id, 24)}<${nameTag}>${getEquipoNombre(r.id)}</${nameTag}>${esFav?' <span class="fav-star">★</span>':''}</span>
             <span class="standings-num">${r.pj}</span>
             <span class="standings-num ${dgClass}">${dgText}</span>
             <span class="standings-pts">${r.pts}</span>
@@ -229,6 +309,7 @@
       }).join('');
       return `
         <div class="standings">
+          <div style="padding: 12px 14px 0; font-size: 14px; font-weight: 700;">Zona ${zonaNum}</div>
           <div class="standings-header">
             <span>#</span><span>Equipo</span>
             <span class="standings-num">PJ</span>
@@ -236,12 +317,16 @@
             <span class="standings-num">Pts</span>
           </div>
           ${items}
+          <div class="clasifica-legend"><span class="swatch"></span> Clasifican a playoffs (top 4)</div>
           <a href="estadisticas.html" class="standings-footer">Ver tabla completa (${total} equipos) →</a>
         </div>
       `;
     }
-    document.getElementById('zone-1').innerHTML = renderStandings(POSICIONES.zona1, POSICIONES.zona1.length);
-    document.getElementById('zone-2').innerHTML = renderStandings(POSICIONES.zona2, POSICIONES.zona2.length);
+    function renderZones() {
+      document.getElementById('zone-1').innerHTML = renderStandings(POSICIONES.zona1, POSICIONES.zona1.length, 1);
+      document.getElementById('zone-2').innerHTML = renderStandings(POSICIONES.zona2, POSICIONES.zona2.length, 2);
+    }
+    renderZones();
 
     function showZone(zone, btn) {
       document.getElementById('zone-1').style.display = zone === 1 ? 'block' : 'none';
@@ -300,6 +385,15 @@
         <span style="font-size:14px; font-weight:700;">${v.gc} <small style="font-weight:400; color:var(--text-secondary);">GC</small></span>
       </a>
     `).join('');
+
+    // En mobile, abrir el toggle en la zona del equipo favorito
+    const miFav = getMiEquipo();
+    if (miFav && EQUIPOS[miFav].zona === 2) {
+      const btnZ2 = document.querySelectorAll('.zones-tabs .tab')[1];
+      if (btnZ2) showZone(2, btnZ2);
+    }
+
+    renderTabBar('inicio');
   </script>
 
 </body>

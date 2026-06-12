@@ -97,10 +97,10 @@
         </div>
       </a>
       <nav class="nav" id="nav">
-        <a href="index.html">Inicio</a>
-        <a href="fixture.html">Fixture</a>
+        <a href="index.html" class="nav-primary">Inicio</a>
+        <a href="fixture.html" class="nav-primary">Fixture</a>
         <a href="equipos.html">Equipos</a>
-        <a href="estadisticas.html" class="active">Estadísticas</a>
+        <a href="estadisticas.html" class="active nav-primary">Estadísticas</a>
         <a href="#">Noticias</a>
         <a href="#">Inscripción</a>
       </nav>
@@ -195,6 +195,7 @@
   </footer>
 
   <script src="data/torneo.js"></script>
+  <script src="js/site.js"></script>
   <script>
     // Subtítulo dinámico con la última fecha jugada
     (function () {
@@ -217,31 +218,46 @@
     });
 
     // ===========================================
-    // POSICIONES (tabla completa con todas las columnas)
+    // POSICIONES — compacta en mobile (PJ·DG·PTS), fila expandible
     // ===========================================
     function renderTablaPosicionesCompleta(zona, contenedorId) {
       const rows = POSICIONES['zona' + zona];
+      const mi = getMiEquipo();
       const body = rows.map((r, i) => {
         const dg = r.gf - r.gc;
         const dgClass = dg > 0 ? 'dg-pos' : (dg < 0 ? 'dg-neg' : '');
         const dgText = dg > 0 ? `+${dg}` : `${dg}`;
+        const esFav = r.id === mi;
+        const rowCls = [i===0 ? 'top-row' : '', esFav ? 'fav' : '', 'pos-row'].filter(Boolean).join(' ');
         return `
-          <tr ${i===0?'class="top-row"':''}>
-            <td class="center"><strong>${i+1}</strong></td>
+          <tr class="${rowCls}" data-equipo="${r.id}">
+            <td class="center ${i<4 ? 'pos-clasifica-band' : ''}"><strong>${i+1}</strong></td>
             <td>
               <a href="equipo.html?id=${r.id}" class="team-cell">
                 ${teamAvatar(r.id, 26)}
-                <span>${getEquipoNombre(r.id)}</span>
+                <span>${getEquipoNombre(r.id)}${esFav ? ' <span class="fav-star">★</span>' : ''}</span>
               </a>
             </td>
             <td class="center">${r.pj}</td>
-            <td class="center">${r.pg}</td>
-            <td class="center">${r.pe}</td>
-            <td class="center">${r.pp}</td>
-            <td class="center">${r.gf}</td>
-            <td class="center">${r.gc}</td>
+            <td class="center col-detail">${r.pg}</td>
+            <td class="center col-detail">${r.pe}</td>
+            <td class="center col-detail">${r.pp}</td>
+            <td class="center col-detail">${r.gf}</td>
+            <td class="center col-detail">${r.gc}</td>
             <td class="center ${dgClass}">${dgText}</td>
             <td class="pts">${r.pts}</td>
+          </tr>
+          <tr class="pos-detail-row" data-detail="${r.id}" style="display:none;">
+            <td colspan="10">
+              <div class="pos-detail-grid">
+                <span class="cell"><b>${r.pg}</b><span>PG</span></span>
+                <span class="cell"><b>${r.pe}</b><span>PE</span></span>
+                <span class="cell"><b>${r.pp}</b><span>PP</span></span>
+                <span class="cell"><b>${r.gf}</b><span>GF</span></span>
+                <span class="cell"><b>${r.gc}</b><span>GC</span></span>
+              </div>
+              <div class="pos-forma">Últimos 5 ${formaDotsHtml(r.id)}</div>
+            </td>
           </tr>
         `;
       }).join('');
@@ -253,18 +269,28 @@
               <th class="center">#</th>
               <th>Equipo</th>
               <th class="center">PJ</th>
-              <th class="center">PG</th>
-              <th class="center">PE</th>
-              <th class="center">PP</th>
-              <th class="center">GF</th>
-              <th class="center">GC</th>
+              <th class="center col-detail">PG</th>
+              <th class="center col-detail">PE</th>
+              <th class="center col-detail">PP</th>
+              <th class="center col-detail">GF</th>
+              <th class="center col-detail">GC</th>
               <th class="center">DG</th>
               <th class="center">Pts</th>
             </tr>
           </thead>
           <tbody>${body}</tbody>
         </table>
+        <div class="clasifica-legend"><span class="swatch"></span> Clasifican a playoffs (top 4)</div>
       `;
+
+      // Tocar la fila despliega el detalle (PG/PE/PP, goles y últimos 5)
+      document.getElementById(contenedorId).querySelectorAll('tr.pos-row').forEach(tr => {
+        tr.addEventListener('click', e => {
+          if (e.target.closest('a')) return; // el link al equipo sigue navegando
+          const detail = document.getElementById(contenedorId).querySelector(`tr[data-detail="${tr.dataset.equipo}"]`);
+          if (detail) detail.style.display = detail.style.display === 'none' ? '' : 'none';
+        });
+      });
     }
     renderTablaPosicionesCompleta(1, 'tabla-posiciones-1');
     renderTablaPosicionesCompleta(2, 'tabla-posiciones-2');
@@ -419,6 +445,17 @@
     }
     renderSanciones();
     document.getElementById('search-sanciones').addEventListener('input', e => renderSanciones(e.target.value));
+
+    // ===========================================
+    // ?tab= abre un panel directo (lo usa el tab bar)
+    // ===========================================
+    const tabParam = new URLSearchParams(window.location.search).get('tab');
+    if (tabParam) {
+      const btn = document.querySelector(`.stats-tabs .tab[data-panel="${tabParam}"]`);
+      if (btn) btn.click();
+    }
+
+    renderTabBar(tabParam && tabParam !== 'posiciones' ? 'stats' : 'posiciones');
   </script>
 
 </body>

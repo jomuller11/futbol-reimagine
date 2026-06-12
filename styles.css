@@ -1390,3 +1390,664 @@ a.ficha-team:hover .ficha-team-name {
     font-size: 16px;
   }
 }
+
+/* ============================================
+   TAB BAR INFERIOR (mobile) — propuesta diseño
+   ============================================ */
+
+.tabbar {
+  display: none;
+  position: fixed;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  z-index: 120;
+  background: var(--surface);
+  border-top: 0.5px solid var(--border);
+  grid-template-columns: repeat(4, 1fr);
+  padding: 6px 8px calc(8px + env(safe-area-inset-bottom));
+  gap: 4px;
+}
+
+.tabbar-item {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 3px;
+  padding: 7px 0 4px;
+  border-radius: 12px;
+  color: var(--text-tertiary);
+  font-size: 10.5px;
+  font-weight: 600;
+  min-height: 48px;
+  text-decoration: none;
+}
+
+.tabbar-item .ico {
+  width: 22px;
+  height: 22px;
+  display: grid;
+  place-items: center;
+}
+
+.tabbar-item .ico svg {
+  width: 20px;
+  height: 20px;
+}
+
+.tabbar-item.on {
+  color: var(--primary);
+}
+
+@media (max-width: 860px) {
+  .tabbar {
+    display: grid;
+  }
+  body.has-tabbar .page {
+    padding-bottom: 96px;
+  }
+  body.has-tabbar .footer {
+    padding-bottom: 72px;
+  }
+  /* El menú hamburguesa queda para lo secundario */
+  .nav.open a.nav-primary {
+    display: none;
+  }
+}
+
+/* ============================================
+   MI EQUIPO (card favorito) — propuesta diseño
+   ============================================ */
+
+.myteam {
+  background: linear-gradient(135deg, var(--primary) 0%, var(--primary-dark) 100%);
+  color: #fff;
+  border-radius: var(--radius-xl);
+  padding: 16px;
+  margin-bottom: 20px;
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+.myteam .top {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.myteam .top .team-avatar {
+  width: 44px;
+  height: 44px;
+  font-size: 17px;
+}
+
+.myteam .top b {
+  font-size: 16px;
+  display: block;
+}
+
+.myteam .top .sub {
+  font-size: 11px;
+  color: rgba(255,255,255,0.65);
+  display: block;
+}
+
+.myteam .star {
+  margin-left: auto;
+  color: var(--gold);
+  font-size: 18px;
+  background: none;
+  border: none;
+  cursor: pointer;
+  padding: 4px;
+}
+
+.myteam .stats {
+  display: flex;
+  gap: 8px;
+}
+
+.myteam .stat {
+  flex: 1;
+  background: rgba(255,255,255,0.08);
+  border-radius: 10px;
+  padding: 8px 0 7px;
+  text-align: center;
+}
+
+.myteam .stat b {
+  display: block;
+  font-size: 16px;
+}
+
+.myteam .stat span {
+  font-size: 9.5px;
+  letter-spacing: 0.5px;
+  color: rgba(255,255,255,0.65);
+  font-weight: 700;
+}
+
+.myteam .next {
+  background: rgba(255,255,255,0.08);
+  border-radius: 10px;
+  padding: 10px 12px;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  font-size: 12.5px;
+  color: inherit;
+  text-decoration: none;
+}
+
+.myteam .next .vs {
+  color: rgba(255,255,255,0.65);
+  font-size: 11px;
+}
+
+.myteam .next b {
+  font-size: 13px;
+}
+
+.myteam .next .when {
+  margin-left: auto;
+  text-align: right;
+  font-size: 11px;
+  color: rgba(255,255,255,0.65);
+  line-height: 1.3;
+}
+
+.myteam .next .when b {
+  color: #fff;
+  display: block;
+  font-size: 12px;
+}
+
+.myteam-picker {
+  background: var(--surface);
+  border: 1px dashed var(--border-strong);
+  border-radius: var(--radius-xl);
+  padding: 14px 16px;
+  margin-bottom: 20px;
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  flex-wrap: wrap;
+}
+
+.myteam-picker .hint {
+  font-size: 13px;
+  color: var(--text-secondary);
+  flex: 1;
+  min-width: 180px;
+}
+
+.myteam-picker select {
+  font-family: inherit;
+  font-size: 13px;
+  padding: 8px 10px;
+  border-radius: var(--radius-md);
+  border: 0.5px solid var(--border-strong);
+  background: var(--surface);
+  color: var(--text);
+}
+
+@media (min-width: 861px) {
+  .myteam, .myteam-picker {
+    display: none;
+  }
+}
+
+/* ============================================
+   MINI PARTIDOS: carrusel mobile / grilla desktop
+   ============================================ */
+
+.hscroll {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(170px, 1fr));
+  gap: 10px;
+  margin-bottom: 28px;
+}
+
+.mini-match {
+  background: var(--surface);
+  border: 0.5px solid var(--border);
+  border-radius: var(--radius-lg);
+  padding: 12px;
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  text-decoration: none;
+  color: inherit;
+  transition: border-color 0.15s, transform 0.1s;
+}
+
+.mini-match:hover {
+  border-color: var(--border-strong);
+  transform: translateY(-1px);
+}
+
+.mini-match .meta {
+  font-size: 10.5px;
+  color: var(--text-tertiary);
+  font-weight: 600;
+}
+
+.mini-match .row {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.mini-match .row b {
+  font-size: 12.5px;
+  font-weight: 600;
+  flex: 1;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.mini-match .row .g {
+  font-size: 14px;
+  font-weight: 800;
+  font-variant-numeric: tabular-nums;
+}
+
+.mini-match .row .g.lose {
+  color: var(--text-tertiary);
+  font-weight: 600;
+}
+
+@media (max-width: 860px) {
+  .hscroll {
+    display: flex;
+    overflow-x: auto;
+    -webkit-overflow-scrolling: touch;
+    scroll-snap-type: x proximity;
+    padding-bottom: 6px;
+  }
+  .hscroll::-webkit-scrollbar {
+    display: none;
+  }
+  .mini-match {
+    width: 158px;
+    flex: none;
+    scroll-snap-align: start;
+  }
+}
+
+/* ============================================
+   CHIPS DE FECHAS (fixture) — propuesta diseño
+   ============================================ */
+
+.fecha-selector {
+  display: flex;
+  gap: 8px;
+  overflow-x: auto;
+  -webkit-overflow-scrolling: touch;
+  padding: 2px 2px 10px;
+  margin-bottom: 14px;
+}
+
+.fecha-selector::-webkit-scrollbar {
+  display: none;
+}
+
+.fecha-btn {
+  border: 0.5px solid var(--border-strong);
+  background: var(--surface);
+  border-radius: 99px;
+  padding: 8px 16px;
+  font-family: inherit;
+  font-size: 12.5px;
+  font-weight: 600;
+  color: var(--text-secondary);
+  white-space: nowrap;
+  flex: none;
+  min-height: 42px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  line-height: 1.2;
+  cursor: pointer;
+  transition: background 0.15s, color 0.15s, border-color 0.15s;
+}
+
+.fecha-btn small {
+  font-size: 9.5px;
+  font-weight: 600;
+  color: var(--text-tertiary);
+}
+
+.fecha-btn:hover {
+  border-color: var(--primary);
+}
+
+.fecha-btn.active {
+  background: var(--primary);
+  border-color: var(--primary);
+  color: #fff;
+}
+
+.fecha-btn.active small {
+  color: rgba(255,255,255,0.65);
+}
+
+/* ============================================
+   SEGMENTED CONTROL (zonas) — propuesta diseño
+   ============================================ */
+
+.seg {
+  display: flex;
+  background: var(--surface-2);
+  border-radius: 10px;
+  padding: 3px;
+  gap: 3px;
+  margin-bottom: 16px;
+  max-width: 340px;
+}
+
+.seg button {
+  flex: 1;
+  border: 0;
+  background: transparent;
+  font-family: inherit;
+  font-size: 13px;
+  font-weight: 600;
+  color: var(--text-secondary);
+  padding: 8px 0;
+  border-radius: 8px;
+  min-height: 36px;
+  cursor: pointer;
+}
+
+.seg button.on {
+  background: var(--primary);
+  color: #fff;
+  box-shadow: 0 1px 3px rgba(0,0,0,0.15);
+}
+
+/* ============================================
+   FILAS DE PARTIDO (fixture) — propuesta diseño
+   ============================================ */
+
+.match-list {
+  background: var(--surface);
+  border: 0.5px solid var(--border);
+  border-radius: var(--radius-lg);
+  overflow: hidden;
+  margin-bottom: 16px;
+}
+
+.match-list-head {
+  display: flex;
+  align-items: baseline;
+  gap: 8px;
+  padding: 14px 16px 8px;
+}
+
+.match-list-head h3 {
+  margin: 0;
+  font-size: 15px;
+  font-weight: 700;
+}
+
+.match-list-head .zona-pill {
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+  font-size: 11px;
+  font-weight: 700;
+  letter-spacing: 0.4px;
+  padding: 3px 9px;
+  border-radius: 99px;
+  text-transform: uppercase;
+  background: var(--surface-2);
+  color: var(--text-secondary);
+}
+
+.match-row {
+  display: grid;
+  grid-template-columns: 1fr auto 1fr;
+  align-items: center;
+  gap: 8px;
+  padding: 12px 14px;
+  border-bottom: 0.5px solid var(--border);
+  text-decoration: none;
+  color: inherit;
+  transition: background 0.15s;
+}
+
+.match-row:last-child {
+  border-bottom: 0;
+}
+
+.match-row:hover {
+  background: var(--surface-2);
+}
+
+.match-row .side {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  min-width: 0;
+}
+
+.match-row .side.right {
+  flex-direction: row-reverse;
+}
+
+.match-row .side b {
+  font-size: 13.5px;
+  font-weight: 600;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.match-row .side b.lose {
+  color: var(--text-tertiary);
+  font-weight: 500;
+}
+
+.match-row .mscore {
+  font-size: 17px;
+  font-weight: 800;
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  font-variant-numeric: tabular-nums;
+}
+
+.match-row .mscore .lose {
+  color: var(--text-tertiary);
+}
+
+.match-row .mscore.muted {
+  color: var(--text-tertiary);
+  font-size: 12px;
+  font-weight: 700;
+}
+
+.match-row .chevron {
+  color: var(--text-tertiary);
+  font-size: 16px;
+  flex: none;
+}
+
+/* ============================================
+   POSICIONES: clasificación, forma, expandible
+   ============================================ */
+
+.pos-clasifica-band {
+  position: relative;
+}
+
+.pos-clasifica-band::before {
+  content: '';
+  position: absolute;
+  left: 0;
+  top: 8px;
+  bottom: 8px;
+  width: 3px;
+  border-radius: 2px;
+  background: var(--success);
+}
+
+.standings-row.fav,
+.data-table tr.fav td {
+  background: #FFF8E1;
+}
+
+.fav-star {
+  color: var(--accent);
+  font-size: 11px;
+}
+
+.clasifica-legend {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  font-size: 11px;
+  color: var(--text-secondary);
+  padding: 10px 14px 12px;
+}
+
+.clasifica-legend .swatch {
+  width: 10px;
+  height: 10px;
+  border-radius: 3px;
+  background: var(--success);
+  flex: none;
+}
+
+.forma-dot {
+  width: 18px;
+  height: 18px;
+  border-radius: 50%;
+  display: inline-grid;
+  place-items: center;
+  color: #fff;
+  font-size: 10px;
+  font-weight: 700;
+}
+
+.forma-dot.g { background: var(--success); }
+.forma-dot.e { background: #A8A8A0; }
+.forma-dot.p { background: var(--danger); }
+
+.pos-detail-row td {
+  background: #FBFAF7;
+  padding: 4px 16px 14px !important;
+}
+
+.pos-detail-grid {
+  display: grid;
+  grid-template-columns: repeat(5, 1fr);
+  gap: 6px;
+  padding-top: 6px;
+}
+
+.pos-detail-grid .cell {
+  background: var(--surface);
+  border: 0.5px solid var(--border);
+  border-radius: 10px;
+  padding: 7px 0 6px;
+  text-align: center;
+}
+
+.pos-detail-grid .cell b {
+  display: block;
+  font-size: 15px;
+  color: var(--text);
+}
+
+.pos-detail-grid .cell span {
+  font-size: 9.5px;
+  letter-spacing: 0.5px;
+  color: var(--text-tertiary);
+  font-weight: 700;
+}
+
+.pos-forma {
+  display: flex;
+  align-items: center;
+  gap: 5px;
+  padding-top: 10px;
+  font-size: 11px;
+  color: var(--text-tertiary);
+}
+
+.data-table tbody tr.pos-row {
+  cursor: pointer;
+}
+
+@media (max-width: 640px) {
+  .data-table .col-detail {
+    display: none;
+  }
+}
+
+/* ============================================
+   HERO CON DATOS RÁPIDOS — propuesta desktop
+   ============================================ */
+
+.hero-inner {
+  display: flex;
+  align-items: center;
+  gap: 24px;
+  flex-wrap: wrap;
+  position: relative;
+  z-index: 1;
+}
+
+.hero-main {
+  flex: 1;
+  min-width: 260px;
+}
+
+.hero-quick {
+  display: flex;
+  gap: 10px;
+  flex-wrap: wrap;
+}
+
+.hero-quick .q {
+  background: rgba(255,255,255,0.08);
+  border-radius: 10px;
+  padding: 9px 16px;
+  text-align: center;
+}
+
+.hero-quick .q b {
+  display: block;
+  font-size: 17px;
+}
+
+.hero-quick .q span {
+  font-size: 10px;
+  letter-spacing: 0.5px;
+  color: rgba(255,255,255,0.65);
+  font-weight: 700;
+}
+
+/* ============================================
+   ZONAS LADO A LADO — propuesta desktop
+   ============================================ */
+
+@media (min-width: 861px) {
+  .zones-row {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 16px;
+  }
+  .zones-row .zone-block {
+    display: block !important;
+  }
+  .zones-tabs {
+    display: none;
+  }
+}
+
