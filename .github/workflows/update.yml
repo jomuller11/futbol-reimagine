@@ -3,8 +3,8 @@ name: Actualizar datos del torneo
 # Cuándo se ejecuta:
 on:
   schedule:
-    # Lunes 11:00 ARG = lunes 14:00 UTC
-    - cron: '0 14 * * 1'
+    # Lunes 11:00 ARG = lunes 14:00 UTC (minuto :07 — los :00 son menos confiables en GitHub)
+    - cron: '7 14 * * 1'
   workflow_dispatch:
 
 # Permisos necesarios para hacer commit al repo
