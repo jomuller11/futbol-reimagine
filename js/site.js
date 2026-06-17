@@ -38,6 +38,24 @@ function formaDotsHtml(id) {
   ).join('');
 }
 
+// ---------- Zona de la fase final según la posición (0-based) ----------
+// 1°-4° → A · 5°-8° → B · 9°-12° → C
+function zonaDestino(idx) {
+  if (idx < 4) return 'A';
+  if (idx < 8) return 'B';
+  return 'C';
+}
+
+function zonaLegendHtml() {
+  return `
+    <div class="zona-legend">
+      <span class="item"><span class="swatch a"></span> 1°-4° → Zona A</span>
+      <span class="item"><span class="swatch b"></span> 5°-8° → Zona B</span>
+      <span class="item"><span class="swatch c"></span> 9°-12° → Zona C</span>
+    </div>
+  `;
+}
+
 // ---------- Próximo partido de un equipo ----------
 function getProximoPartido(id) {
   for (const f of FIXTURE) {

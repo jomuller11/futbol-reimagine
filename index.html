@@ -296,14 +296,16 @@
         const dgClass = dg > 0 ? 'dg-pos' : (dg < 0 ? 'dg-neg' : '');
         const dgText = dg > 0 ? `+${dg}` : `${dg}`;
         const esFav = r.id === mi;
+        const zd = zonaDestino(i);
         const nameTag = (i === 0 || esFav) ? 'strong' : 'span';
         return `
-          <a href="equipo.html?id=${r.id}" class="standings-row ${i===0?'top-1':''} ${i<4?'pos-clasifica-band':''} ${esFav?'fav':''}">
+          <a href="equipo.html?id=${r.id}" class="standings-row zband zband-${zd.toLowerCase()} ${i===0?'top-1':''} ${esFav?'fav':''}">
             <span class="standings-pos">${i+1}</span>
             <span class="standings-team">${teamAvatar(r.id, 24)}<${nameTag}>${getEquipoNombre(r.id)}</${nameTag}>${esFav?' <span class="fav-star">★</span>':''}</span>
             <span class="standings-num">${r.pj}</span>
             <span class="standings-num ${dgClass}">${dgText}</span>
             <span class="standings-pts">${r.pts}</span>
+            <span class="zchip zchip-${zd.toLowerCase()}" title="Zona ${zd}">${zd}</span>
           </a>
         `;
       }).join('');
@@ -315,9 +317,10 @@
             <span class="standings-num">PJ</span>
             <span class="standings-num">DG</span>
             <span class="standings-num">Pts</span>
+            <span class="standings-num">Fase</span>
           </div>
           ${items}
-          <div class="clasifica-legend"><span class="swatch"></span> Clasifican a playoffs (top 4)</div>
+          ${zonaLegendHtml()}
           <a href="estadisticas.html" class="standings-footer">Ver tabla completa (${total} equipos) →</a>
         </div>
       `;

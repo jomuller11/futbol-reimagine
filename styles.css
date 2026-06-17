@@ -644,10 +644,15 @@ a.match-card-sm .mc-info {
 .standings-header,
 .standings-row {
   display: grid;
-  grid-template-columns: 32px 1fr 40px 40px 44px;
+  grid-template-columns: 32px 1fr 40px 40px 44px 34px;
   align-items: center;
   padding: 10px 14px;
   font-size: 13px;
+}
+
+.standings-header span:last-child,
+.standings-row .zchip {
+  justify-self: center;
 }
 
 .standings-header {
@@ -1377,7 +1382,7 @@ a.ficha-team:hover .ficha-team-name {
   }
   .standings-header,
   .standings-row {
-    grid-template-columns: 28px 1fr 32px 36px 38px;
+    grid-template-columns: 28px 1fr 30px 34px 36px 30px;
     font-size: 12px;
     padding: 10px;
   }
@@ -1881,20 +1886,46 @@ a.ficha-team:hover .ficha-team-name {
    POSICIONES: clasificación, forma, expandible
    ============================================ */
 
-.pos-clasifica-band {
+/* Zona destino de la fase final: A (1°-4°) · B (5°-8°) · C (9°-12°) */
+:root {
+  --zona-a: #0F3C5F;  /* navy */
+  --zona-b: #2E5E8C;  /* azul */
+  --zona-c: #888780;  /* gris */
+}
+
+.zband {
   position: relative;
 }
 
-.pos-clasifica-band::before {
+.zband::before {
   content: '';
   position: absolute;
   left: 0;
-  top: 8px;
-  bottom: 8px;
+  top: 6px;
+  bottom: 6px;
   width: 3px;
   border-radius: 2px;
-  background: var(--success);
 }
+
+.zband-a::before { background: var(--zona-a); }
+.zband-b::before { background: var(--zona-b); }
+.zband-c::before { background: var(--zona-c); }
+
+.zchip {
+  display: inline-grid;
+  place-items: center;
+  width: 19px;
+  height: 19px;
+  border-radius: 50%;
+  font-size: 10px;
+  font-weight: 700;
+  color: #fff;
+  flex: none;
+}
+
+.zchip-a { background: var(--zona-a); }
+.zchip-b { background: var(--zona-b); }
+.zchip-c { background: var(--zona-c); }
 
 .standings-row.fav,
 .data-table tr.fav td {
@@ -1906,22 +1937,32 @@ a.ficha-team:hover .ficha-team-name {
   font-size: 11px;
 }
 
-.clasifica-legend {
+.zona-legend {
   display: flex;
   align-items: center;
-  gap: 6px;
+  gap: 14px;
+  flex-wrap: wrap;
   font-size: 11px;
   color: var(--text-secondary);
   padding: 10px 14px 12px;
 }
 
-.clasifica-legend .swatch {
+.zona-legend .item {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+}
+
+.zona-legend .swatch {
   width: 10px;
   height: 10px;
   border-radius: 3px;
-  background: var(--success);
   flex: none;
 }
+
+.zona-legend .swatch.a { background: var(--zona-a); }
+.zona-legend .swatch.b { background: var(--zona-b); }
+.zona-legend .swatch.c { background: var(--zona-c); }
 
 .forma-dot {
   width: 18px;

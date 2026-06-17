@@ -228,10 +228,11 @@
         const dgClass = dg > 0 ? 'dg-pos' : (dg < 0 ? 'dg-neg' : '');
         const dgText = dg > 0 ? `+${dg}` : `${dg}`;
         const esFav = r.id === mi;
+        const zd = zonaDestino(i);
         const rowCls = [i===0 ? 'top-row' : '', esFav ? 'fav' : '', 'pos-row'].filter(Boolean).join(' ');
         return `
           <tr class="${rowCls}" data-equipo="${r.id}">
-            <td class="center ${i<4 ? 'pos-clasifica-band' : ''}"><strong>${i+1}</strong></td>
+            <td class="center zband zband-${zd.toLowerCase()}"><strong>${i+1}</strong></td>
             <td>
               <a href="equipo.html?id=${r.id}" class="team-cell">
                 ${teamAvatar(r.id, 26)}
@@ -246,9 +247,10 @@
             <td class="center col-detail">${r.gc}</td>
             <td class="center ${dgClass}">${dgText}</td>
             <td class="pts">${r.pts}</td>
+            <td class="center"><span class="zchip zchip-${zd.toLowerCase()}" title="Zona ${zd}">${zd}</span></td>
           </tr>
           <tr class="pos-detail-row" data-detail="${r.id}" style="display:none;">
-            <td colspan="10">
+            <td colspan="11">
               <div class="pos-detail-grid">
                 <span class="cell"><b>${r.pg}</b><span>PG</span></span>
                 <span class="cell"><b>${r.pe}</b><span>PE</span></span>
@@ -276,11 +278,12 @@
               <th class="center col-detail">GC</th>
               <th class="center">DG</th>
               <th class="center">Pts</th>
+              <th class="center">Fase</th>
             </tr>
           </thead>
           <tbody>${body}</tbody>
         </table>
-        <div class="clasifica-legend"><span class="swatch"></span> Clasifican a playoffs (top 4)</div>
+        ${zonaLegendHtml()}
       `;
 
       // Tocar la fila despliega el detalle (PG/PE/PP, goles y últimos 5)
