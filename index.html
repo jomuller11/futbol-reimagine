@@ -132,15 +132,18 @@
   <script src="data/torneo.js"></script>
   <script src="js/site.js"></script>
   <script>
+    const proximaTxt = STATS_GLOBALES.proximaFecha
+      ? `Próxima: Fecha ${STATS_GLOBALES.proximaFecha} · ${STATS_GLOBALES.proximaFechaTexto}`
+      : 'Fase regular finalizada';
     document.getElementById('hero-sub').textContent =
-      `Fecha ${STATS_GLOBALES.fechaActual} de ${STATS_GLOBALES.totalFechas} jugada · Próxima fecha ${STATS_GLOBALES.proximaFechaTexto}`;
+      `${STATS_GLOBALES.fechaActual} de ${STATS_GLOBALES.totalFechas} fechas jugadas · ${proximaTxt}`;
 
     // Datos rápidos arriba del pliegue (propuesta desktop)
     document.getElementById('hero-quick').innerHTML = `
       <span class="q"><b>${STATS_GLOBALES.equipos}</b><span>EQUIPOS</span></span>
       <span class="q"><b>${STATS_GLOBALES.partidosJugados}</b><span>JUGADOS</span></span>
       <span class="q"><b>${STATS_GLOBALES.totalGoles}</b><span>GOLES</span></span>
-      <span class="q"><b>${STATS_GLOBALES.proximaFechaTexto}</b><span>PRÓXIMA FECHA</span></span>
+      <span class="q"><b>${STATS_GLOBALES.proximaFecha ? 'Fecha ' + STATS_GLOBALES.proximaFecha : '—'}</b><span>PRÓXIMA FECHA</span></span>
     `;
 
     // ===========================================
