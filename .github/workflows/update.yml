@@ -3,8 +3,11 @@ name: Actualizar datos del torneo
 # Cuándo se ejecuta:
 on:
   schedule:
-    # Todos los días 11:00 ARG = 14:00 UTC (minuto :07 — los :00 son menos confiables en GitHub)
-    - cron: '7 14 * * *'
+    # 3 intentos por día (GitHub saltea crons seguido; con "Detectar cambios"
+    # los runs sin novedades no commitean nada). Horarios ARG: 10:37, 13:37, 17:37.
+    - cron: '37 13 * * *'
+    - cron: '37 16 * * *'
+    - cron: '37 20 * * *'
   workflow_dispatch:
 
 # Permisos necesarios para hacer commit al repo
