@@ -44,8 +44,6 @@
         <a href="fixture.html" class="nav-primary">Fixture</a>
         <a href="equipos.html">Equipos</a>
         <a href="estadisticas.html" class="nav-primary">Estadísticas</a>
-        <a href="#">Noticias</a>
-        <a href="#">Inscripción</a>
       </nav>
       <button class="mobile-toggle" onclick="document.getElementById('nav').classList.toggle('open')">☰</button>
     </div>
@@ -76,8 +74,6 @@
       </div>
       <div class="footer-social">
         <a href="https://www.facebook.com/papifutbolmoron" title="Facebook">f</a>
-        <a href="#" title="Instagram">ig</a>
-        <a href="#" title="WhatsApp">wa</a>
       </div>
     </div>
   </footer>
@@ -236,6 +232,8 @@
           </div>
         </div>
 
+        ${renderHistorial(partido)}
+
         <!-- COMPARATIVA DE EQUIPOS EN EL TORNEO -->
         <div class="ficha-section" style="margin-top: 16px;">
           <div class="ficha-section-title">📊 Comparativa en el torneo</div>
@@ -248,6 +246,43 @@
 
       document.getElementById('ficha-content').innerHTML = html;
       document.title = `${eqLocal.nombre} ${jugada ? partido.golesL+'-'+partido.golesV : 'vs'} ${eqVisit.nombre} · Papi Fútbol`;
+    }
+
+    // Otros cruces entre los mismos dos equipos (ida/vuelta u otra rueda)
+    function renderHistorial(partido) {
+      const cruces = [];
+      FIXTURE.forEach(f => {
+        if (f.estado !== 'jugada' || f.fecha === partido.fecha) return;
+        [...f.zona1, ...f.zona2].forEach(p => {
+          const mismoPar =
+            (p.local === partido.local && p.visitante === partido.visitante) ||
+            (p.local === partido.visitante && p.visitante === partido.local);
+          if (mismoPar && p.golesL !== undefined) {
+            cruces.push({ ...p, fecha: f.fecha, fechaTexto: f.fechaTexto });
+          }
+        });
+      });
+      if (!cruces.length) return '';
+
+      const filas = cruces.map(c => {
+        const winL = c.golesL > c.golesV;
+        const winV = c.golesV > c.golesL;
+        return `
+          <a href="ficha.html?fecha=${c.fecha}&local=${c.local}" class="match-row">
+            <span class="side">${teamAvatar(c.local, 26)}<b class="${winV ? 'lose' : ''}">${getEquipoNombre(c.local)}</b></span>
+            <span class="mscore"><span class="${winV ? 'lose' : ''}">${c.golesL}</span>–<span class="${winL ? 'lose' : ''}">${c.golesV}</span></span>
+            <span class="side right"><span class="chevron">›</span>${teamAvatar(c.visitante, 26)}<b class="${winL ? 'lose' : ''}">${getEquipoNombre(c.visitante)}</b></span>
+          </a>
+          <div style="font-size:11px; color:var(--text-tertiary); text-align:center; padding-bottom:8px;">Fecha ${c.fecha} · ${c.fechaTexto}</div>
+        `;
+      }).join('');
+
+      return `
+        <div class="ficha-section" style="margin-top: 16px;">
+          <div class="ficha-section-title">🔁 Ya se enfrentaron</div>
+          ${filas}
+        </div>
+      `;
     }
 
     function renderBarra(label, valL, valV, colorL, colorV, lessIsBetter) {

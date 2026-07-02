@@ -216,8 +216,6 @@
         <a href="fixture.html" class="nav-primary">Fixture</a>
         <a href="equipos.html" class="active">Equipos</a>
         <a href="estadisticas.html" class="nav-primary">Estadísticas</a>
-        <a href="#">Noticias</a>
-        <a href="#">Inscripción</a>
       </nav>
       <button class="mobile-toggle" onclick="document.getElementById('nav').classList.toggle('open')">☰</button>
     </div>
@@ -248,8 +246,6 @@
       </div>
       <div class="footer-social">
         <a href="https://www.facebook.com/papifutbolmoron" title="Facebook">f</a>
-        <a href="#" title="Instagram">ig</a>
-        <a href="#" title="WhatsApp">wa</a>
       </div>
     </div>
   </footer>
@@ -301,7 +297,10 @@
         <div class="equipo-hero" style="border-top: 4px solid ${color};">
           <div class="equipo-hero-avatar" style="background:${color};">${id}</div>
           <div class="equipo-hero-info">
-            <div class="equipo-hero-zone">Zona ${zona} · Posición ${posIndex+1}°</div>
+            <div class="equipo-hero-zone" style="display:flex; align-items:center; gap:8px;">
+              Zona ${zona} · Posición ${posIndex+1}°
+              <span class="zchip zchip-${zonaDestino(posIndex).toLowerCase()}" title="Hoy clasifica a Zona ${zonaDestino(posIndex)}">${zonaDestino(posIndex)}</span>
+            </div>
             <div class="equipo-hero-name">${equipo.nombre}</div>
             <div class="equipo-hero-stats">
               <span><strong>${posicionData.pts}</strong>pts</span>
@@ -311,6 +310,7 @@
               <span><strong>${posicionData.pp}</strong>PP</span>
               <span><strong>${posicionData.gf}:${posicionData.gc}</strong></span>
               <span>DG <strong style="color:${dg>0?'var(--success)':(dg<0?'var(--danger)':'inherit')}">${dgText}</strong></span>
+              <span style="display:inline-flex; align-items:center; gap:4px;">Últimos 5 ${formaDotsHtml(id)}</span>
             </div>
           </div>
         </div>

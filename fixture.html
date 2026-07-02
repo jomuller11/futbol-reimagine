@@ -32,8 +32,6 @@
         <a href="fixture.html" class="active nav-primary">Fixture</a>
         <a href="equipos.html">Equipos</a>
         <a href="estadisticas.html" class="nav-primary">Estadísticas</a>
-        <a href="#">Noticias</a>
-        <a href="#">Inscripción</a>
       </nav>
       <button class="mobile-toggle" onclick="document.getElementById('nav').classList.toggle('open')">☰</button>
     </div>
@@ -71,8 +69,6 @@
       </div>
       <div class="footer-social">
         <a href="https://www.facebook.com/papifutbolmoron" title="Facebook">f</a>
-        <a href="#" title="Instagram">ig</a>
-        <a href="#" title="WhatsApp">wa</a>
       </div>
     </div>
   </footer>
@@ -93,19 +89,22 @@
       </button>
     `).join('');
 
-    // Fila de partido: ganador en negrita, perdedor atenuado, hora si está pendiente
+    // Fila de partido: ganador en negrita, perdedor atenuado, hora si está pendiente.
+    // El partido de "mi equipo" se resalta.
     function renderMatchRow(p, fechaNum) {
       const jugada = (p.golesL !== undefined && p.golesV !== undefined);
       const winL = jugada && p.golesL > p.golesV;
       const winV = jugada && p.golesV > p.golesL;
+      const mi = getMiEquipo();
+      const esMio = mi && (p.local === mi || p.visitante === mi);
       const center = jugada
         ? `<span class="mscore"><span class="${winV ? 'lose' : ''}">${p.golesL}</span>–<span class="${winL ? 'lose' : ''}">${p.golesV}</span></span>`
         : `<span class="mscore muted">${p.hora || 'VS'}</span>`;
       return `
-        <a href="ficha.html?fecha=${fechaNum}&local=${p.local}" class="match-row">
-          <span class="side">${teamAvatar(p.local, 30)}<b class="${winV ? 'lose' : ''}">${getEquipoNombre(p.local)}</b></span>
+        <a href="ficha.html?fecha=${fechaNum}&local=${p.local}" class="match-row ${esMio ? 'mine' : ''}">
+          <span class="side">${teamAvatar(p.local, 30)}<b class="${winV ? 'lose' : ''}">${getEquipoNombre(p.local)}${p.local === mi ? ' <span class="fav-star">★</span>' : ''}</b></span>
           ${center}
-          <span class="side right"><span class="chevron">›</span>${teamAvatar(p.visitante, 30)}<b class="${winL ? 'lose' : ''}">${getEquipoNombre(p.visitante)}</b></span>
+          <span class="side right"><span class="chevron">›</span>${teamAvatar(p.visitante, 30)}<b class="${winL ? 'lose' : ''}">${getEquipoNombre(p.visitante)}${p.visitante === mi ? ' <span class="fav-star">★</span>' : ''}</b></span>
         </a>
       `;
     }

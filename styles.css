@@ -1882,6 +1882,14 @@ a.ficha-team:hover .ficha-team-name {
   flex: none;
 }
 
+.match-row.mine {
+  background: #FFF8E1;
+}
+
+.match-row.mine:hover {
+  background: #FAF0D0;
+}
+
 /* ============================================
    POSICIONES: clasificación, forma, expandible
    ============================================ */
