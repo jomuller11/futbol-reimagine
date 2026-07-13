@@ -42,16 +42,14 @@
 
       <div class="page-header">
         <h1 class="page-title">Fixture del torneo</h1>
-        <p class="page-sub">Primera fase · 11 fechas · 24 equipos divididos en 2 zonas</p>
+        <p class="page-sub" id="fixture-sub"></p>
       </div>
+
+      <div class="seg" id="fase-filter" style="max-width:400px;"></div>
 
       <div class="fecha-selector" id="fecha-selector"></div>
 
-      <div class="seg" id="zona-filter">
-        <button data-zona="0" class="on">Todas</button>
-        <button data-zona="1">Zona 1</button>
-        <button data-zona="2">Zona 2</button>
-      </div>
+      <div class="seg" id="zona-filter"></div>
 
       <div id="fecha-content"></div>
 
@@ -76,21 +74,21 @@
   <script src="data/torneo.js"></script>
   <script src="js/site.js"></script>
   <script>
-    // Chips de fechas, centrados en la fecha vigente
     const selector = document.getElementById('fecha-selector');
-    const ultimasJugadas = FIXTURE.filter(f => f.estado === 'jugada');
-    let fechaActiva = ultimasJugadas.length > 0 ? ultimasJugadas[ultimasJugadas.length-1].fecha : 1;
-    let zonaActiva = parseInt(localStorage.getItem('fixtureZona') || '0');
+    const faseFilter = document.getElementById('fase-filter');
+    const zonaFilter = document.getElementById('zona-filter');
 
-    selector.innerHTML = FIXTURE.map(f => `
-      <button class="fecha-btn ${f.fecha===fechaActiva?'active':''}" data-fecha="${f.fecha}">
-        ${f.fecha===fechaActiva ? 'Fecha ' + f.fecha : 'F' + f.fecha}
-        <small>${f.fechaTexto.substring(0, 5)}</small>
-      </button>
-    `).join('');
+    // Fase por defecto: la actual (última). Se recuerda la elección.
+    const faseActualNum = Math.max(...FIXTURE.map(f => f.fase));
+    let faseActiva = parseInt(localStorage.getItem('fixtureFase')) || faseActualNum;
+    if (!FASES.some(f => f.id === faseActiva)) faseActiva = faseActualNum;
+    let zonaActiva = 'todas';   // 'todas' o una zona de la fase
+    let fechaActiva = null;     // fecha global activa
+
+    function faseDe(id) { return FASES.find(f => f.id === id); }
+    function fechasDeFase(id) { return FIXTURE.filter(f => f.fase === id); }
 
     // Fila de partido: ganador en negrita, perdedor atenuado, hora si está pendiente.
-    // El partido de "mi equipo" se resalta.
     function renderMatchRow(p, fechaNum) {
       const jugada = (p.golesL !== undefined && p.golesV !== undefined);
       const winL = jugada && p.golesL > p.golesV;
@@ -109,79 +107,110 @@
       `;
     }
 
-    function renderZonaList(f, zona) {
-      const partidos = f['zona' + zona];
+    function renderZonaList(f, zonaKey) {
+      const partidos = f.zonas[zonaKey] || [];
+      if (!partidos.length) return '';
       return `
         <div class="match-list">
           <div class="match-list-head">
             <h3>${f.estado === 'jugada' ? 'Resultados' : 'Partidos'}</h3>
-            <span class="zona-pill">Zona ${zona}</span>
+            <span class="zona-pill">Zona ${zonaKey}</span>
           </div>
           ${partidos.map(p => renderMatchRow(p, f.fecha)).join('')}
         </div>
       `;
     }
 
-    function renderFecha(numero) {
-      const f = FIXTURE.find(x => x.fecha === numero);
+    function renderFecha(fechaGlobal) {
+      const f = FIXTURE.find(x => x.fecha === fechaGlobal);
       if (!f) return;
-
       const estadoBadge = f.estado === 'jugada'
         ? '<span class="badge badge-success">Jugada</span>'
         : '<span class="badge badge-warning">Pendiente</span>';
-
-      const zonas = zonaActiva === 0 ? [1, 2] : [zonaActiva];
-
-      const html = `
-        <div style="display:flex; align-items:center; gap:12px; margin-bottom:16px;">
-          <h2 style="font-size: 22px; font-weight: 700;">Fecha ${f.fecha}</h2>
-          <span style="color: var(--text-secondary); font-size: 14px;">· ${f.fechaTexto}</span>
+      const zonasFase = faseDe(f.fase).zonas;
+      const zonas = zonaActiva === 'todas' ? zonasFase : [zonaActiva];
+      document.getElementById('fecha-content').innerHTML = `
+        <div style="display:flex; align-items:center; gap:12px; margin-bottom:16px; flex-wrap:wrap;">
+          <h2 style="font-size: 22px; font-weight: 700;">Fecha ${f.faseFecha}</h2>
+          <span style="color: var(--text-secondary); font-size: 14px;">Fase ${f.fase} · ${f.fechaTexto}</span>
           ${estadoBadge}
         </div>
         ${zonas.map(z => renderZonaList(f, z)).join('')}
       `;
-      document.getElementById('fecha-content').innerHTML = html;
     }
 
-    selector.addEventListener('click', e => {
-      const btn = e.target.closest('.fecha-btn');
-      if (!btn) return;
-      fechaActiva = parseInt(btn.dataset.fecha);
-      selector.innerHTML = FIXTURE.map(f => `
+    function renderChips() {
+      const fechas = fechasDeFase(faseActiva);
+      selector.innerHTML = fechas.map(f => `
         <button class="fecha-btn ${f.fecha===fechaActiva?'active':''}" data-fecha="${f.fecha}">
-          ${f.fecha===fechaActiva ? 'Fecha ' + f.fecha : 'F' + f.fecha}
+          ${f.fecha===fechaActiva ? 'Fecha ' + f.faseFecha : 'F' + f.faseFecha}
           <small>${f.fechaTexto.substring(0, 5)}</small>
         </button>
       `).join('');
+    }
+
+    function renderZonaFilter() {
+      const zonas = faseDe(faseActiva).zonas;
+      zonaFilter.innerHTML =
+        `<button data-zona="todas" class="${zonaActiva==='todas'?'on':''}">Todas</button>` +
+        zonas.map(z => `<button data-zona="${z}" class="${zonaActiva===z?'on':''}">Zona ${z}</button>`).join('');
+    }
+
+    // Elegir la fecha activa dentro de la fase: la última jugada, o la primera pendiente
+    function fechaInicialDeFase(id) {
+      const fechas = fechasDeFase(id);
+      const jugadas = fechas.filter(f => f.estado === 'jugada');
+      if (jugadas.length) return jugadas[jugadas.length - 1].fecha;
+      return fechas.length ? fechas[0].fecha : null;
+    }
+
+    function switchFase(id) {
+      faseActiva = id;
+      localStorage.setItem('fixtureFase', id);
+      zonaActiva = 'todas';
+      fechaActiva = fechaInicialDeFase(id);
+      document.getElementById('fixture-sub').textContent =
+        `${faseDe(id).label} · ${faseDe(id).sub} · ${fechasDeFase(id).length} fechas`;
+      faseFilter.querySelectorAll('button').forEach(b =>
+        b.classList.toggle('on', parseInt(b.dataset.fase) === id));
+      renderZonaFilter();
+      renderChips();
       renderFecha(fechaActiva);
+      centrarChip('instant');
+    }
+
+    function centrarChip(behavior) {
       const activeBtn = selector.querySelector('.fecha-btn.active');
-      if (activeBtn) activeBtn.scrollIntoView({inline: 'center', block: 'nearest', behavior: 'smooth'});
+      if (activeBtn) activeBtn.scrollIntoView({inline:'center', block:'nearest', behavior: behavior||'smooth'});
+    }
+
+    // Toggle de fase
+    faseFilter.innerHTML = FASES.map(f =>
+      `<button data-fase="${f.id}" class="${f.id===faseActiva?'on':''}">${f.label} <span style="opacity:.6; font-weight:400;">· ${f.sub}</span></button>`
+    ).join('');
+    faseFilter.addEventListener('click', e => {
+      const b = e.target.closest('button'); if (!b) return;
+      switchFase(parseInt(b.dataset.fase));
     });
 
-    // Filtro de zona (persistente)
-    const zonaFilter = document.getElementById('zona-filter');
-    zonaFilter.querySelectorAll('button').forEach(b => {
-      if (parseInt(b.dataset.zona) === zonaActiva) {
-        zonaFilter.querySelectorAll('button').forEach(x => x.classList.remove('on'));
-        b.classList.add('on');
-      }
-      b.addEventListener('click', () => {
-        zonaActiva = parseInt(b.dataset.zona);
-        localStorage.setItem('fixtureZona', zonaActiva);
-        zonaFilter.querySelectorAll('button').forEach(x => x.classList.remove('on'));
-        b.classList.add('on');
-        renderFecha(fechaActiva);
-      });
+    // Click en chip de fecha
+    selector.addEventListener('click', e => {
+      const btn = e.target.closest('.fecha-btn'); if (!btn) return;
+      fechaActiva = parseInt(btn.dataset.fecha);
+      renderChips();
+      renderFecha(fechaActiva);
+      centrarChip('smooth');
     });
 
-    renderFecha(fechaActiva);
+    // Click en filtro de zona
+    zonaFilter.addEventListener('click', e => {
+      const b = e.target.closest('button'); if (!b) return;
+      zonaActiva = b.dataset.zona;
+      renderZonaFilter();
+      renderFecha(fechaActiva);
+    });
 
-    // Centrar el chip activo
-    setTimeout(() => {
-      const activeBtn = selector.querySelector('.fecha-btn.active');
-      if (activeBtn) activeBtn.scrollIntoView({inline: 'center', block: 'nearest', behavior: 'instant'});
-    }, 100);
-
+    switchFase(faseActiva);
     renderTabBar('fixture');
   </script>
 

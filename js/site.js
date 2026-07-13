@@ -19,7 +19,7 @@ function computeForma(id, n) {
   n = n || 5;
   const res = [];
   FIXTURE.filter(f => f.estado === 'jugada').forEach(f => {
-    [...f.zona1, ...f.zona2].forEach(p => {
+    fechaPartidos(f).forEach(p => {
       if ((p.local === id || p.visitante === id) && p.golesL !== undefined) {
         const gp = p.local === id ? p.golesL : p.golesV;
         const gr = p.local === id ? p.golesV : p.golesL;
@@ -56,14 +56,24 @@ function zonaLegendHtml() {
   `;
 }
 
+// ---------- Zona real de fase final de un equipo (A/B/C), según datos oficiales ----------
+function getZonaFinal(id) {
+  for (const z of ['A', 'B', 'C']) {
+    const arr = (typeof POSICIONES !== 'undefined') && POSICIONES['zona' + z];
+    if (arr && arr.some(r => r.id === id)) return z;
+  }
+  return null;
+}
+
 // ---------- Próximo partido de un equipo ----------
 function getProximoPartido(id) {
   for (const f of FIXTURE) {
     if (f.estado !== 'pendiente') continue;
-    for (const zona of [1, 2]) {
-      for (const p of f['zona' + zona]) {
+    for (const [zona, partidos] of Object.entries(f.zonas)) {
+      for (const p of partidos) {
         if (p.local === id || p.visitante === id) {
-          return { ...p, fecha: f.fecha, fechaTexto: f.fechaTexto, zona, rival: p.local === id ? p.visitante : p.local };
+          return { ...p, fecha: f.fecha, fechaTexto: f.fechaTexto, zona,
+                   rival: p.local === id ? p.visitante : p.local };
         }
       }
     }

@@ -155,21 +155,27 @@ def parse_home(html):
     data["valla"] = parse_table_valla(tables[2])
     data["sanciones"] = parse_table_sanciones(tables[3])
 
-    # Posiciones: buscamos tablas que tengan encabezado con PTS/PJ/PG
-    posiciones = {"zona1": [], "zona2": []}
-    zona_idx = 1
-    for t in tables[4:]:
-        headers = [clean_text(th.get_text()) for th in t.find_all("th")]
-        if "PTS" in headers and "PJ" in headers:
-            key = f"zona{zona_idx}"
-            posiciones[key] = parse_table_posiciones(t)
-            zona_idx += 1
-            if zona_idx > 2:
-                break
+    # Posiciones: cada tabla vive en un contenedor con id 'posicionesZONA_X'
+    # (X = 1, 2 para la fase regular; A, B, C para la fase final).
+    posiciones = {}
+    for cont in soup.find_all(id=re.compile(r"^posicionesZONA_")):
+        m = re.match(r"posicionesZONA_(\w+)", cont.get("id", ""))
+        if not m:
+            continue
+        zona_key = m.group(1)  # '1','2','A','B','C'
+        t = cont.find("table")
+        if not t:
+            continue
+        filas = parse_table_posiciones(t)
+        if filas:
+            posiciones["zona" + zona_key] = filas
 
-    if not posiciones["zona1"] or not posiciones["zona2"]:
-        fail("No se encontraron las dos tablas de posiciones (zona 1 y zona 2)")
+    if "zona1" not in posiciones or "zona2" not in posiciones:
+        fail("No se encontraron las tablas de posiciones de la fase regular (zona 1 y 2)")
 
+    zonas_fin = [k for k in posiciones if k in ("zonaA", "zonaB", "zonaC")]
+    log(f"  Posiciones: fase regular (zona 1, 2) + fase final ({', '.join(zonas_fin) or 'sin datos aún'})",
+        verbose_only=True)
     data["posiciones"] = posiciones
 
     # Fixture: parseamos las secciones de cada fecha
@@ -307,65 +313,63 @@ def parse_fixture(soup):
     # Aprovechamos que en el fixture aparecen los headers 'FECHA N'
     fecha_blocks = re.split(r"\n(?=\d{2}-\d{2}-\d{4}\n)", text)
 
-    fechas_dict = {}  # numero_fecha -> {fechaTexto, zona1: [], zona2: []}
+    fechas_dict = {}  # fecha_str -> {fechaTexto, fase, zonas: {zonaKey: [partidos]}}
 
-    # Para detectar el número de fecha buscamos las listas de tabs "FECHA 1 ... FECHA 11"
-    # y luego cada bloque ZONA contiene una fecha en formato DD-MM-YYYY que es la que
-    # nos dice cuándo se juega.
-
-    # Más simple: buscar todos los bloques con patrón "ZONA ZONA N\n\nDD-MM-YYYY\n\n<partidos>"
+    # Cada bloque: "ZONA ZONA X\nDD-MM-YYYY\n<partidos>" donde X = 1/2 (fase regular)
+    # o A/B/C (fase final). La fase se deduce de la etiqueta de zona.
     zona_pattern = re.compile(
-        r"ZONA ZONA (\d)\n+(\d{2}-\d{2}-\d{4})\n+(.+?)(?=\n+ZONA ZONA \d|\n+\* FASE|\n+!\[|\Z)",
+        r"ZONA ZONA (\d|[ABC])\n+(\d{2}-\d{2}-\d{4})\n+(.+?)"
+        r"(?=\n+ZONA ZONA (?:\d|[ABC])|\n+\* FASE|\n+!\[|\Z)",
         re.DOTALL
     )
 
     for m in zona_pattern.finditer(text):
-        zona_num = int(m.group(1))
+        zona_key = m.group(1)  # '1','2','A','B','C'
         fecha_str = m.group(2)
         bloque_partidos = m.group(3)
+        fase = 1 if zona_key in ("1", "2") else 2
 
-        # Clave: fecha en formato DD-MM-YYYY (la usamos como agrupador)
-        # Misma fecha = misma jornada
-        if fecha_str not in fechas_dict:
-            fechas_dict[fecha_str] = {
-                "fechaTexto": fecha_str.replace("-", "/"),
-                "zona1": [],
-                "zona2": [],
-            }
+        d = fechas_dict.setdefault(fecha_str, {
+            "fechaTexto": fecha_str.replace("-", "/"),
+            "fase": fase,
+            "zonas": {},
+        })
+        d["zonas"].setdefault(zona_key, []).extend(
+            parse_partidos_bloque(bloque_partidos))
 
-        # Parsear los partidos dentro del bloque
-        partidos = parse_partidos_bloque(bloque_partidos)
-        clave_zona = f"zona{zona_num}"
-        fechas_dict[fecha_str][clave_zona].extend(partidos)
-
-    # Ordenar por fecha cronológica y numerar
+    # Ordenar cronológicamente. Numeración global (para URLs de ficha) y por fase.
     fechas_ordenadas = sorted(
         fechas_dict.items(),
         key=lambda kv: datetime.strptime(kv[0], "%d-%m-%Y")
     )
 
-    today = datetime.now().date()
+    fase_counter = {}
     for idx, (fecha_str, contenido) in enumerate(fechas_ordenadas, start=1):
-        fecha_dt = datetime.strptime(fecha_str, "%d-%m-%Y").date()
-        # Estado: 'jugada' si al menos un partido tiene resultado, 'pendiente' si no
-        partidos_todos = contenido["zona1"] + contenido["zona2"]
+        fase = contenido["fase"]
+        fase_counter[fase] = fase_counter.get(fase, 0) + 1
+        partidos_todos = [p for arr in contenido["zonas"].values() for p in arr]
         tiene_resultados = any("golesL" in p for p in partidos_todos)
-        estado = "jugada" if tiene_resultados else "pendiente"
 
         fixture.append({
-            "fecha": idx,
+            "fecha": idx,                     # global, único — usado en ficha.html?fecha=
+            "faseFecha": fase_counter[fase],  # número dentro de la fase
+            "fase": fase,
             "fechaTexto": contenido["fechaTexto"],
-            "estado": estado,
-            "zona1": contenido["zona1"],
-            "zona2": contenido["zona2"],
+            "estado": "jugada" if tiene_resultados else "pendiente",
+            "zonas": contenido["zonas"],
         })
 
-    log(f"  Fixture parseado: {len(fixture)} fechas")
+    n_f1 = sum(1 for f in fixture if f["fase"] == 1)
+    n_f2 = sum(1 for f in fixture if f["fase"] == 2)
+    log(f"  Fixture parseado: {len(fixture)} fechas (Fase 1: {n_f1}, Fase 2: {n_f2})")
+
+    def partidos_de(f):
+        return [p for arr in f["zonas"].values() for p in arr]
 
     # Agregar partido_id a cada partido jugado (para poder bajar la ficha)
     partido_map = extract_partido_ids_map(soup)
     for f in fixture:
-        for p in f["zona1"] + f["zona2"]:
+        for p in partidos_de(f):
             key = (p["local"], p["visitante"])
             if key in partido_map:
                 p["partido_id"] = partido_map[key]
@@ -375,7 +379,7 @@ def parse_fixture(soup):
     for f in fixture:
         if f["estado"] != "pendiente":
             continue
-        for p in f["zona1"] + f["zona2"]:
+        for p in partidos_de(f):
             key = (p["local"], p["visitante"])
             if key in cancha_map:
                 p.update(cancha_map[key])
@@ -612,7 +616,7 @@ def fetch_detalles_fichas(fixture):
     y agrega los eventos (goles y tarjetas) al objeto del partido."""
     jugados = [
         p for f in fixture if f["estado"] == "jugada"
-        for p in f["zona1"] + f["zona2"]
+        for arr in f["zonas"].values() for p in arr
         if p.get("partido_id")
     ]
     total = len(jugados)
@@ -725,6 +729,38 @@ def js_string(s):
     return "'" + str(s).replace("\\", "\\\\").replace("'", "\\'") + "'"
 
 
+# Etiqueta descriptiva de cada fase (extensible: una Fase 3 con llaves iría acá)
+FASE_SUBTITULOS = {1: "Regular", 2: "Final", 3: "Llaves"}
+
+
+def build_fases(fixture, posiciones):
+    """Metadata de las fases presentes, para que el frontend arme el toggle.
+    Cada fase lista sus zonas (orden 1,2 o A,B,C) tomadas del fixture y las
+    posiciones."""
+    fases = sorted({f["fase"] for f in fixture})
+    orden = {"1": 0, "2": 1, "A": 2, "B": 3, "C": 4}
+    out = []
+    for fase in fases:
+        zonas = set()
+        for f in fixture:
+            if f["fase"] == fase:
+                zonas.update(f["zonas"].keys())
+        # Incluir también zonas que estén en posiciones aunque el fixture aún no las tenga
+        for zk in ("1", "2", "A", "B", "C"):
+            if ("zona" + zk) in posiciones:
+                es_final = zk in ("A", "B", "C")
+                if (fase == 2 and es_final) or (fase == 1 and not es_final):
+                    zonas.add(zk)
+        zonas_ord = sorted(zonas, key=lambda z: orden.get(z, 99))
+        out.append({
+            "id": fase,
+            "label": f"Fase {fase}",
+            "sub": FASE_SUBTITULOS.get(fase, ""),
+            "zonas": zonas_ord,
+        })
+    return out
+
+
 def generar_js(equipos, planteles, posiciones, goleadores, fairplay, valla,
                sanciones, fixture):
     """Genera el contenido completo de data/torneo.js."""
@@ -756,7 +792,12 @@ def generar_js(equipos, planteles, posiciones, goleadores, fairplay, valla,
         "",
         "const SANCIONES = " + json.dumps(sanciones, indent=2, ensure_ascii=False) + ";",
         "",
+        "const FASES = " + json.dumps(build_fases(fixture, posiciones), indent=2, ensure_ascii=False) + ";",
+        "",
         # Funciones helper (estables, no cambian con los datos)
+        "// Todos los partidos de una fecha, sin importar cuántas zonas tenga",
+        "function fechaPartidos(f) { return Object.values(f.zonas).flat(); }",
+        "",
         "function getEquipoLabel(id) {",
         "  if (!id) return '—';",
         "  const e = EQUIPOS[id];",
@@ -796,27 +837,34 @@ def generar_js(equipos, planteles, posiciones, goleadores, fairplay, valla,
         "}",
         "",
         "const STATS_GLOBALES = (function() {",
+        "  // Totales acumulados de todo el torneo (todas las fases)",
         "  let totalGoles = 0;",
         "  let partidosJugados = 0;",
         "  FIXTURE.forEach(f => {",
         "    if (f.estado === 'jugada') {",
-        "      [...f.zona1, ...f.zona2].forEach(p => {",
+        "      fechaPartidos(f).forEach(p => {",
         "        partidosJugados++;",
         "        totalGoles += (p.golesL || 0) + (p.golesV || 0);",
         "      });",
         "    }",
         "  });",
-        "  const fechasJugadas = FIXTURE.filter(f => f.estado === 'jugada').length;",
-        "  const proximaFecha = FIXTURE.find(f => f.estado === 'pendiente');",
+        "  // La fase actual es la de número más alto presente en el fixture",
+        "  const faseActual = Math.max(...FIXTURE.map(f => f.fase));",
+        "  const fechasFase = FIXTURE.filter(f => f.fase === faseActual);",
+        "  const jugadasFase = fechasFase.filter(f => f.estado === 'jugada').length;",
+        "  const proxima = fechasFase.find(f => f.estado === 'pendiente')",
+        "    || FIXTURE.find(f => f.estado === 'pendiente');",
         "  return {",
         "    equipos: Object.keys(EQUIPOS).length,",
         "    partidosJugados,",
         "    totalGoles,",
-        "    fechaActual: fechasJugadas,",
-        "    totalFechas: FIXTURE.length,",
-        "    proximaFecha: proximaFecha ? proximaFecha.fecha : null,",
-        "    proximaFechaTexto: proximaFecha ? proximaFecha.fechaTexto : '',",
-        "    ultimaFecha: fechasJugadas",
+        "    faseActual,",
+        "    fechaActual: jugadasFase,",
+        "    totalFechas: fechasFase.length,",
+        "    proximaFecha: proxima ? proxima.faseFecha : null,",
+        "    proximaFechaGlobal: proxima ? proxima.fecha : null,",
+        "    proximaFechaTexto: proxima ? proxima.fechaTexto : '',",
+        "    ultimaFecha: jugadasFase",
         "  };",
         "})();",
         "",

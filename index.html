@@ -70,16 +70,12 @@
       <div class="match-grid" id="ultima-grid"></div>
 
       <div class="section-head">
-        <h2 class="section-title">Tabla de posiciones</h2>
-        <div class="tabs zones-tabs">
-          <button class="tab active" onclick="showZone(1, this)">Zona 1</button>
-          <button class="tab" onclick="showZone(2, this)">Zona 2</button>
-        </div>
+        <h2 class="section-title">Posiciones</h2>
+        <a href="estadisticas.html" class="section-link">Ver completas →</a>
       </div>
-      <div class="zones-row" style="margin-bottom: 28px;">
-        <div id="zone-1" class="zone-block"></div>
-        <div id="zone-2" class="zone-block" style="display:none;"></div>
-      </div>
+      <div class="seg" id="home-fase-filter" style="max-width:360px; margin-bottom:14px;"></div>
+      <div class="tabs zones-tabs" id="home-zona-tabs" style="margin-bottom:14px; flex-wrap:wrap;"></div>
+      <div class="zones-row" id="zones-row" style="margin-bottom: 28px;"></div>
 
       <div class="two-col">
         <div>
@@ -196,7 +192,7 @@
             ${teamAvatar(id, 44)}
             <a href="equipo.html?id=${id}" style="color:inherit;">
               <b>${equipo.nombre}</b>
-              <span class="sub">Zona ${zona} · ${pos}° · ${row.pts} pts</span>
+              <span class="sub">Zona ${zona} · ${pos}° · ${row.pts} pts${(() => { const zf = getZonaFinal(id); return zf ? ' · Fase Final: Zona ' + zf : ''; })()}</span>
             </a>
             <button class="star" title="Cambiar equipo" onclick="setMiEquipo(null); renderMiEquipo(); renderZones(); renderProxima();">★</button>
           </div>
@@ -270,13 +266,14 @@
         return;
       }
       document.getElementById('proxima-title').innerHTML =
-        `Próxima fecha · Fecha ${proxima.fecha} <small>· ${proxima.fechaTexto}</small>`;
+        `Próxima fecha · Fase ${proxima.fase} · Fecha ${proxima.faseFecha} <small>· ${proxima.fechaTexto}</small>`;
       // El partido de "mi equipo" primero en el carrusel
       const mi = getMiEquipo();
-      const partidos = [
-        ...proxima.zona1.map(p => ({...p, zona:1})),
-        ...proxima.zona2.map(p => ({...p, zona:2}))
-      ].sort((a, b) => {
+      const partidos = [];
+      Object.entries(proxima.zonas).forEach(([zona, arr]) => {
+        arr.forEach(p => partidos.push({ ...p, zona }));
+      });
+      partidos.sort((a, b) => {
         const am = (a.local === mi || a.visitante === mi) ? 0 : 1;
         const bm = (b.local === mi || b.visitante === mi) ? 0 : 1;
         return am - bm;
@@ -290,16 +287,24 @@
     const ultima = ultimas[ultimas.length - 1];
     if (ultima) {
       document.getElementById('ultima-title').innerHTML =
-        `Última fecha · Fecha ${ultima.fecha} <small>· ${ultima.fechaTexto}</small>`;
-      const partidos = [
-        ...ultima.zona1.slice(0,2).map(p => ({...p, zona:1})),
-        ...ultima.zona2.slice(0,2).map(p => ({...p, zona:2}))
-      ];
+        `Última fecha · Fase ${ultima.fase} · Fecha ${ultima.faseFecha} <small>· ${ultima.fechaTexto}</small>`;
+      const partidos = [];
+      Object.entries(ultima.zonas).forEach(([zona, arr]) => {
+        arr.slice(0, 2).forEach(p => partidos.push({ ...p, zona }));
+      });
       document.getElementById('ultima-grid').innerHTML =
-        partidos.map(p => renderMatchCard(p, p.zona, ultima.fecha)).join('');
+        partidos.slice(0, 4).map(p => renderMatchCard(p, p.zona, ultima.fecha)).join('');
     }
 
-    function renderStandings(rows, total, zonaNum) {
+    // Posiciones en la home: toggle de fase + zonas (mismo criterio que Estadísticas)
+    const homeFaseActual = Math.max(...FIXTURE.map(f => f.fase));
+    let homeFase = FASES.some(f => f.id === homeFaseActual) ? homeFaseActual : FASES[0].id;
+    let homeZona = null;
+
+    function renderStandings(zonaKey) {
+      const esRegular = zonaKey === '1' || zonaKey === '2';
+      const rows = POSICIONES['zona' + zonaKey] || [];
+      const total = rows.length;
       const mi = getMiEquipo();
       const items = rows.slice(0, 6).map((r, i) => {
         const dg = r.gf - r.gc;
@@ -308,45 +313,78 @@
         const esFav = r.id === mi;
         const zd = zonaDestino(i);
         const nameTag = (i === 0 || esFav) ? 'strong' : 'span';
+        const bandCls = esRegular ? `zband zband-${zd.toLowerCase()}` : '';
+        const faseCol = esRegular
+          ? `<span class="zchip zchip-${zd.toLowerCase()}" title="Zona ${zd}">${zd}</span>`
+          : '<span></span>';
         return `
-          <a href="equipo.html?id=${r.id}" class="standings-row zband zband-${zd.toLowerCase()} ${i===0?'top-1':''} ${esFav?'fav':''}">
+          <a href="equipo.html?id=${r.id}" class="standings-row ${bandCls} ${i===0?'top-1':''} ${esFav?'fav':''}">
             <span class="standings-pos">${i+1}</span>
             <span class="standings-team">${teamAvatar(r.id, 24)}<${nameTag}>${getEquipoNombre(r.id)}</${nameTag}>${esFav?' <span class="fav-star">★</span>':''}</span>
             <span class="standings-num">${r.pj}</span>
             <span class="standings-num ${dgClass}">${dgText}</span>
             <span class="standings-pts">${r.pts}</span>
-            <span class="zchip zchip-${zd.toLowerCase()}" title="Zona ${zd}">${zd}</span>
+            ${faseCol}
           </a>
         `;
       }).join('');
       return `
         <div class="standings">
-          <div style="padding: 12px 14px 0; font-size: 14px; font-weight: 700;">Zona ${zonaNum}</div>
+          <div style="padding: 12px 14px 0; font-size: 14px; font-weight: 700;">Zona ${zonaKey}</div>
           <div class="standings-header">
             <span>#</span><span>Equipo</span>
             <span class="standings-num">PJ</span>
             <span class="standings-num">DG</span>
             <span class="standings-num">Pts</span>
-            <span class="standings-num">Fase</span>
+            <span class="standings-num">${esRegular ? 'Fase' : ''}</span>
           </div>
           ${items}
-          ${zonaLegendHtml()}
+          ${esRegular ? zonaLegendHtml() : ''}
           <a href="estadisticas.html" class="standings-footer">Ver tabla completa (${total} equipos) →</a>
         </div>
       `;
     }
-    function renderZones() {
-      document.getElementById('zone-1').innerHTML = renderStandings(POSICIONES.zona1, POSICIONES.zona1.length, 1);
-      document.getElementById('zone-2').innerHTML = renderStandings(POSICIONES.zona2, POSICIONES.zona2.length, 2);
-    }
-    renderZones();
 
-    function showZone(zone, btn) {
-      document.getElementById('zone-1').style.display = zone === 1 ? 'block' : 'none';
-      document.getElementById('zone-2').style.display = zone === 2 ? 'block' : 'none';
-      document.querySelectorAll('.tab').forEach(t => t.classList.remove('active'));
-      btn.classList.add('active');
+    function renderZones() {
+      const zonas = FASES.find(f => f.id === homeFase).zonas;
+      if (!homeZona || !zonas.includes(homeZona)) homeZona = zonas[0];
+      // En desktop se muestran todas las zonas de la fase lado a lado; en mobile,
+      // solo la seleccionada (las demás quedan ocultas por el toggle).
+      const row = document.getElementById('zones-row');
+      row.innerHTML = zonas.map(z =>
+        `<div class="zone-block" data-zona="${z}" ${z===homeZona?'':'style="display:none;"'}>${renderStandings(z)}</div>`
+      ).join('');
+      // Tabs de zona
+      document.getElementById('home-zona-tabs').innerHTML = zonas.map(z =>
+        `<button class="tab ${z===homeZona?'active':''}" data-zona="${z}">Zona ${z}</button>`
+      ).join('');
     }
+
+    function switchHomeFase(id) {
+      homeFase = id;
+      homeZona = FASES.find(f => f.id === id).zonas[0];
+      document.querySelectorAll('#home-fase-filter button').forEach(b =>
+        b.classList.toggle('on', parseInt(b.dataset.fase) === id));
+      renderZones();
+    }
+
+    document.getElementById('home-fase-filter').innerHTML = FASES.map(f =>
+      `<button data-fase="${f.id}" class="${f.id===homeFase?'on':''}">${f.label} <span style="opacity:.6; font-weight:400;">· ${f.sub}</span></button>`
+    ).join('');
+    document.getElementById('home-fase-filter').addEventListener('click', e => {
+      const b = e.target.closest('button'); if (!b) return;
+      switchHomeFase(parseInt(b.dataset.fase));
+    });
+    document.getElementById('home-zona-tabs').addEventListener('click', e => {
+      const b = e.target.closest('.tab'); if (!b) return;
+      homeZona = b.dataset.zona;
+      document.querySelectorAll('#zones-row .zone-block').forEach(blk =>
+        blk.style.display = blk.dataset.zona === homeZona ? '' : 'none');
+      document.querySelectorAll('#home-zona-tabs .tab').forEach(t =>
+        t.classList.toggle('active', t.dataset.zona === homeZona));
+    });
+
+    switchHomeFase(homeFase);
 
     function shortName(full) {
       const parts = full.split(' ');

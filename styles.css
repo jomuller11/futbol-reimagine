@@ -2089,7 +2089,7 @@ a.ficha-team:hover .ficha-team-name {
 @media (min-width: 861px) {
   .zones-row {
     display: grid;
-    grid-template-columns: 1fr 1fr;
+    grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
     gap: 16px;
   }
   .zones-row .zone-block {

@@ -276,11 +276,13 @@
       // Partidos del equipo
       const partidosDelEquipo = [];
       FIXTURE.forEach(f => {
-        [...f.zona1, ...f.zona2].forEach(p => {
+        fechaPartidos(f).forEach(p => {
           if (p.local === id || p.visitante === id) {
             partidosDelEquipo.push({
               ...p,
               fecha: f.fecha,
+              faseFecha: f.faseFecha,
+              fase: f.fase,
               fechaTexto: f.fechaTexto,
               estado: f.estado,
               esLocal: p.local === id
@@ -297,9 +299,11 @@
         <div class="equipo-hero" style="border-top: 4px solid ${color};">
           <div class="equipo-hero-avatar" style="background:${color};">${id}</div>
           <div class="equipo-hero-info">
-            <div class="equipo-hero-zone" style="display:flex; align-items:center; gap:8px;">
-              Zona ${zona} · Posición ${posIndex+1}°
-              <span class="zchip zchip-${zonaDestino(posIndex).toLowerCase()}" title="Hoy clasifica a Zona ${zonaDestino(posIndex)}">${zonaDestino(posIndex)}</span>
+            <div class="equipo-hero-zone" style="display:flex; align-items:center; gap:8px; flex-wrap:wrap;">
+              Fase Regular · Zona ${zona} · ${posIndex+1}°
+              ${(() => { const zf = getZonaFinal(id); if (!zf) return '';
+                const col = zf==='A'?'var(--zona-a)':(zf==='B'?'var(--zona-b)':'var(--zona-c)');
+                return `<span style="background:${col}; color:#fff; font-size:10px; font-weight:700; padding:2px 8px; border-radius:99px; text-transform:none; letter-spacing:0;">Fase Final · Zona ${zf}</span>`; })()}
             </div>
             <div class="equipo-hero-name">${equipo.nombre}</div>
             <div class="equipo-hero-stats">
@@ -378,7 +382,7 @@
                 const rival = p.esLocal ? p.visitante : p.local;
                 return `
                   <a href="ficha.html?fecha=${p.fecha}&local=${p.local}" class="fixture-equipo-row" style="text-decoration:none; color:inherit;">
-                    <div class="fixture-equipo-fecha">F${p.fecha}<br>${p.fechaTexto.substring(0,5)}</div>
+                    <div class="fixture-equipo-fecha">F${p.fase}·${p.faseFecha}<br>${p.fechaTexto.substring(0,5)}</div>
                     <div class="fixture-equipo-team">
                       ${p.esLocal ? teamAvatar(id, 22) + '<strong>' + equipo.nombre + '</strong>' : teamAvatar(rival, 22) + '<span>' + getEquipoNombre(rival) + '</span>'}
                     </div>

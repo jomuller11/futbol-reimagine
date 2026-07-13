@@ -88,23 +88,14 @@
     function findPartido(fechaNum, localId) {
       const fecha = FIXTURE.find(f => f.fecha === fechaNum);
       if (!fecha) return null;
-      let p = fecha.zona1.find(x => x.local === localId);
-      let zona = 1;
-      if (!p) {
-        p = fecha.zona2.find(x => x.local === localId);
-        zona = 2;
-      }
-      if (!p) {
-        // Quizás el equipo aparece como visitante
-        p = fecha.zona1.find(x => x.visitante === localId);
-        if (p) zona = 1;
-        else {
-          p = fecha.zona2.find(x => x.visitante === localId);
-          if (p) zona = 2;
+      for (const [zona, partidos] of Object.entries(fecha.zonas)) {
+        const p = partidos.find(x => x.local === localId || x.visitante === localId);
+        if (p) {
+          return { ...p, fecha: fechaNum, fechaTexto: fecha.fechaTexto,
+                   estado: fecha.estado, zona, fase: fecha.fase, faseFecha: fecha.faseFecha };
         }
       }
-      if (!p) return null;
-      return { ...p, fecha: fechaNum, fechaTexto: fecha.fechaTexto, estado: fecha.estado, zona };
+      return null;
     }
 
     function renderFicha() {
@@ -189,7 +180,7 @@
             <span>📅 ${partido.fechaTexto}</span>
             ${partido.cancha ? `<span>🏟️ Cancha ${partido.cancha}</span>` : ''}
             ${partido.hora ? `<span>⏰ ${partido.hora}</span>` : (partido.turno ? `<span>⏰ ${partido.turno}</span>` : '')}
-            <span><span class="match-zone ${partido.zona===2?'zona-2':''}">Zona ${partido.zona} · Fecha ${partido.fecha}</span></span>
+            <span><span class="match-zone ${partido.zona==='2'||partido.zona==='B'?'zona-2':''}">Fase ${partido.fase} · Zona ${partido.zona} · Fecha ${partido.faseFecha || partido.fecha}</span></span>
           </div>
           <div class="ficha-result">
             <a href="equipo.html?id=${partido.local}" class="ficha-team">
@@ -253,7 +244,7 @@
       const cruces = [];
       FIXTURE.forEach(f => {
         if (f.estado !== 'jugada' || f.fecha === partido.fecha) return;
-        [...f.zona1, ...f.zona2].forEach(p => {
+        fechaPartidos(f).forEach(p => {
           const mismoPar =
             (p.local === partido.local && p.visitante === partido.visitante) ||
             (p.local === partido.visitante && p.visitante === partido.local);

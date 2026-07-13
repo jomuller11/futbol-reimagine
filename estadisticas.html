@@ -134,12 +134,9 @@
 
       <!-- Panel: POSICIONES -->
       <div class="panel active" id="panel-posiciones">
-        <div class="tabs" style="display:inline-flex; margin-bottom: 16px;">
-          <button class="tab active" onclick="switchZone(1, this)">Zona 1</button>
-          <button class="tab" onclick="switchZone(2, this)">Zona 2</button>
-        </div>
-        <div id="tabla-posiciones-1"></div>
-        <div id="tabla-posiciones-2" style="display:none;"></div>
+        <div class="seg" id="pos-fase-filter" style="max-width:400px;"></div>
+        <div class="tabs" id="pos-zona-tabs" style="display:inline-flex; margin-bottom: 16px; flex-wrap:wrap;"></div>
+        <div id="tabla-posiciones"></div>
       </div>
 
       <!-- Panel: GOLEADORES -->
@@ -223,11 +220,21 @@
     });
 
     // ===========================================
-    // POSICIONES — compacta en mobile (PJ·DG·PTS), fila expandible
+    // POSICIONES — toggle de fase + zonas, compacta en mobile, fila expandible
     // ===========================================
-    function renderTablaPosicionesCompleta(zona, contenedorId) {
-      const rows = POSICIONES['zona' + zona];
+    const posFaseActualNum = Math.max(...FIXTURE.map(f => f.fase));
+    let posFase = FASES.some(f => f.id === posFaseActualNum) ? posFaseActualNum : FASES[0].id;
+    let posZona = null;
+
+    function posFaseDe(id) { return FASES.find(f => f.id === id); }
+
+    function renderTablaPosiciones(zonaKey) {
+      // La fase regular (zonas 1/2, 12 equipos) muestra la columna "Fase" con el
+      // destino A/B/C y la banda de color. La fase final (A/B/C, 8 equipos) no.
+      const esRegular = zonaKey === '1' || zonaKey === '2';
+      const rows = POSICIONES['zona' + zonaKey] || [];
       const mi = getMiEquipo();
+      const colspan = esRegular ? 11 : 10;
       const body = rows.map((r, i) => {
         const dg = r.gf - r.gc;
         const dgClass = dg > 0 ? 'dg-pos' : (dg < 0 ? 'dg-neg' : '');
@@ -235,9 +242,15 @@
         const esFav = r.id === mi;
         const zd = zonaDestino(i);
         const rowCls = [i===0 ? 'top-row' : '', esFav ? 'fav' : '', 'pos-row'].filter(Boolean).join(' ');
+        const posCell = esRegular
+          ? `<td class="center zband zband-${zd.toLowerCase()}"><strong>${i+1}</strong></td>`
+          : `<td class="center"><strong>${i+1}</strong></td>`;
+        const faseCell = esRegular
+          ? `<td class="center"><span class="zchip zchip-${zd.toLowerCase()}" title="Zona ${zd}">${zd}</span></td>`
+          : '';
         return `
           <tr class="${rowCls}" data-equipo="${r.id}">
-            <td class="center zband zband-${zd.toLowerCase()}"><strong>${i+1}</strong></td>
+            ${posCell}
             <td>
               <a href="equipo.html?id=${r.id}" class="team-cell">
                 ${teamAvatar(r.id, 26)}
@@ -252,10 +265,10 @@
             <td class="center col-detail">${r.gc}</td>
             <td class="center ${dgClass}">${dgText}</td>
             <td class="pts">${r.pts}</td>
-            <td class="center"><span class="zchip zchip-${zd.toLowerCase()}" title="Zona ${zd}">${zd}</span></td>
+            ${faseCell}
           </tr>
           <tr class="pos-detail-row" data-detail="${r.id}" style="display:none;">
-            <td colspan="11">
+            <td colspan="${colspan}">
               <div class="pos-detail-grid">
                 <span class="cell"><b>${r.pg}</b><span>PG</span></span>
                 <span class="cell"><b>${r.pe}</b><span>PE</span></span>
@@ -263,13 +276,14 @@
                 <span class="cell"><b>${r.gf}</b><span>GF</span></span>
                 <span class="cell"><b>${r.gc}</b><span>GC</span></span>
               </div>
-              <div class="pos-forma">Últimos 5 ${formaDotsHtml(r.id)}</div>
+              <div class="pos-forma">Últimos 5 ${formaDotsHtml(r.id) || '<span style="color:var(--text-tertiary)">sin partidos aún</span>'}</div>
             </td>
           </tr>
         `;
       }).join('');
 
-      document.getElementById(contenedorId).innerHTML = `
+      const cont = document.getElementById('tabla-posiciones');
+      cont.innerHTML = `
         <table class="data-table">
           <thead>
             <tr>
@@ -283,32 +297,56 @@
               <th class="center col-detail">GC</th>
               <th class="center">DG</th>
               <th class="center">Pts</th>
-              <th class="center">Fase</th>
+              ${esRegular ? '<th class="center">Fase</th>' : ''}
             </tr>
           </thead>
           <tbody>${body}</tbody>
         </table>
-        ${zonaLegendHtml()}
+        ${esRegular ? zonaLegendHtml() : '<div class="clasifica-legend">Clasificados de la fase regular a la Zona ' + zonaKey + ' de la fase final.</div>'}
       `;
 
-      // Tocar la fila despliega el detalle (PG/PE/PP, goles y últimos 5)
-      document.getElementById(contenedorId).querySelectorAll('tr.pos-row').forEach(tr => {
+      cont.querySelectorAll('tr.pos-row').forEach(tr => {
         tr.addEventListener('click', e => {
-          if (e.target.closest('a')) return; // el link al equipo sigue navegando
-          const detail = document.getElementById(contenedorId).querySelector(`tr[data-detail="${tr.dataset.equipo}"]`);
+          if (e.target.closest('a')) return;
+          const detail = cont.querySelector(`tr[data-detail="${tr.dataset.equipo}"]`);
           if (detail) detail.style.display = detail.style.display === 'none' ? '' : 'none';
         });
       });
     }
-    renderTablaPosicionesCompleta(1, 'tabla-posiciones-1');
-    renderTablaPosicionesCompleta(2, 'tabla-posiciones-2');
 
-    function switchZone(zona, btn) {
-      document.getElementById('tabla-posiciones-1').style.display = zona === 1 ? 'block' : 'none';
-      document.getElementById('tabla-posiciones-2').style.display = zona === 2 ? 'block' : 'none';
-      btn.parentElement.querySelectorAll('.tab').forEach(t => t.classList.remove('active'));
-      btn.classList.add('active');
+    function renderPosZonaTabs() {
+      const zonas = posFaseDe(posFase).zonas;
+      const tabs = document.getElementById('pos-zona-tabs');
+      tabs.innerHTML = zonas.map(z =>
+        `<button class="tab ${z===posZona?'active':''}" data-zona="${z}">Zona ${z}</button>`
+      ).join('');
     }
+
+    function switchPosFase(id) {
+      posFase = id;
+      posZona = posFaseDe(id).zonas[0];
+      document.querySelectorAll('#pos-fase-filter button').forEach(b =>
+        b.classList.toggle('on', parseInt(b.dataset.fase) === id));
+      renderPosZonaTabs();
+      renderTablaPosiciones(posZona);
+    }
+
+    // Toggle de fase
+    document.getElementById('pos-fase-filter').innerHTML = FASES.map(f =>
+      `<button data-fase="${f.id}" class="${f.id===posFase?'on':''}">${f.label} <span style="opacity:.6; font-weight:400;">· ${f.sub}</span></button>`
+    ).join('');
+    document.getElementById('pos-fase-filter').addEventListener('click', e => {
+      const b = e.target.closest('button'); if (!b) return;
+      switchPosFase(parseInt(b.dataset.fase));
+    });
+    document.getElementById('pos-zona-tabs').addEventListener('click', e => {
+      const b = e.target.closest('.tab'); if (!b) return;
+      posZona = b.dataset.zona;
+      renderPosZonaTabs();
+      renderTablaPosiciones(posZona);
+    });
+
+    switchPosFase(posFase);
 
     // ===========================================
     // GOLEADORES (con búsqueda)
