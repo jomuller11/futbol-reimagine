@@ -47,7 +47,7 @@
             <h1 class="hero-title">Torneo Papi Fútbol San José</h1>
             <p class="hero-sub" id="hero-sub">Cargando...</p>
             <div class="hero-actions">
-              <a href="fixture.html" class="btn btn-primary">Ver próxima fecha</a>
+              <a href="fixture.html" class="btn btn-primary" id="hero-cta-fixture">Ver próxima fecha</a>
               <a href="estadisticas.html" class="btn btn-ghost">Ver posiciones</a>
             </div>
           </div>
@@ -57,7 +57,7 @@
 
       <div id="miequipo-slot"></div>
 
-      <div class="section-head">
+      <div class="section-head" id="proxima-head">
         <h2 class="section-title" id="proxima-title">Próxima fecha</h2>
         <a href="fixture.html" class="section-link">Ver fixture completo →</a>
       </div>
@@ -262,7 +262,13 @@
 
     function renderProxima() {
       const proxima = FIXTURE.find(f => f.estado === 'pendiente');
-      if (!proxima) return;
+      if (!proxima) {
+        // Fase regular terminada: no hay fecha pendiente que mostrar
+        document.getElementById('proxima-head').style.display = 'none';
+        document.getElementById('proxima-grid').style.display = 'none';
+        document.getElementById('hero-cta-fixture').textContent = 'Ver fixture';
+        return;
+      }
       document.getElementById('proxima-title').innerHTML =
         `Próxima fecha · Fecha ${proxima.fecha} <small>· ${proxima.fechaTexto}</small>`;
       // El partido de "mi equipo" primero en el carrusel
