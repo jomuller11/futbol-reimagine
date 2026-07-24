@@ -1,6 +1,6 @@
 // ============================================================
 // DATOS DEL TORNEO PAPI FÚTBOL SAN JOSÉ — Generado automáticamente
-// Última actualización: 2026-07-24 18:09 UTC
+// Última actualización: 2026-07-24 21:46 UTC
 // Fuente: papifutbolsanjosemoron.com.ar
 // NO EDITAR A MANO — este archivo lo regenera scraper/scrape.py
 // ============================================================
@@ -7018,14 +7018,14 @@ const GOLEADORES = [
   },
   {
     "pos": 26,
-    "nombre": "Juan Manuel Tuegols",
-    "equipo": "06",
+    "nombre": "Sebastian Ruegg",
+    "equipo": "05",
     "goles": 7
   },
   {
     "pos": 27,
-    "nombre": "Sebastian Ruegg",
-    "equipo": "05",
+    "nombre": "Juan Manuel Tuegols",
+    "equipo": "06",
     "goles": 7
   },
   {
@@ -7402,26 +7402,26 @@ const GOLEADORES = [
   },
   {
     "pos": 90,
-    "nombre": "Gaston Pringles",
-    "equipo": "21",
-    "goles": 2
-  },
-  {
-    "pos": 91,
     "nombre": "Eleazar Pin Etchave",
     "equipo": "24",
     "goles": 2
   },
   {
+    "pos": 91,
+    "nombre": "Gaston Pringles",
+    "equipo": "21",
+    "goles": 2
+  },
+  {
     "pos": 92,
-    "nombre": "Oscar Marcos",
-    "equipo": "10",
+    "nombre": "Aníbal Domínguez",
+    "equipo": "22",
     "goles": 2
   },
   {
     "pos": 93,
-    "nombre": "Aníbal Domínguez",
-    "equipo": "22",
+    "nombre": "Oscar Marcos",
+    "equipo": "10",
     "goles": 2
   },
   {
@@ -7612,26 +7612,26 @@ const GOLEADORES = [
   },
   {
     "pos": 125,
+    "nombre": "Kevin Zanola",
+    "equipo": "06",
+    "goles": 1
+  },
+  {
+    "pos": 126,
     "nombre": "Ernesto Daniel Iribarren",
     "equipo": "08",
     "goles": 1
   },
   {
-    "pos": 126,
+    "pos": 127,
     "nombre": "Lucas Matias Pizarro",
     "equipo": "16",
     "goles": 1
   },
   {
-    "pos": 127,
+    "pos": 128,
     "nombre": "Guido Ezequiel Oclander",
     "equipo": "10",
-    "goles": 1
-  },
-  {
-    "pos": 128,
-    "nombre": "Kevin Zanola",
-    "equipo": "06",
     "goles": 1
   },
   {
@@ -7678,26 +7678,26 @@ const GOLEADORES = [
   },
   {
     "pos": 136,
+    "nombre": "Ezequiel Rodriguez Achaval",
+    "equipo": "22",
+    "goles": 1
+  },
+  {
+    "pos": 137,
     "nombre": "Ariel Froloff",
     "equipo": "19",
     "goles": 1
   },
   {
-    "pos": 137,
+    "pos": 138,
     "nombre": "Walter Santini",
     "equipo": "12",
     "goles": 1
   },
   {
-    "pos": 138,
+    "pos": 139,
     "nombre": "Tomas Mc Cormack",
     "equipo": "09",
-    "goles": 1
-  },
-  {
-    "pos": 139,
-    "nombre": "Ezequiel Rodriguez Achaval",
-    "equipo": "22",
     "goles": 1
   },
   {
@@ -7726,20 +7726,20 @@ const GOLEADORES = [
   },
   {
     "pos": 144,
+    "nombre": "Fernando Palmas",
+    "equipo": "18",
+    "goles": 1
+  },
+  {
+    "pos": 145,
     "nombre": "Leandro Ariel Rosciano",
     "equipo": "07",
     "goles": 1
   },
   {
-    "pos": 145,
+    "pos": 146,
     "nombre": "Matías Espinola",
     "equipo": "08",
-    "goles": 1
-  },
-  {
-    "pos": 146,
-    "nombre": "Fernando Palmas",
-    "equipo": "18",
     "goles": 1
   },
   {
@@ -7816,32 +7816,32 @@ const GOLEADORES = [
   },
   {
     "pos": 159,
+    "nombre": "Federico Oviedo",
+    "equipo": "18",
+    "goles": 1
+  },
+  {
+    "pos": 160,
     "nombre": "Omar Eliceo Caraballo",
     "equipo": "24",
     "goles": 1
   },
   {
-    "pos": 160,
+    "pos": 161,
     "nombre": "Julio Orma Carrasco",
     "equipo": "07",
     "goles": 1
   },
   {
-    "pos": 161,
+    "pos": 162,
     "nombre": "Omar Alejandro Diaz",
     "equipo": "06",
     "goles": 1
   },
   {
-    "pos": 162,
+    "pos": 163,
     "nombre": "German Ricardo Miguel",
     "equipo": "20",
-    "goles": 1
-  },
-  {
-    "pos": 163,
-    "nombre": "Federico Oviedo",
-    "equipo": "18",
     "goles": 1
   },
   {
@@ -8622,6 +8622,22 @@ const SANCIONES = [
     "fechas": 1
   },
   {
+    "jugador": "Ernesto Fermin Bravo",
+    "equipo": "10",
+    "amarillas": 1,
+    "azules": 0,
+    "rojas": 0,
+    "fechas": 0
+  },
+  {
+    "jugador": "Marcelo Gomez",
+    "equipo": "18",
+    "amarillas": 1,
+    "azules": 0,
+    "rojas": 0,
+    "fechas": 0
+  },
+  {
     "jugador": "Walter Santini",
     "equipo": "12",
     "amarillas": 1,
@@ -8766,16 +8782,16 @@ const SANCIONES = [
     "fechas": 0
   },
   {
-    "jugador": "Ernesto Fermin Bravo",
-    "equipo": "10",
+    "jugador": "Hernan Zabala",
+    "equipo": "21",
     "amarillas": 1,
     "azules": 0,
     "rojas": 0,
     "fechas": 0
   },
   {
-    "jugador": "Marcelo Gomez",
-    "equipo": "18",
+    "jugador": "Luis Jeronimo",
+    "equipo": "14",
     "amarillas": 1,
     "azules": 0,
     "rojas": 0,
@@ -8966,16 +8982,16 @@ const SANCIONES = [
     "fechas": 0
   },
   {
-    "jugador": "Hernan Zabala",
-    "equipo": "21",
+    "jugador": "Fernando De La Vega",
+    "equipo": "02",
     "amarillas": 1,
     "azules": 0,
     "rojas": 0,
     "fechas": 0
   },
   {
-    "jugador": "Luis Jeronimo",
-    "equipo": "14",
+    "jugador": "Martin Rodriguez",
+    "equipo": "03",
     "amarillas": 1,
     "azules": 0,
     "rojas": 0,
@@ -9104,22 +9120,6 @@ const SANCIONES = [
   {
     "jugador": "Oscar Marcos",
     "equipo": "10",
-    "amarillas": 1,
-    "azules": 0,
-    "rojas": 0,
-    "fechas": 0
-  },
-  {
-    "jugador": "Fernando De La Vega",
-    "equipo": "02",
-    "amarillas": 1,
-    "azules": 0,
-    "rojas": 0,
-    "fechas": 0
-  },
-  {
-    "jugador": "Martin Rodriguez",
-    "equipo": "03",
     "amarillas": 1,
     "azules": 0,
     "rojas": 0,
