@@ -1,6 +1,6 @@
 // ============================================================
 // DATOS DEL TORNEO PAPI FÚTBOL SAN JOSÉ — Generado automáticamente
-// Última actualización: 2026-07-25 14:53 UTC
+// Última actualización: 2026-07-26 14:55 UTC
 // Fuente: papifutbolsanjosemoron.com.ar
 // NO EDITAR A MANO — este archivo lo regenera scraper/scrape.py
 // ============================================================
@@ -6970,20 +6970,20 @@ const GOLEADORES = [
   },
   {
     "pos": 18,
-    "nombre": "Marcelo Alberto Bonfiglio",
-    "equipo": "14",
-    "goles": 8
-  },
-  {
-    "pos": 19,
     "nombre": "Martin Celedon",
     "equipo": "09",
     "goles": 8
   },
   {
-    "pos": 20,
+    "pos": 19,
     "nombre": "Villalba Garcete Carlos Fidel",
     "equipo": "16",
+    "goles": 8
+  },
+  {
+    "pos": 20,
+    "nombre": "Marcelo Alberto Bonfiglio",
+    "equipo": "14",
     "goles": 8
   },
   {
@@ -8068,26 +8068,26 @@ const FAIRPLAY = [
 const VALLA = [
   {
     "pos": 1,
+    "arquero": "Leo Soiero",
+    "equipo": "17",
+    "gc": 15
+  },
+  {
+    "pos": 2,
     "arquero": "Hernan Zabala",
     "equipo": "21",
     "gc": 15
   },
   {
-    "pos": 2,
+    "pos": 3,
     "arquero": "Gabriel Luis Blanco",
     "equipo": "20",
     "gc": 15
   },
   {
-    "pos": 3,
+    "pos": 4,
     "arquero": "Ariel Pagano",
     "equipo": "19",
-    "gc": 15
-  },
-  {
-    "pos": 4,
-    "arquero": "Leo Soiero",
-    "equipo": "17",
     "gc": 15
   },
   {
@@ -8110,32 +8110,32 @@ const VALLA = [
   },
   {
     "pos": 8,
-    "arquero": "Nicolas Vernola",
-    "equipo": "24",
-    "gc": 23
-  },
-  {
-    "pos": 9,
     "arquero": "Mariano Luis Garcia",
     "equipo": "18",
     "gc": 23
   },
   {
-    "pos": 10,
-    "arquero": "Jorge Fernandez Menendez",
-    "equipo": "10",
-    "gc": 24
+    "pos": 9,
+    "arquero": "Nicolas Vernola",
+    "equipo": "24",
+    "gc": 23
   },
   {
-    "pos": 11,
+    "pos": 10,
     "arquero": "Ariel Peralta",
     "equipo": "13",
     "gc": 24
   },
   {
-    "pos": 12,
+    "pos": 11,
     "arquero": "Pablo Luis Vidaller",
     "equipo": "08",
+    "gc": 24
+  },
+  {
+    "pos": 12,
+    "arquero": "Jorge Fernandez Menendez",
+    "equipo": "10",
     "gc": 24
   },
   {
@@ -8430,14 +8430,6 @@ const SANCIONES = [
     "fechas": 0
   },
   {
-    "jugador": "Juan Manuel Ruiz Diaz",
-    "equipo": "15",
-    "amarillas": 2,
-    "azules": 0,
-    "rojas": 0,
-    "fechas": 0
-  },
-  {
     "jugador": "Pablo Fernando Javier Rodríguez",
     "equipo": "07",
     "amarillas": 2,
@@ -8454,8 +8446,8 @@ const SANCIONES = [
     "fechas": 0
   },
   {
-    "jugador": "Patricio Javier Ventriceli",
-    "equipo": "02",
+    "jugador": "Juan Manuel Ruiz Diaz",
+    "equipo": "15",
     "amarillas": 2,
     "azules": 0,
     "rojas": 0,
@@ -8504,6 +8496,14 @@ const SANCIONES = [
   {
     "jugador": "Tomas Mc Cormack",
     "equipo": "09",
+    "amarillas": 2,
+    "azules": 0,
+    "rojas": 0,
+    "fechas": 0
+  },
+  {
+    "jugador": "Patricio Javier Ventriceli",
+    "equipo": "02",
     "amarillas": 2,
     "azules": 0,
     "rojas": 0,
