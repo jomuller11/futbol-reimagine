@@ -38,7 +38,20 @@ jobs:
       - name: Ejecutar scraper
         run: |
           cd scraper
-          python scrape.py --verbose
+          # El sitio oficial a veces responde lento o sirve páginas incompletas
+          # (sobre todo cuando los organizadores están cargando datos). Reintentamos
+          # la corrida completa hasta 3 veces antes de dar la fecha por fallida.
+          for intento in 1 2 3; do
+            echo "▶ Intento $intento de 3"
+            if python scrape.py --verbose; then
+              echo "✓ Scraper OK en el intento $intento"
+              exit 0
+            fi
+            echo "⚠ Falló el intento $intento"
+            [ "$intento" -lt 3 ] && sleep 90
+          done
+          echo "❌ El scraper falló los 3 intentos"
+          exit 1
 
       - name: Detectar cambios
         id: changes

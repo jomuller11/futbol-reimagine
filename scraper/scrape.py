@@ -37,7 +37,7 @@ USER_AGENT = (
     "PapifutbolPrototipoBot/1.0 "
     "(rediseño visual no oficial; contacto: josemuller11@gmail.com)"
 )
-REQUEST_TIMEOUT = 20
+REQUEST_TIMEOUT = 30
 SLEEP_BETWEEN_REQUESTS = 2  # segundos: ser respetuosos con el servidor
 
 # Colores asignados a equipos (se mantienen entre corridas; si se agrega
@@ -76,8 +76,8 @@ def fail(msg):
     sys.exit(1)
 
 
-def fetch(url, retries=3):
-    """Descarga una URL con retries y backoff exponencial."""
+def fetch(url, retries=5):
+    """Descarga una URL con retries y backoff exponencial (2, 4, 8, 16s)."""
     headers = {"User-Agent": USER_AGENT}
     last_err = None
     for attempt in range(1, retries + 1):
@@ -90,7 +90,7 @@ def fetch(url, retries=3):
         except requests.RequestException as e:
             last_err = e
             if attempt < retries:
-                wait = 2 ** attempt
+                wait = min(2 ** attempt, 20)
                 log(f"  Falló: {e}. Reintentando en {wait}s...")
                 time.sleep(wait)
     fail(f"No se pudo descargar {url}: {last_err}")
