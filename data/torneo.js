@@ -1,6 +1,6 @@
 // ============================================================
 // DATOS DEL TORNEO PAPI FÚTBOL SAN JOSÉ — Generado automáticamente
-// Última actualización: 2026-09-14 20:37 UTC
+// Última actualización: 2026-09-14 23:30 UTC
 // Fuente: papifutbolsanjosemoron.com.ar
 // NO EDITAR A MANO — este archivo lo regenera scraper/scrape.py
 // ============================================================
@@ -9849,38 +9849,38 @@ const GOLEADORES = [
   },
   {
     "pos": 162,
+    "nombre": "Walter Santini",
+    "equipo": "",
+    "goles": 1
+  },
+  {
+    "pos": 163,
     "nombre": "Tomas Mc Cormack",
     "equipo": "09",
     "goles": 1
   },
   {
-    "pos": 163,
+    "pos": 164,
     "nombre": "Ezequiel Rodriguez Achaval",
     "equipo": "22",
     "goles": 1
   },
   {
-    "pos": 164,
+    "pos": 165,
     "nombre": "Pablo Mattos",
     "equipo": "15",
     "goles": 1
   },
   {
-    "pos": 165,
+    "pos": 166,
     "nombre": "Cristian Szczygiel",
     "equipo": "16",
     "goles": 1
   },
   {
-    "pos": 166,
+    "pos": 167,
     "nombre": "Ariel Froloff",
     "equipo": "19",
-    "goles": 1
-  },
-  {
-    "pos": 167,
-    "nombre": "Walter Santini",
-    "equipo": "",
     "goles": 1
   },
   {
@@ -10601,6 +10601,14 @@ const SANCIONES = [
     "fechas": 0
   },
   {
+    "jugador": "Javier Alejandro Garcia",
+    "equipo": "04",
+    "amarillas": 3,
+    "azules": 0,
+    "rojas": 0,
+    "fechas": 0
+  },
+  {
     "jugador": "Martin Andreotta",
     "equipo": "23",
     "amarillas": 3,
@@ -10611,14 +10619,6 @@ const SANCIONES = [
   {
     "jugador": "Maximiliano Ponce De Leon",
     "equipo": "02",
-    "amarillas": 3,
-    "azules": 0,
-    "rojas": 0,
-    "fechas": 0
-  },
-  {
-    "jugador": "Javier Alejandro Garcia",
-    "equipo": "04",
     "amarillas": 3,
     "azules": 0,
     "rojas": 0,
@@ -10647,6 +10647,14 @@ const SANCIONES = [
     "azules": 0,
     "rojas": 0,
     "fechas": 1
+  },
+  {
+    "jugador": "Pablo Fernando Javier Rodríguez",
+    "equipo": "07",
+    "amarillas": 2,
+    "azules": 0,
+    "rojas": 0,
+    "fechas": 0
   },
   {
     "jugador": "Calcagno Fernando Pablo",
@@ -10698,14 +10706,6 @@ const SANCIONES = [
   },
   {
     "jugador": "Nahuel Serini",
-    "equipo": "07",
-    "amarillas": 2,
-    "azules": 0,
-    "rojas": 0,
-    "fechas": 0
-  },
-  {
-    "jugador": "Pablo Fernando Javier Rodríguez",
     "equipo": "07",
     "amarillas": 2,
     "azules": 0,
@@ -10937,7 +10937,7 @@ const SANCIONES = [
     "fechas": 0
   },
   {
-    "jugador": "Marcelo Carlos Rodriguez",
+    "jugador": "Gonzalo Raúl Rivas",
     "equipo": "22",
     "amarillas": 1,
     "azules": 0,
@@ -10945,7 +10945,7 @@ const SANCIONES = [
     "fechas": 1
   },
   {
-    "jugador": "Gonzalo Raúl Rivas",
+    "jugador": "Marcelo Carlos Rodriguez",
     "equipo": "22",
     "amarillas": 1,
     "azules": 0,
@@ -10983,6 +10983,14 @@ const SANCIONES = [
     "azules": 0,
     "rojas": 0,
     "fechas": 1
+  },
+  {
+    "jugador": "Ezequiel Bernardez",
+    "equipo": "17",
+    "amarillas": 1,
+    "azules": 0,
+    "rojas": 0,
+    "fechas": 0
   },
   {
     "jugador": "Hernan Rodriguez",
@@ -11123,14 +11131,6 @@ const SANCIONES = [
   {
     "jugador": "Leandro Arroyo",
     "equipo": "10",
-    "amarillas": 1,
-    "azules": 0,
-    "rojas": 0,
-    "fechas": 0
-  },
-  {
-    "jugador": "Ezequiel Bernardez",
-    "equipo": "17",
     "amarillas": 1,
     "azules": 0,
     "rojas": 0,
