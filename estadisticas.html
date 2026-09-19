@@ -92,6 +92,53 @@
     }
     .panel { display: none; }
     .panel.active { display: block; }
+
+    /* ============================================
+       MARCA DE COPA (Fase 2 → Fase 3)
+       Franja lateral coloreada + inicial O/P/B
+       Usa --gold, --silver, --bronze de :root en styles.css
+       ============================================ */
+    .zband-oro::before    { background: var(--gold); }
+    .zband-plata::before  { background: var(--silver); }
+    .zband-bronce::before { background: var(--bronze); }
+
+    .zchip-oro    { background: var(--gold);   color: #633806; }
+    .zchip-plata  { background: var(--silver); color: #444441; }
+    .zchip-bronce { background: var(--bronze); color: #712B13; }
+
+    /* Leyenda para las tablas de copa */
+    .copa-legend {
+      display: flex;
+      align-items: center;
+      gap: 14px;
+      flex-wrap: wrap;
+      font-size: 11px;
+      color: var(--text-secondary);
+      padding: 10px 14px 12px;
+    }
+    .copa-legend .item {
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+    }
+    .copa-legend .swatch {
+      width: 10px;
+      height: 10px;
+      border-radius: 3px;
+      flex: none;
+    }
+    .copa-legend .swatch.oro    { background: var(--gold); }
+    .copa-legend .swatch.plata  { background: var(--silver); }
+    .copa-legend .swatch.bronce { background: var(--bronze); }
+
+    .copa-legend .rules {
+      display: block;
+      width: 100%;
+      margin-top: 4px;
+      font-size: 10.5px;
+      color: var(--text-tertiary);
+      letter-spacing: 0.2px;
+    }
   </style>
 </head>
 <body>
@@ -220,6 +267,53 @@
     });
 
     // ===========================================
+    // FASE 2 → FASE 3: reglas de clasificación por zona
+    // ===========================================
+    //
+    // Reglas confirmadas:
+    //   Zona A: 1° a 5° → Oro · 6° y 7° → Plata · 8° → Bronce
+    //   Zona B: 1° y 2° → Oro · 3° a 6° → Plata · 7° y 8° → Bronce
+    //   Zona C: 1°      → Oro · 2° y 3° → Plata · 4° a 8° → Bronce
+    //
+    // Cada regla es un array donde el índice = posición-1 y el valor = copa.
+    const REGLAS_COPA_FASE2 = {
+      A: ['oro','oro','oro','oro','oro','plata','plata','bronce'],
+      B: ['oro','oro','plata','plata','plata','plata','bronce','bronce'],
+      C: ['oro','plata','plata','bronce','bronce','bronce','bronce','bronce']
+    };
+
+    // Devuelve 'oro' | 'plata' | 'bronce' para el equipo en posición idx (0-based)
+    // de una zona de Fase 2 (A, B o C).
+    function copaDestino(zonaKey, idx) {
+      const reglas = REGLAS_COPA_FASE2[zonaKey];
+      if (!reglas) return null;
+      return reglas[idx] || null;
+    }
+
+    function copaLabel(copa) {
+      return copa === 'oro' ? 'Oro' : copa === 'plata' ? 'Plata' : 'Bronce';
+    }
+
+    function copaInicial(copa) {
+      return copa === 'oro' ? 'O' : copa === 'plata' ? 'P' : 'B';
+    }
+
+    function copaLegendHtml() {
+      return `
+        <div class="copa-legend">
+          <span class="item"><span class="swatch oro"></span> Copa de Oro</span>
+          <span class="item"><span class="swatch plata"></span> Copa de Plata</span>
+          <span class="item"><span class="swatch bronce"></span> Copa de Bronce</span>
+          <span class="rules">
+            Zona A: 1°–5° Oro · 6°–7° Plata · 8° Bronce &nbsp;·&nbsp;
+            Zona B: 1°–2° Oro · 3°–6° Plata · 7°–8° Bronce &nbsp;·&nbsp;
+            Zona C: 1° Oro · 2°–3° Plata · 4°–8° Bronce
+          </span>
+        </div>
+      `;
+    }
+
+    // ===========================================
     // POSICIONES — toggle de fase + zonas, compacta en mobile, fila expandible
     // ===========================================
     const posFaseActualNum = Math.max(...FIXTURE.map(f => f.fase));
@@ -229,25 +323,43 @@
     function posFaseDe(id) { return FASES.find(f => f.id === id); }
 
     function renderTablaPosiciones(zonaKey) {
-      // La fase regular (zonas 1/2, 12 equipos) muestra la columna "Fase" con el
-      // destino A/B/C y la banda de color. La fase final (A/B/C, 8 equipos) no.
+      // Tres modos distintos de marca en la columna extra:
+      //  - 'fase-final' → zonas '1' / '2' de la fase regular (12 equipos): destino A/B/C
+      //  - 'copa'       → zonas 'A' / 'B' / 'C' de la Fase 2  (8 equipos): Oro / Plata / Bronce
+      //  - 'ninguno'    → cualquier otra combinación (por ejemplo la propia Fase 3)
       const esRegular = zonaKey === '1' || zonaKey === '2';
+      const faseActual = posFaseDe(posFase);
+      const esFase2   = (zonaKey === 'A' || zonaKey === 'B' || zonaKey === 'C')
+                        && faseActual && faseActual.id === 2;
+
+      const marcaMode = esRegular ? 'fase-final' : (esFase2 ? 'copa' : 'ninguno');
+      const mostrarMarca = marcaMode !== 'ninguno';
+
       const rows = POSICIONES['zona' + zonaKey] || [];
       const mi = getMiEquipo();
-      const colspan = esRegular ? 11 : 10;
+      const colspan = mostrarMarca ? 11 : 10;
+
       const body = rows.map((r, i) => {
         const dg = r.gf - r.gc;
         const dgClass = dg > 0 ? 'dg-pos' : (dg < 0 ? 'dg-neg' : '');
         const dgText = dg > 0 ? `+${dg}` : `${dg}`;
         const esFav = r.id === mi;
-        const zd = zonaDestino(i);
         const rowCls = [i===0 ? 'top-row' : '', esFav ? 'fav' : '', 'pos-row'].filter(Boolean).join(' ');
-        const posCell = esRegular
-          ? `<td class="center zband zband-${zd.toLowerCase()}"><strong>${i+1}</strong></td>`
-          : `<td class="center"><strong>${i+1}</strong></td>`;
-        const faseCell = esRegular
-          ? `<td class="center"><span class="zchip zchip-${zd.toLowerCase()}" title="Zona ${zd}">${zd}</span></td>`
-          : '';
+
+        let posCell, faseCell = '';
+        if (marcaMode === 'fase-final') {
+          const zd = zonaDestino(i);  // A/B/C
+          const key = zd.toLowerCase();
+          posCell = `<td class="center zband zband-${key}"><strong>${i+1}</strong></td>`;
+          faseCell = `<td class="center"><span class="zchip zchip-${key}" title="Zona ${zd}">${zd}</span></td>`;
+        } else if (marcaMode === 'copa') {
+          const copa = copaDestino(zonaKey, i);  // oro/plata/bronce
+          posCell = `<td class="center zband zband-${copa}"><strong>${i+1}</strong></td>`;
+          faseCell = `<td class="center"><span class="zchip zchip-${copa}" title="Copa de ${copaLabel(copa)}">${copaInicial(copa)}</span></td>`;
+        } else {
+          posCell = `<td class="center"><strong>${i+1}</strong></td>`;
+        }
+
         return `
           <tr class="${rowCls}" data-equipo="${r.id}">
             ${posCell}
@@ -282,6 +394,23 @@
         `;
       }).join('');
 
+      // Título de la columna de marca según el modo
+      const marcaTh = marcaMode === 'fase-final'
+        ? '<th class="center">Fase</th>'
+        : marcaMode === 'copa'
+          ? '<th class="center">Copa</th>'
+          : '';
+
+      // Leyenda / footer contextual
+      let legendHtml = '';
+      if (marcaMode === 'fase-final') {
+        legendHtml = zonaLegendHtml();
+      } else if (marcaMode === 'copa') {
+        legendHtml = copaLegendHtml();
+      } else {
+        legendHtml = '<div class="clasifica-legend">Clasificados de la fase regular a la Zona ' + zonaKey + ' de la fase final.</div>';
+      }
+
       const cont = document.getElementById('tabla-posiciones');
       cont.innerHTML = `
         <table class="data-table">
@@ -297,12 +426,12 @@
               <th class="center col-detail">GC</th>
               <th class="center">DG</th>
               <th class="center">Pts</th>
-              ${esRegular ? '<th class="center">Fase</th>' : ''}
+              ${marcaTh}
             </tr>
           </thead>
           <tbody>${body}</tbody>
         </table>
-        ${esRegular ? zonaLegendHtml() : '<div class="clasifica-legend">Clasificados de la fase regular a la Zona ' + zonaKey + ' de la fase final.</div>'}
+        ${legendHtml}
       `;
 
       cont.querySelectorAll('tr.pos-row').forEach(tr => {
