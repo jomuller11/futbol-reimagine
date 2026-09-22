@@ -1,0 +1,963 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Bracket · Fase 3 · Papi Fútbol San José Morón</title>
+  <meta name="description" content="Bracket de la Fase 3 del torneo Papi Fútbol San José Morón: copas Oro, Plata y Bronce con cuartos, semis y finales de puesto.">
+  <meta property="og:type" content="website">
+  <meta property="og:site_name" content="Papi Fútbol San José Morón">
+  <meta property="og:title" content="Bracket · Fase 3 · Papi Fútbol San José Morón">
+  <meta property="og:description" content="Bracket de las copas Oro, Plata y Bronce.">
+  <meta property="og:url" content="https://jomuller11.github.io/futbol-reimagine/bracket.html">
+  <meta property="og:image" content="https://jomuller11.github.io/futbol-reimagine/logo.png">
+  <meta property="og:locale" content="es_AR">
+  <meta name="twitter:card" content="summary">
+  <link rel="icon" type="image/png" href="logo.png">
+  <link rel="stylesheet" href="styles.css">
+  <style>
+    /* ============================================================
+       BRACKET · FASE 3
+       Estructura por copa: cuartos + rama ganadores + rama perdedores + finales
+       ============================================================ */
+
+    .bracket-header {
+      background: linear-gradient(135deg, var(--primary) 0%, var(--primary-dark) 100%);
+      color: #fff;
+      border-radius: var(--radius-xl);
+      padding: 22px 24px;
+      margin-bottom: 20px;
+      position: relative;
+      overflow: hidden;
+    }
+    .bracket-header::before {
+      content: '';
+      position: absolute;
+      right: -30px;
+      top: 50%;
+      transform: translateY(-50%);
+      width: 180px;
+      height: 180px;
+      background: url('logo.png') center/contain no-repeat;
+      opacity: 0.08;
+      pointer-events: none;
+    }
+    .bracket-header .tag {
+      font-size: 11px;
+      letter-spacing: 1.5px;
+      text-transform: uppercase;
+      opacity: 0.85;
+      margin-bottom: 6px;
+      font-weight: 600;
+    }
+    .bracket-header h1 {
+      font-size: 26px;
+      font-weight: 700;
+      line-height: 1.15;
+      margin-bottom: 4px;
+    }
+    .bracket-header p {
+      font-size: 13px;
+      opacity: 0.9;
+    }
+
+    /* Selector de copa */
+    .copa-selector {
+      display: flex;
+      gap: 8px;
+      margin-bottom: 24px;
+      flex-wrap: wrap;
+    }
+    .copa-btn {
+      flex: 1;
+      min-width: 140px;
+      padding: 12px 16px;
+      border-radius: var(--radius-md);
+      background: var(--surface);
+      border: 0.5px solid var(--border-strong);
+      font-family: inherit;
+      font-size: 14px;
+      font-weight: 600;
+      color: var(--text-secondary);
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 8px;
+      transition: background 0.15s, border-color 0.15s, transform 0.1s;
+    }
+    .copa-btn:hover {
+      background: var(--surface-2);
+    }
+    .copa-btn.on {
+      color: var(--text);
+      border-width: 1.5px;
+      transform: translateY(-1px);
+    }
+    .copa-btn.on.oro    { background: var(--warning-bg); border-color: var(--gold); }
+    .copa-btn.on.plata  { background: #F1EFE8; border-color: var(--silver); }
+    .copa-btn.on.bronce { background: #FAECE7; border-color: var(--bronze); }
+    .copa-btn .swatch {
+      width: 14px;
+      height: 14px;
+      border-radius: 50%;
+      flex: none;
+    }
+    .copa-btn.oro    .swatch { background: var(--gold); }
+    .copa-btn.plata  .swatch { background: var(--silver); }
+    .copa-btn.bronce .swatch { background: var(--bronze); }
+
+    /* Barra con info de la copa activa */
+    .copa-info {
+      background: var(--surface);
+      border: 0.5px solid var(--border);
+      border-left: 4px solid transparent;
+      border-radius: var(--radius-md);
+      padding: 12px 14px;
+      margin-bottom: 20px;
+      font-size: 13px;
+      color: var(--text-secondary);
+      line-height: 1.5;
+    }
+    .copa-info.oro    { border-left-color: var(--gold); }
+    .copa-info.plata  { border-left-color: var(--silver); }
+    .copa-info.bronce { border-left-color: var(--bronze); }
+    .copa-info strong { color: var(--text); }
+
+    /* Sección de bracket */
+    .bracket-section {
+      margin-bottom: 28px;
+    }
+    .bracket-section-head {
+      display: flex;
+      align-items: baseline;
+      justify-content: space-between;
+      gap: 12px;
+      margin-bottom: 12px;
+      padding-bottom: 8px;
+      border-bottom: 2px solid var(--border);
+    }
+    .bracket-section-title {
+      font-size: 15px;
+      font-weight: 700;
+      color: var(--text);
+      letter-spacing: 0.2px;
+    }
+    .bracket-section-sub {
+      font-size: 11.5px;
+      color: var(--text-tertiary);
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+      font-weight: 600;
+    }
+
+    /* Grid para partidos */
+    .partidos-grid {
+      display: grid;
+      grid-template-columns: repeat(2, 1fr);
+      gap: 12px;
+    }
+    .partidos-grid.solo {
+      grid-template-columns: 1fr;
+    }
+
+    /* Grid para las dos ramas (ganadores | perdedores) */
+    .ramas-grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 20px;
+    }
+    @media (max-width: 860px) {
+      .ramas-grid {
+        grid-template-columns: 1fr;
+      }
+      .partidos-grid {
+        grid-template-columns: 1fr;
+      }
+    }
+
+    .rama {
+      background: var(--surface);
+      border: 0.5px solid var(--border);
+      border-radius: var(--radius-lg);
+      padding: 16px;
+    }
+    .rama-title {
+      font-size: 13px;
+      font-weight: 700;
+      color: var(--primary);
+      letter-spacing: 0.3px;
+      margin-bottom: 4px;
+    }
+    .rama-sub {
+      font-size: 11px;
+      color: var(--text-tertiary);
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+      font-weight: 600;
+      margin-bottom: 14px;
+    }
+    .rama-subsection {
+      margin-bottom: 16px;
+    }
+    .rama-subsection:last-child {
+      margin-bottom: 0;
+    }
+    .rama-subsection-label {
+      font-size: 11px;
+      color: var(--text-secondary);
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+      font-weight: 600;
+      margin-bottom: 8px;
+    }
+
+    /* Card de partido de bracket */
+    .b-match {
+      background: var(--surface);
+      border: 0.5px solid var(--border);
+      border-radius: var(--radius-md);
+      overflow: hidden;
+      transition: border-color 0.15s;
+    }
+    .rama .b-match {
+      background: var(--surface-2);
+      border: none;
+    }
+    .b-match-head {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 8px 12px;
+      background: var(--surface-2);
+      border-bottom: 0.5px solid var(--border);
+      font-size: 10.5px;
+      color: var(--text-tertiary);
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+      font-weight: 600;
+    }
+    .rama .b-match .b-match-head {
+      background: rgba(0,0,0,0.03);
+    }
+    .b-match-label {
+      display: flex;
+      align-items: center;
+      gap: 6px;
+    }
+    .b-match-tag {
+      padding: 2px 7px;
+      border-radius: 999px;
+      background: var(--surface);
+      font-size: 10px;
+      color: var(--text-secondary);
+    }
+    .rama .b-match .b-match-tag {
+      background: var(--surface);
+    }
+    .b-match-mode {
+      font-size: 10px;
+      color: var(--text-tertiary);
+      font-weight: 600;
+    }
+
+    .b-match-body {
+      padding: 10px 12px;
+    }
+    .b-team-row {
+      display: grid;
+      grid-template-columns: 26px 1fr auto;
+      align-items: center;
+      gap: 8px;
+      padding: 5px 0;
+    }
+    .b-team-row + .b-team-row {
+      border-top: 0.5px dashed var(--border);
+    }
+    .b-team-name {
+      font-size: 13px;
+      font-weight: 500;
+      color: var(--text);
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+    }
+    .b-team-row.winner .b-team-name {
+      font-weight: 700;
+    }
+    .b-team-row.loser .b-team-name {
+      color: var(--text-tertiary);
+      font-weight: 400;
+    }
+    .b-team-row.tbd .b-team-name {
+      font-style: italic;
+      color: var(--text-tertiary);
+      font-weight: 400;
+      font-size: 12px;
+    }
+    .b-team-scores {
+      display: flex;
+      gap: 4px;
+      font-family: ui-monospace, "SF Mono", Menlo, Consolas, monospace;
+      font-size: 12px;
+      font-weight: 700;
+      color: var(--text);
+    }
+    .b-team-row.loser .b-team-scores {
+      color: var(--text-tertiary);
+      font-weight: 500;
+    }
+    .b-team-row.tbd .b-team-scores {
+      color: var(--text-tertiary);
+    }
+    .b-score-cell {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      min-width: 22px;
+      padding: 2px 6px;
+      background: var(--surface-2);
+      border-radius: 5px;
+    }
+    .rama .b-match .b-score-cell {
+      background: var(--surface);
+    }
+    .b-team-row.winner .b-score-cell.agg {
+      background: var(--success-bg);
+      color: var(--success);
+    }
+    .b-team-avatar {
+      width: 22px;
+      height: 22px;
+      font-size: 9px;
+    }
+    .b-seed {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      width: 18px;
+      height: 18px;
+      font-size: 10px;
+      font-weight: 700;
+      color: var(--text-secondary);
+      background: var(--surface);
+      border: 0.5px solid var(--border);
+      border-radius: 4px;
+      margin-right: 4px;
+      flex: none;
+      font-variant-numeric: tabular-nums;
+    }
+    .rama .b-seed {
+      background: var(--surface-2);
+    }
+
+    /* Cards especiales para las finales de puesto */
+    .b-match.puesto-1 {
+      border: 1.5px solid var(--gold);
+    }
+    .b-match.puesto-1 .b-match-head {
+      background: var(--warning-bg);
+      color: var(--warning);
+      border-bottom-color: var(--gold);
+    }
+    .b-match.puesto-3 { border-color: var(--border-strong); }
+    .b-match.puesto-3 .b-match-head { background: var(--surface-2); }
+
+    /* Trofeo para el ganador de una final */
+    .b-trophy {
+      display: inline-block;
+      margin-left: 4px;
+      font-size: 12px;
+    }
+
+    /* Meta arriba de cada ronda */
+    .ronda-meta {
+      display: inline-block;
+      padding: 3px 8px;
+      background: var(--surface-2);
+      border-radius: 999px;
+      font-size: 10px;
+      font-weight: 600;
+      color: var(--text-secondary);
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+      margin-left: 8px;
+    }
+  </style>
+</head>
+<body>
+
+  <header class="header">
+    <div class="container header-inner">
+      <a href="index.html" class="brand">
+        <div class="brand-logo"></div>
+        <div class="brand-text">
+          <div class="brand-name">Papi Fútbol</div>
+          <div class="brand-sub">Colegio Marista San José · Morón</div>
+        </div>
+      </a>
+      <nav class="nav" id="nav">
+        <a href="index.html" class="nav-primary">Inicio</a>
+        <a href="fixture.html" class="nav-primary">Fixture</a>
+        <a href="equipos.html">Equipos</a>
+        <a href="estadisticas.html" class="nav-primary">Estadísticas</a>
+        <a href="bracket.html" class="active nav-primary">Copa Final</a>
+      </nav>
+      <button class="mobile-toggle" onclick="document.getElementById('nav').classList.toggle('open')">☰</button>
+    </div>
+  </header>
+
+  <main class="page">
+    <div class="container">
+
+      <!-- Header dinámico -->
+      <div class="bracket-header">
+        <div class="tag">Fase 3 · Copa Final</div>
+        <h1>Bracket de las tres copas</h1>
+        <p id="bracket-sub">Cuartos y semis ida y vuelta, finales de puesto a partido único</p>
+      </div>
+
+      <!-- Selector de copa -->
+      <div class="copa-selector" id="copa-selector">
+        <button class="copa-btn oro on" data-copa="oro">
+          <span class="swatch"></span> Copa de Oro
+        </button>
+        <button class="copa-btn plata" data-copa="plata">
+          <span class="swatch"></span> Copa de Plata
+        </button>
+        <button class="copa-btn bronce" data-copa="bronce">
+          <span class="swatch"></span> Copa de Bronce
+        </button>
+      </div>
+
+      <!-- Info contextual -->
+      <div class="copa-info" id="copa-info"></div>
+
+      <!-- Bracket -->
+      <div id="bracket-container"></div>
+
+    </div>
+  </main>
+
+  <footer class="footer">
+    <div class="container footer-inner">
+      <div class="footer-brand">
+        <div class="brand-logo small"></div>
+        <div>
+          <div style="font-weight: 600; color: var(--text);">Papi Fútbol Morón</div>
+          <div>Colegio Marista San José</div>
+        </div>
+      </div>
+      <div class="footer-social">
+        <a href="https://www.facebook.com/papifutbolmoron" title="Facebook">f</a>
+      </div>
+    </div>
+  </footer>
+
+  <script src="data/torneo.js"></script>
+  <script src="js/site.js"></script>
+  <script>
+    // ===========================================
+    // FASE 2 → FASE 3: reglas de clasificación
+    // (mismas que en estadisticas.html)
+    // ===========================================
+    const REGLAS_COPA_FASE2 = {
+      A: ['oro','oro','oro','oro','oro','plata','plata','bronce'],
+      B: ['oro','oro','plata','plata','plata','plata','bronce','bronce'],
+      C: ['oro','plata','plata','bronce','bronce','bronce','bronce','bronce']
+    };
+
+    // Cruces de cuartos por seed: 1v8, 4v5, 2v7, 3v6
+    // Cada QF define un ganador y un perdedor que arrastran a sus semis correspondientes.
+    const CRUCES_CUARTOS = [
+      { id: 'QF1', seedL: 1, seedV: 8 },
+      { id: 'QF2', seedL: 4, seedV: 5 },
+      { id: 'QF3', seedL: 2, seedV: 7 },
+      { id: 'QF4', seedL: 3, seedV: 6 }
+    ];
+
+    // Semis: SFG1 = ganadores de QF1/QF2, SFG2 = ganadores de QF3/QF4
+    //        SFP1 = perdedores de QF1/QF2, SFP2 = perdedores de QF3/QF4
+    const CRUCES_SEMIS = [
+      { id: 'SFG1', localFrom: { partido: 'QF1', tipo: 'G' }, visitFrom: { partido: 'QF2', tipo: 'G' }, rama: 'ganadores' },
+      { id: 'SFG2', localFrom: { partido: 'QF3', tipo: 'G' }, visitFrom: { partido: 'QF4', tipo: 'G' }, rama: 'ganadores' },
+      { id: 'SFP1', localFrom: { partido: 'QF1', tipo: 'P' }, visitFrom: { partido: 'QF2', tipo: 'P' }, rama: 'perdedores' },
+      { id: 'SFP2', localFrom: { partido: 'QF3', tipo: 'P' }, visitFrom: { partido: 'QF4', tipo: 'P' }, rama: 'perdedores' }
+    ];
+
+    // Finales de puesto (partido único)
+    const CRUCES_FINALES = [
+      { id: 'F12', puesto: '1°/2°',   localFrom: { partido: 'SFG1', tipo: 'G' }, visitFrom: { partido: 'SFG2', tipo: 'G' }, rama: 'ganadores', puestoClass: 'puesto-1' },
+      { id: 'F34', puesto: '3°/4°',   localFrom: { partido: 'SFG1', tipo: 'P' }, visitFrom: { partido: 'SFG2', tipo: 'P' }, rama: 'ganadores', puestoClass: 'puesto-3' },
+      { id: 'F56', puesto: '5°/6°',   localFrom: { partido: 'SFP1', tipo: 'G' }, visitFrom: { partido: 'SFP2', tipo: 'G' }, rama: 'perdedores', puestoClass: '' },
+      { id: 'F78', puesto: '7°/8°',   localFrom: { partido: 'SFP1', tipo: 'P' }, visitFrom: { partido: 'SFP2', tipo: 'P' }, rama: 'perdedores', puestoClass: '' }
+    ];
+
+    // ===========================================
+    // CÁLCULO DE SEEDS
+    // ===========================================
+    // Toma las tres zonas de Fase 2, filtra los equipos que clasifican a la copa dada
+    // según REGLAS_COPA_FASE2, y los ordena por puntos → DG → GF → posición en zona.
+    function getSeedsCopa(copa) {
+      const clasificados = [];
+      ['A', 'B', 'C'].forEach(z => {
+        const posiciones = POSICIONES['zona' + z] || [];
+        posiciones.forEach((row, idx) => {
+          if (REGLAS_COPA_FASE2[z][idx] === copa) {
+            clasificados.push({
+              equipoId: row.id,
+              zonaOrigen: z,
+              posOrigen: idx + 1,
+              pts: row.pts,
+              gf: row.gf,
+              gc: row.gc,
+              dg: row.gf - row.gc
+            });
+          }
+        });
+      });
+
+      clasificados.sort((a, b) => {
+        if (a.pts !== b.pts) return b.pts - a.pts;
+        if (a.dg !== b.dg)   return b.dg - a.dg;
+        if (a.gf !== b.gf)   return b.gf - a.gf;
+        return a.posOrigen - a.posOrigen;  // desempate final: mejor puesto en zona
+      });
+
+      return clasificados;
+    }
+
+    // ===========================================
+    // BUSCAR RESULTADOS DE FASE 3 EN EL FIXTURE
+    // ===========================================
+    // Cuando el scraper empiece a traer partidos con fase===3, esta función los cruza
+    // con la estructura del bracket. Por ahora devuelve null hasta que existan.
+    function findResultadoBracket(equipoLocalId, equipoVisitId) {
+      if (!equipoLocalId || !equipoVisitId) return null;
+      const partidosFase3 = FIXTURE
+        .filter(f => f.fase === 3)
+        .flatMap(f => {
+          if (f.zonas) return Object.values(f.zonas).flat();
+          if (f.partidos) return f.partidos;
+          return [];
+        });
+
+      // Buscar por ida (local-visitante) y vuelta (visitante-local)
+      const ida = partidosFase3.find(p =>
+        p.local === equipoLocalId && p.visitante === equipoVisitId
+        && p.golesL !== undefined && p.golesV !== undefined);
+      const vuelta = partidosFase3.find(p =>
+        p.local === equipoVisitId && p.visitante === equipoLocalId
+        && p.golesL !== undefined && p.golesV !== undefined);
+
+      if (!ida && !vuelta) return null;
+
+      // Agregado (siempre desde la perspectiva del "local" del bracket)
+      const golesL = (ida ? ida.golesL : 0) + (vuelta ? vuelta.golesV : 0);
+      const golesV = (ida ? ida.golesV : 0) + (vuelta ? vuelta.golesL : 0);
+
+      return {
+        ida:    ida    ? { l: ida.golesL,    v: ida.golesV    } : null,
+        vuelta: vuelta ? { l: vuelta.golesV, v: vuelta.golesL } : null,
+        agg: { l: golesL, v: golesV },
+        completo: !!(ida && vuelta)
+      };
+    }
+
+    // Idem pero para partido único (finales de puesto)
+    function findResultadoUnico(equipoLocalId, equipoVisitId) {
+      if (!equipoLocalId || !equipoVisitId) return null;
+      const partidosFase3 = FIXTURE
+        .filter(f => f.fase === 3)
+        .flatMap(f => {
+          if (f.zonas) return Object.values(f.zonas).flat();
+          if (f.partidos) return f.partidos;
+          return [];
+        });
+      const p = partidosFase3.find(x =>
+        ((x.local === equipoLocalId && x.visitante === equipoVisitId) ||
+         (x.local === equipoVisitId && x.visitante === equipoLocalId))
+        && x.golesL !== undefined && x.golesV !== undefined);
+      if (!p) return null;
+      const inverso = p.local !== equipoLocalId;
+      return {
+        l: inverso ? p.golesV : p.golesL,
+        v: inverso ? p.golesL : p.golesV
+      };
+    }
+
+    // ===========================================
+    // RESOLVER EL BRACKET COMPLETO PARA UNA COPA
+    // ===========================================
+    function resolverBracket(copa) {
+      const seeds = getSeedsCopa(copa);  // array de 8 (o menos si faltan datos)
+
+      // Función auxiliar: obtener el "equipo" en un slot (seed o "ganador de X" / "perdedor de X")
+      const bracket = {
+        seeds: seeds,
+        cuartos: {},
+        semis: {},
+        finales: {}
+      };
+
+      // Cuartos
+      CRUCES_CUARTOS.forEach(c => {
+        const seedL = seeds[c.seedL - 1];
+        const seedV = seeds[c.seedV - 1];
+        const equipoL = seedL ? seedL.equipoId : null;
+        const equipoV = seedV ? seedV.equipoId : null;
+        const res = findResultadoBracket(equipoL, equipoV);
+        let ganador = null, perdedor = null;
+        if (res && res.completo) {
+          if (res.agg.l > res.agg.v) { ganador = equipoL; perdedor = equipoV; }
+          else if (res.agg.v > res.agg.l) { ganador = equipoV; perdedor = equipoL; }
+          // en caso de empate agregado se resuelve por penales; el scraper lo definirá
+        }
+        bracket.cuartos[c.id] = {
+          id: c.id,
+          seedL: c.seedL, seedV: c.seedV,
+          equipoL, equipoV,
+          resultado: res, ganador, perdedor
+        };
+      });
+
+      // Semis (ganadores y perdedores)
+      CRUCES_SEMIS.forEach(c => {
+        const equipoL = bracket.cuartos[c.localFrom.partido]
+                         && (c.localFrom.tipo === 'G' ? bracket.cuartos[c.localFrom.partido].ganador
+                                                     : bracket.cuartos[c.localFrom.partido].perdedor);
+        const equipoV = bracket.cuartos[c.visitFrom.partido]
+                         && (c.visitFrom.tipo === 'G' ? bracket.cuartos[c.visitFrom.partido].ganador
+                                                     : bracket.cuartos[c.visitFrom.partido].perdedor);
+        const res = findResultadoBracket(equipoL, equipoV);
+        let ganador = null, perdedor = null;
+        if (res && res.completo) {
+          if (res.agg.l > res.agg.v) { ganador = equipoL; perdedor = equipoV; }
+          else if (res.agg.v > res.agg.l) { ganador = equipoV; perdedor = equipoL; }
+        }
+        bracket.semis[c.id] = {
+          id: c.id,
+          equipoL, equipoV,
+          resultado: res, ganador, perdedor,
+          rama: c.rama,
+          localFrom: c.localFrom, visitFrom: c.visitFrom
+        };
+      });
+
+      // Finales de puesto (partido único)
+      CRUCES_FINALES.forEach(c => {
+        const equipoL = bracket.semis[c.localFrom.partido]
+                         && (c.localFrom.tipo === 'G' ? bracket.semis[c.localFrom.partido].ganador
+                                                     : bracket.semis[c.localFrom.partido].perdedor);
+        const equipoV = bracket.semis[c.visitFrom.partido]
+                         && (c.visitFrom.tipo === 'G' ? bracket.semis[c.visitFrom.partido].ganador
+                                                     : bracket.semis[c.visitFrom.partido].perdedor);
+        const res = findResultadoUnico(equipoL, equipoV);
+        let ganador = null;
+        if (res) {
+          if (res.l > res.v) ganador = equipoL;
+          else if (res.v > res.l) ganador = equipoV;
+        }
+        bracket.finales[c.id] = {
+          id: c.id, puesto: c.puesto, puestoClass: c.puestoClass,
+          equipoL, equipoV,
+          resultado: res, ganador,
+          rama: c.rama
+        };
+      });
+
+      return bracket;
+    }
+
+    // ===========================================
+    // RENDER
+    // ===========================================
+    const COPA_META = {
+      oro:    { label: 'Copa de Oro',    initial: 'O', color: 'var(--gold)',   trofeoWinner: '🏆' },
+      plata:  { label: 'Copa de Plata',  initial: 'P', color: 'var(--silver)', trofeoWinner: '🥈' },
+      bronce: { label: 'Copa de Bronce', initial: 'B', color: 'var(--bronze)', trofeoWinner: '🥉' }
+    };
+
+    // Devuelve el HTML de una fila de equipo dentro de un partido
+    function teamRow(equipoId, score, opts) {
+      opts = opts || {};
+      // score: número (partido único), o { ida, vuelta, agg }
+      if (!equipoId) {
+        return `
+          <div class="b-team-row tbd">
+            <span></span>
+            <span class="b-team-name">${opts.placeholder || 'Por definir'}</span>
+            <span class="b-team-scores"><span class="b-score-cell">–</span></span>
+          </div>
+        `;
+      }
+      const nombre = getEquipoNombre(equipoId);
+      const winnerCls = opts.esGanador ? 'winner' : (opts.esPerdedor ? 'loser' : '');
+      const seedBadge = opts.seed
+        ? `<span class="b-seed" title="Seed ${opts.seed}">${opts.seed}</span>`
+        : '';
+      let scoresHtml = '';
+      if (typeof score === 'object' && score !== null && 'agg' in score) {
+        // ida y vuelta
+        const idaCell    = score.ida    ? `<span class="b-score-cell" title="Ida">${score.ida}</span>` : `<span class="b-score-cell" title="Ida">–</span>`;
+        const vueltaCell = score.vuelta ? `<span class="b-score-cell" title="Vuelta">${score.vuelta}</span>` : `<span class="b-score-cell" title="Vuelta">–</span>`;
+        const aggCell    = `<span class="b-score-cell agg" title="Agregado">${score.agg}</span>`;
+        scoresHtml = idaCell + vueltaCell + aggCell;
+      } else if (typeof score === 'number') {
+        scoresHtml = `<span class="b-score-cell" title="Resultado">${score}</span>`;
+      } else {
+        scoresHtml = `<span class="b-score-cell">–</span>`;
+      }
+      return `
+        <div class="b-team-row ${winnerCls}">
+          <a href="equipo.html?id=${equipoId}" style="display:flex; align-items:center; gap:6px; text-decoration:none; color:inherit; overflow:hidden;">
+            ${seedBadge}${teamAvatar(equipoId, 22)}
+          </a>
+          <a href="equipo.html?id=${equipoId}" class="b-team-name" style="text-decoration:none; color:inherit;">
+            ${nombre}${opts.trofeo ? ' <span class="b-trophy">' + opts.trofeo + '</span>' : ''}
+          </a>
+          <span class="b-team-scores">${scoresHtml}</span>
+        </div>
+      `;
+    }
+
+    // Card de partido de cuartos o semis (ida y vuelta)
+    function matchCardIdaVuelta(partido, opts) {
+      opts = opts || {};
+      const res = partido.resultado;
+      const scoreL = res
+        ? { ida: res.ida ? `${res.ida.l}` : null, vuelta: res.vuelta ? `${res.vuelta.l}` : null, agg: res.agg.l }
+        : null;
+      const scoreV = res
+        ? { ida: res.ida ? `${res.ida.v}` : null, vuelta: res.vuelta ? `${res.vuelta.v}` : null, agg: res.agg.v }
+        : null;
+
+      const esGanadorL = partido.ganador === partido.equipoL;
+      const esGanadorV = partido.ganador === partido.equipoV;
+
+      return `
+        <div class="b-match">
+          <div class="b-match-head">
+            <div class="b-match-label">
+              <span class="b-match-tag">${opts.tag || partido.id}</span>
+              <span>${opts.title || ''}</span>
+            </div>
+            <span class="b-match-mode">Ida y vuelta</span>
+          </div>
+          <div class="b-match-body">
+            ${teamRow(partido.equipoL, scoreL, {
+              seed: partido.seedL,
+              esGanador: esGanadorL,
+              esPerdedor: !!partido.ganador && !esGanadorL,
+              placeholder: opts.placeholderL
+            })}
+            ${teamRow(partido.equipoV, scoreV, {
+              seed: partido.seedV,
+              esGanador: esGanadorV,
+              esPerdedor: !!partido.ganador && !esGanadorV,
+              placeholder: opts.placeholderV
+            })}
+          </div>
+        </div>
+      `;
+    }
+
+    // Card de partido único (finales de puesto)
+    function matchCardUnico(partido, opts) {
+      opts = opts || {};
+      const res = partido.resultado;
+      const esGanadorL = partido.ganador === partido.equipoL;
+      const esGanadorV = partido.ganador === partido.equipoV;
+
+      return `
+        <div class="b-match ${opts.puestoClass || ''}">
+          <div class="b-match-head">
+            <div class="b-match-label">
+              <span class="b-match-tag">${partido.puesto}</span>
+              <span>${opts.title || ''}</span>
+            </div>
+            <span class="b-match-mode">Partido único</span>
+          </div>
+          <div class="b-match-body">
+            ${teamRow(partido.equipoL, res ? res.l : null, {
+              esGanador: esGanadorL,
+              esPerdedor: !!partido.ganador && !esGanadorL,
+              placeholder: opts.placeholderL,
+              trofeo: (esGanadorL && opts.trofeo) ? opts.trofeo : null
+            })}
+            ${teamRow(partido.equipoV, res ? res.v : null, {
+              esGanador: esGanadorV,
+              esPerdedor: !!partido.ganador && !esGanadorV,
+              placeholder: opts.placeholderV,
+              trofeo: (esGanadorV && opts.trofeo) ? opts.trofeo : null
+            })}
+          </div>
+        </div>
+      `;
+    }
+
+    // Placeholders inteligentes para semis y finales
+    function placeholderSemi(from) {
+      return (from.tipo === 'G' ? 'Ganador ' : 'Perdedor ') + from.partido;
+    }
+
+    function renderBracket(copa) {
+      const meta = COPA_META[copa];
+      const bracket = resolverBracket(copa);
+
+      // Estado de la Fase 2 para el subtítulo
+      const fixtureF2 = FIXTURE.filter(f => f.fase === 2);
+      const jugadasF2 = fixtureF2.filter(f => f.estado === 'jugada').length;
+      const totalF2 = fixtureF2.length;
+      const faseCerrada = totalF2 > 0 && jugadasF2 === totalF2;
+      const proyeccion = !faseCerrada;
+
+      // Info contextual
+      const infoBox = document.getElementById('copa-info');
+      infoBox.className = 'copa-info ' + copa;
+      infoBox.innerHTML = `
+        <strong>${meta.label}</strong> · 8 equipos clasificados de las zonas A/B/C. ${proyeccion
+          ? `Bracket <strong>proyectado</strong> según la tabla actual (Fase 2 en curso: fecha ${jugadasF2} de ${totalF2}). Los cruces pueden cambiar hasta que termine la Fase 2.`
+          : `Bracket definitivo con los clasificados oficiales.`}
+        Cruces por seed: 1v8, 2v7, 3v6, 4v5.
+      `;
+
+      // Container principal
+      const cont = document.getElementById('bracket-container');
+
+      // Sección cuartos
+      const cuartosHtml = CRUCES_CUARTOS.map(c => {
+        const p = bracket.cuartos[c.id];
+        return matchCardIdaVuelta(p, {
+          tag: c.id,
+          title: `Seed ${c.seedL} vs Seed ${c.seedV}`
+        });
+      }).join('');
+
+      // Sección rama ganadores
+      const sfg = ['SFG1', 'SFG2'].map(id => {
+        const p = bracket.semis[id];
+        return matchCardIdaVuelta(p, {
+          tag: id,
+          title: `${placeholderSemi(p.localFrom)} vs ${placeholderSemi(p.visitFrom)}`,
+          placeholderL: placeholderSemi(p.localFrom),
+          placeholderV: placeholderSemi(p.visitFrom)
+        });
+      }).join('');
+
+      const finalesGanadores = ['F12', 'F34'].map(id => {
+        const p = bracket.finales[id];
+        return matchCardUnico(p, {
+          title: id === 'F12' ? '¡Final por el título!' : 'Partido por el 3er puesto',
+          puestoClass: p.puestoClass,
+          placeholderL: placeholderSemi(p.localFrom || { partido: id, tipo: 'G' }),
+          placeholderV: placeholderSemi(p.visitFrom || { partido: id, tipo: 'G' }),
+          trofeo: id === 'F12' ? meta.trofeoWinner : null
+        });
+      }).join('');
+
+      // Sección rama perdedores
+      const sfp = ['SFP1', 'SFP2'].map(id => {
+        const p = bracket.semis[id];
+        return matchCardIdaVuelta(p, {
+          tag: id,
+          title: `${placeholderSemi(p.localFrom)} vs ${placeholderSemi(p.visitFrom)}`,
+          placeholderL: placeholderSemi(p.localFrom),
+          placeholderV: placeholderSemi(p.visitFrom)
+        });
+      }).join('');
+
+      const finalesPerdedores = ['F56', 'F78'].map(id => {
+        const p = bracket.finales[id];
+        return matchCardUnico(p, {
+          title: id === 'F56' ? 'Partido por el 5° puesto' : 'Partido por el 7° puesto',
+          puestoClass: p.puestoClass,
+          placeholderL: placeholderSemi(p.localFrom || { partido: id, tipo: 'G' }),
+          placeholderV: placeholderSemi(p.visitFrom || { partido: id, tipo: 'G' })
+        });
+      }).join('');
+
+      cont.innerHTML = `
+        <!-- Cuartos -->
+        <div class="bracket-section">
+          <div class="bracket-section-head">
+            <div class="bracket-section-title">Cuartos de final</div>
+            <div class="bracket-section-sub">Ida y vuelta · 4 llaves</div>
+          </div>
+          <div class="partidos-grid">${cuartosHtml}</div>
+        </div>
+
+        <!-- Ramas ganadores + perdedores -->
+        <div class="ramas-grid">
+
+          <!-- Rama ganadores -->
+          <div class="rama">
+            <div class="rama-title">Rama de ganadores</div>
+            <div class="rama-sub">Definirá 1° · 2° · 3° · 4°</div>
+
+            <div class="rama-subsection">
+              <div class="rama-subsection-label">Semifinales · Ida y vuelta</div>
+              <div class="partidos-grid solo">${sfg}</div>
+            </div>
+
+            <div class="rama-subsection">
+              <div class="rama-subsection-label">Finales de puesto · Partido único</div>
+              <div class="partidos-grid solo">${finalesGanadores}</div>
+            </div>
+          </div>
+
+          <!-- Rama perdedores -->
+          <div class="rama">
+            <div class="rama-title">Rama de perdedores</div>
+            <div class="rama-sub">Definirá 5° · 6° · 7° · 8°</div>
+
+            <div class="rama-subsection">
+              <div class="rama-subsection-label">Semifinales · Ida y vuelta</div>
+              <div class="partidos-grid solo">${sfp}</div>
+            </div>
+
+            <div class="rama-subsection">
+              <div class="rama-subsection-label">Finales de puesto · Partido único</div>
+              <div class="partidos-grid solo">${finalesPerdedores}</div>
+            </div>
+          </div>
+
+        </div>
+      `;
+    }
+
+    // ===========================================
+    // EVENTOS
+    // ===========================================
+    const selector = document.getElementById('copa-selector');
+    let copaActual = 'oro';
+
+    selector.addEventListener('click', e => {
+      const btn = e.target.closest('.copa-btn');
+      if (!btn) return;
+      selector.querySelectorAll('.copa-btn').forEach(b => b.classList.remove('on'));
+      btn.classList.add('on');
+      copaActual = btn.dataset.copa;
+      renderBracket(copaActual);
+    });
+
+    // ?copa=oro|plata|bronce en la URL
+    const copaParam = new URLSearchParams(window.location.search).get('copa');
+    if (copaParam && COPA_META[copaParam]) {
+      copaActual = copaParam;
+      selector.querySelectorAll('.copa-btn').forEach(b => {
+        b.classList.toggle('on', b.dataset.copa === copaActual);
+      });
+    }
+
+    // Render inicial
+    renderBracket(copaActual);
+
+    // Tab bar mobile (marcado como 'stats' por proximidad — la barra tiene 4 items fijos)
+    if (typeof renderTabBar === 'function') {
+      renderTabBar('stats');
+    }
+  </script>
+
+</body>
+</html>
