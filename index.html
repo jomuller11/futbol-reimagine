@@ -32,6 +32,7 @@
         <a href="fixture.html" class="nav-primary">Fixture</a>
         <a href="equipos.html">Equipos</a>
         <a href="estadisticas.html" class="nav-primary">Estadísticas</a>
+        <a href="bracket.html" class="nav-primary">Copa Final</a>
       </nav>
       <button class="mobile-toggle" onclick="document.getElementById('nav').classList.toggle('open')">☰</button>
     </div>
@@ -430,7 +431,7 @@
           ${teamAvatar(v.equipo, 24)}
           <div style="line-height:1.2;">
             <div style="font-size:13px; font-weight:${i===0?600:500};">${shortName(v.arquero)}</div>
-            <div style="font-size:11px; color:var(--text-secondary);">${getEquipoNombre(v.equipo)}</div>
+          <div style="font-size:11px; color:var(--text-secondary);">${getEquipoNombre(v.equipo)}</div>
           </div>
         </div>
         <span style="font-size:14px; font-weight:700;">${v.gc} <small style="font-weight:400; color:var(--text-secondary);">GC</small></span>
