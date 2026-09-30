@@ -467,14 +467,29 @@
       C: ['oro','plata','plata','bronce','bronce','bronce','bronce','bronce']
     };
 
-    // Cruces de cuartos por seed: 1v8, 4v5, 2v7, 3v6
+    // Cruces oficiales de cuartos por copa (fijados por la organización del torneo,
+    // no derivados de seeds). Fuente: papifutbolsanjosemoron.com.ar (fixture 4tos de final).
     // Cada QF define un ganador y un perdedor que arrastran a sus semis correspondientes.
-    const CRUCES_CUARTOS = [
-      { id: 'QF1', seedL: 1, seedV: 8 },
-      { id: 'QF2', seedL: 4, seedV: 5 },
-      { id: 'QF3', seedL: 2, seedV: 7 },
-      { id: 'QF4', seedL: 3, seedV: 6 }
-    ];
+    const CRUCES_POR_COPA = {
+      oro: [
+        { id: 'QF1', localId: '05', visitId: '12' },  // FUNARO vs MACIEL
+        { id: 'QF2', localId: '20', visitId: '24' },  // MIGUEL vs FENNER
+        { id: 'QF3', localId: '02', visitId: '04' },  // VENTRICELI vs DA COSTA
+        { id: 'QF4', localId: '21', visitId: '16' }   // PINTO vs VISCONTI
+      ],
+      plata: [
+        { id: 'QF1', localId: '10', visitId: '11' },  // AHUMADA vs ELIZALDE
+        { id: 'QF2', localId: '17', visitId: '03' },  // CASTRO vs MEYER
+        { id: 'QF3', localId: '08', visitId: '23' },  // IRIBARREN vs RESICO
+        { id: 'QF4', localId: '14', visitId: '18' }   // TORRES vs GOMEZ
+      ],
+      bronce: [
+        { id: 'QF1', localId: '06', visitId: '09' },  // ORTIZ vs ALIANO
+        { id: 'QF2', localId: '15', visitId: '13' },  // RUIZ DIAZ vs PISTILLI
+        { id: 'QF3', localId: '19', visitId: '01' },  // LAGUNA vs MOBRICI
+        { id: 'QF4', localId: '07', visitId: '22' }   // DEL VALLE vs RIVAS
+      ]
+    };
 
     // Semis: SFG1 = ganadores de QF1/QF2, SFG2 = ganadores de QF3/QF4
     //        SFP1 = perdedores de QF1/QF2, SFP2 = perdedores de QF3/QF4
@@ -590,9 +605,9 @@
     // RESOLVER EL BRACKET COMPLETO PARA UNA COPA
     // ===========================================
     function resolverBracket(copa) {
-      const seeds = getSeedsCopa(copa);  // array de 8 (o menos si faltan datos)
+      const cruces = CRUCES_POR_COPA[copa] || [];
+      const seeds = getSeedsCopa(copa);  // se sigue calculando por si querés mostrarlos como contexto
 
-      // Función auxiliar: obtener el "equipo" en un slot (seed o "ganador de X" / "perdedor de X")
       const bracket = {
         seeds: seeds,
         cuartos: {},
@@ -600,12 +615,10 @@
         finales: {}
       };
 
-      // Cuartos
-      CRUCES_CUARTOS.forEach(c => {
-        const seedL = seeds[c.seedL - 1];
-        const seedV = seeds[c.seedV - 1];
-        const equipoL = seedL ? seedL.equipoId : null;
-        const equipoV = seedV ? seedV.equipoId : null;
+      // Cuartos: cruces fijos por copa (no dependen de seeds)
+      cruces.forEach(c => {
+        const equipoL = c.localId;
+        const equipoV = c.visitId;
         const res = findResultadoBracket(equipoL, equipoV);
         let ganador = null, perdedor = null;
         if (res && res.completo) {
@@ -615,7 +628,6 @@
         }
         bracket.cuartos[c.id] = {
           id: c.id,
-          seedL: c.seedL, seedV: c.seedV,
           equipoL, equipoV,
           resultado: res, ganador, perdedor
         };
@@ -817,20 +829,19 @@
       infoBox.className = 'copa-info ' + copa;
       infoBox.innerHTML = `
         <strong>${meta.label}</strong> · 8 equipos clasificados de las zonas A/B/C. ${proyeccion
-          ? `Bracket <strong>proyectado</strong> según la tabla actual (Fase 2 en curso: fecha ${jugadasF2} de ${totalF2}). Los cruces pueden cambiar hasta que termine la Fase 2.`
-          : `Bracket definitivo con los clasificados oficiales.`}
-        Cruces por seed: 1v8, 2v7, 3v6, 4v5.
+          ? `Bracket <strong>proyectado</strong> según la tabla actual (Fase 2 en curso: fecha ${jugadasF2} de ${totalF2}). Los cruces oficiales pueden confirmarse una vez terminada la Fase 2.`
+          : `Cruces oficiales del torneo.`}
       `;
 
       // Container principal
       const cont = document.getElementById('bracket-container');
 
       // Sección cuartos
-      const cuartosHtml = CRUCES_CUARTOS.map(c => {
+      const cruces = CRUCES_POR_COPA[copa] || [];
+      const cuartosHtml = cruces.map(c => {
         const p = bracket.cuartos[c.id];
         return matchCardIdaVuelta(p, {
-          tag: c.id,
-          title: `Seed ${c.seedL} vs Seed ${c.seedV}`
+          tag: c.id
         });
       }).join('');
 
