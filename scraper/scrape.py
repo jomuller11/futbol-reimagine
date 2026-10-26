@@ -316,18 +316,28 @@ def parse_fixture(soup):
     fechas_dict = {}  # fecha_str -> {fechaTexto, fase, zonas: {zonaKey: [partidos]}}
 
     # Cada bloque: "ZONA ZONA X\nDD-MM-YYYY\n<partidos>" donde X = 1/2 (fase regular)
-    # o A/B/C (fase final). La fase se deduce de la etiqueta de zona.
+    # o A/B/C (fase final). Para Fase 3 el sitio usa "ZONA COPA DE X" donde
+    # X = ORO/PLATA/BRONCE (cuartos, semis, finales de puesto).
     zona_pattern = re.compile(
-        r"ZONA ZONA (\d|[ABC])\n+(\d{2}-\d{2}-\d{4})\n+(.+?)"
-        r"(?=\n+ZONA ZONA (?:\d|[ABC])|\n+\* FASE|\n+!\[|\Z)",
+        r"ZONA (?:ZONA (\d|[ABC])|COPA DE (ORO|PLATA|BRONCE))\n+(\d{2}-\d{2}-\d{4})\n+(.+?)"
+        r"(?=\n+ZONA (?:ZONA (?:\d|[ABC])|COPA DE (?:ORO|PLATA|BRONCE))|\n+\* FASE|\n+!\[|\Z)",
         re.DOTALL
     )
 
     for m in zona_pattern.finditer(text):
-        zona_key = m.group(1)  # '1','2','A','B','C'
-        fecha_str = m.group(2)
-        bloque_partidos = m.group(3)
-        fase = 1 if zona_key in ("1", "2") else 2
+        zona_num = m.group(1)   # '1','2','A','B','C' o None
+        zona_copa = m.group(2)  # 'ORO','PLATA','BRONCE' o None
+        fecha_str = m.group(3)
+        bloque_partidos = m.group(4)
+
+        if zona_num is not None:
+            zona_key = zona_num
+            fase = 1 if zona_num in ("1", "2") else 2
+        else:
+            # Fase 3: una "zona" por copa. Guardamos como 'Oro'/'Plata'/'Bronce'
+            # (capitalizado) para que el frontend las muestre así en los tabs.
+            zona_key = zona_copa.capitalize()
+            fase = 3
 
         d = fechas_dict.setdefault(fecha_str, {
             "fechaTexto": fecha_str.replace("-", "/"),
@@ -361,7 +371,8 @@ def parse_fixture(soup):
 
     n_f1 = sum(1 for f in fixture if f["fase"] == 1)
     n_f2 = sum(1 for f in fixture if f["fase"] == 2)
-    log(f"  Fixture parseado: {len(fixture)} fechas (Fase 1: {n_f1}, Fase 2: {n_f2})")
+    n_f3 = sum(1 for f in fixture if f["fase"] == 3)
+    log(f"  Fixture parseado: {len(fixture)} fechas (Fase 1: {n_f1}, Fase 2: {n_f2}, Fase 3: {n_f3})")
 
     def partidos_de(f):
         return [p for arr in f["zonas"].values() for p in arr]
@@ -738,7 +749,7 @@ def build_fases(fixture, posiciones):
     Cada fase lista sus zonas (orden 1,2 o A,B,C) tomadas del fixture y las
     posiciones."""
     fases = sorted({f["fase"] for f in fixture})
-    orden = {"1": 0, "2": 1, "A": 2, "B": 3, "C": 4}
+    orden = {"1": 0, "2": 1, "A": 2, "B": 3, "C": 4, "Oro": 5, "Plata": 6, "Bronce": 7}
     out = []
     for fase in fases:
         zonas = set()
