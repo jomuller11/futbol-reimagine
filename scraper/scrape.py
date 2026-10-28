@@ -52,6 +52,8 @@ COLORES_EQUIPOS = {
 }
 
 OUTPUT_PATH = Path(__file__).parent.parent / "data" / "torneo.js"
+OUTPUT_JSON_PATH = Path(__file__).parent.parent / "data" / "torneo.json"
+META_PATH = Path(__file__).parent.parent / "data" / "torneo-meta.json"
 
 
 # ============================================================
@@ -902,6 +904,20 @@ def main():
     log(f"   User-Agent: {USER_AGENT}")
     log("")
 
+    # Pausa entre torneos: si torneo-meta.json tiene activo=null, el scraper
+    # no escribe. Esto evita contaminar un snapshot cerrado con datos nuevos
+    # del papi mientras un humano todavía no inicializó el próximo torneo.
+    if META_PATH.exists():
+        try:
+            meta = json.loads(META_PATH.read_text(encoding="utf-8"))
+            if meta.get("activo") is None:
+                log("⏸️  Torneo activo = null en data/torneo-meta.json.")
+                log("    El scraper está en pausa hasta que se inicialice el próximo torneo.")
+                log(f"    Para reanudar: editar {META_PATH.name} con un bloque 'activo'.")
+                return
+        except Exception as e:
+            log(f"⚠️  No pude leer {META_PATH.name}: {e}. Continúo sin check de pausa.")
+
     # 1. Descargar las dos páginas
     log("📥 Descargando home...")
     home_html = fetch(HOME_URL)
@@ -948,6 +964,30 @@ def main():
         OUTPUT_PATH.parent.mkdir(parents=True, exist_ok=True)
         OUTPUT_PATH.write_text(contenido, encoding="utf-8")
         log(f"✅ Escrito: {OUTPUT_PATH} ({len(contenido):,} caracteres)")
+
+        # También JSON crudo para herramientas externas (snapshot.py, registrar.py, etc.)
+        # Contiene toda la data del torneo sin las funciones helper ni STATS_GLOBALES
+        # (que se recomputan en el navegador a partir del fixture).
+        datos_json = {
+            "generado": datetime.now(timezone.utc).strftime("%Y-%m-%d %H:%M UTC"),
+            "fuente": "papifutbolsanjosemoron.com.ar",
+            "equipos": equipos_completo,
+            "planteles": planteles,
+            "posiciones": home_data["posiciones"],
+            "goleadores": home_data["goleadores"],
+            "fairplay": home_data["fairplay"],
+            "valla": home_data["valla"],
+            "sanciones": home_data["sanciones"],
+            "fixture": home_data["fixture"],
+            "colores_equipos": COLORES_EQUIPOS,
+            "fases": build_fases(home_data["fixture"], home_data["posiciones"]),
+        }
+        OUTPUT_JSON_PATH.write_text(
+            json.dumps(datos_json, indent=2, ensure_ascii=False),
+            encoding="utf-8",
+        )
+        log(f"✅ Escrito: {OUTPUT_JSON_PATH} "
+            f"({OUTPUT_JSON_PATH.stat().st_size:,} bytes)")
 
     log("")
     log("🎉 Listo")
