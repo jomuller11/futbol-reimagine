@@ -414,7 +414,7 @@
       <div class="bracket-header">
         <div class="tag">Fase 3 · Copa Final</div>
         <h1>Bracket de las tres copas</h1>
-        <p id="bracket-sub">Cuartos y semis ida y vuelta, finales de puesto a partido único</p>
+        <p id="bracket-sub">Cuartos ida y vuelta · semis y finales de puesto a partido único (si empatan, penales)</p>
       </div>
 
       <!-- Selector de copa -->
@@ -552,30 +552,42 @@
       const partidosFase3 = FIXTURE
         .filter(f => f.fase === 3)
         .flatMap(f => {
-          if (f.zonas) return Object.values(f.zonas).flat();
-          if (f.partidos) return f.partidos;
-          return [];
+          const ps = f.zonas ? Object.values(f.zonas).flat() : (f.partidos || []);
+          return ps.map(p => Object.assign({}, p, { _fecha: f.fecha }));
         });
 
-      // Buscar por ida (local-visitante) y vuelta (visitante-local)
-      const ida = partidosFase3.find(p =>
-        p.local === equipoLocalId && p.visitante === equipoVisitId
-        && p.golesL !== undefined && p.golesV !== undefined);
-      const vuelta = partidosFase3.find(p =>
-        p.local === equipoVisitId && p.visitante === equipoLocalId
-        && p.golesL !== undefined && p.golesV !== undefined);
+      // El papi suele publicar las dos fechas con el mismo "local" nominal (no
+      // invierte roles entre ida y vuelta), así que no podemos distinguir
+      // ida/vuelta por el orden local/visitante. Buscamos todos los partidos
+      // entre estos dos equipos y usamos el número de fecha para ordenar.
+      const matches = partidosFase3
+        .filter(p =>
+          ((p.local === equipoLocalId && p.visitante === equipoVisitId) ||
+           (p.local === equipoVisitId && p.visitante === equipoLocalId))
+          && p.golesL !== undefined && p.golesV !== undefined)
+        .sort((a, b) => (a._fecha || 0) - (b._fecha || 0));
 
-      if (!ida && !vuelta) return null;
+      if (matches.length === 0) return null;
 
-      // Agregado (siempre desde la perspectiva del "local" del bracket)
-      const golesL = (ida ? ida.golesL : 0) + (vuelta ? vuelta.golesV : 0);
-      const golesV = (ida ? ida.golesV : 0) + (vuelta ? vuelta.golesL : 0);
+      // Normaliza los goles al punto de vista del equipoLocalId del bracket
+      function norm(p) {
+        const asLocal = p.local === equipoLocalId;
+        return {
+          l: asLocal ? p.golesL : p.golesV,
+          v: asLocal ? p.golesV : p.golesL
+        };
+      }
+      const ida    = norm(matches[0]);
+      const vuelta = matches[1] ? norm(matches[1]) : null;
+
+      const golesL = ida.l + (vuelta ? vuelta.l : 0);
+      const golesV = ida.v + (vuelta ? vuelta.v : 0);
 
       return {
-        ida:    ida    ? { l: ida.golesL,    v: ida.golesV    } : null,
-        vuelta: vuelta ? { l: vuelta.golesV, v: vuelta.golesL } : null,
+        ida: ida,
+        vuelta: vuelta,
         agg: { l: golesL, v: golesV },
-        completo: !!(ida && vuelta)
+        completo: matches.length >= 2
       };
     }
 
@@ -633,7 +645,7 @@
         };
       });
 
-      // Semis (ganadores y perdedores)
+      // Semis (ganadores y perdedores) — partido único; empate se define por penales.
       CRUCES_SEMIS.forEach(c => {
         const equipoL = bracket.cuartos[c.localFrom.partido]
                          && (c.localFrom.tipo === 'G' ? bracket.cuartos[c.localFrom.partido].ganador
@@ -641,11 +653,12 @@
         const equipoV = bracket.cuartos[c.visitFrom.partido]
                          && (c.visitFrom.tipo === 'G' ? bracket.cuartos[c.visitFrom.partido].ganador
                                                      : bracket.cuartos[c.visitFrom.partido].perdedor);
-        const res = findResultadoBracket(equipoL, equipoV);
+        const res = findResultadoUnico(equipoL, equipoV);
         let ganador = null, perdedor = null;
-        if (res && res.completo) {
-          if (res.agg.l > res.agg.v) { ganador = equipoL; perdedor = equipoV; }
-          else if (res.agg.v > res.agg.l) { ganador = equipoV; perdedor = equipoL; }
+        if (res) {
+          if (res.l > res.v)      { ganador = equipoL; perdedor = equipoV; }
+          else if (res.v > res.l) { ganador = equipoV; perdedor = equipoL; }
+          // empate: ganador/perdedor quedan null hasta que se cargue el resultado de penales
         }
         bracket.semis[c.id] = {
           id: c.id,
@@ -774,21 +787,22 @@
       `;
     }
 
-    // Card de partido único (finales de puesto)
+    // Card de partido único (semis, finales de puesto)
     function matchCardUnico(partido, opts) {
       opts = opts || {};
       const res = partido.resultado;
       const esGanadorL = partido.ganador === partido.equipoL;
       const esGanadorV = partido.ganador === partido.equipoV;
+      const empatePenales = res && res.l === res.v && !partido.ganador;
 
       return `
         <div class="b-match ${opts.puestoClass || ''}">
           <div class="b-match-head">
             <div class="b-match-label">
-              <span class="b-match-tag">${partido.puesto}</span>
+              <span class="b-match-tag">${opts.tag || partido.puesto}</span>
               <span>${opts.title || ''}</span>
             </div>
-            <span class="b-match-mode">Partido único</span>
+            <span class="b-match-mode">${empatePenales ? 'Empate · penales' : 'Partido único'}</span>
           </div>
           <div class="b-match-body">
             ${teamRow(partido.equipoL, res ? res.l : null, {
@@ -848,7 +862,7 @@
       // Sección rama ganadores
       const sfg = ['SFG1', 'SFG2'].map(id => {
         const p = bracket.semis[id];
-        return matchCardIdaVuelta(p, {
+        return matchCardUnico(p, {
           tag: id,
           title: `${placeholderSemi(p.localFrom)} vs ${placeholderSemi(p.visitFrom)}`,
           placeholderL: placeholderSemi(p.localFrom),
@@ -870,7 +884,7 @@
       // Sección rama perdedores
       const sfp = ['SFP1', 'SFP2'].map(id => {
         const p = bracket.semis[id];
-        return matchCardIdaVuelta(p, {
+        return matchCardUnico(p, {
           tag: id,
           title: `${placeholderSemi(p.localFrom)} vs ${placeholderSemi(p.visitFrom)}`,
           placeholderL: placeholderSemi(p.localFrom),
@@ -907,7 +921,7 @@
             <div class="rama-sub">Definirá 1° · 2° · 3° · 4°</div>
 
             <div class="rama-subsection">
-              <div class="rama-subsection-label">Semifinales · Ida y vuelta</div>
+              <div class="rama-subsection-label">Semifinales · Partido único</div>
               <div class="partidos-grid solo">${sfg}</div>
             </div>
 
@@ -923,7 +937,7 @@
             <div class="rama-sub">Definirá 5° · 6° · 7° · 8°</div>
 
             <div class="rama-subsection">
-              <div class="rama-subsection-label">Semifinales · Ida y vuelta</div>
+              <div class="rama-subsection-label">Semifinales · Partido único</div>
               <div class="partidos-grid solo">${sfp}</div>
             </div>
 
