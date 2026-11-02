@@ -348,15 +348,17 @@
                 if (stats.azules > 0) pills.push(`<span class="stat-pill stat-azul">🟦 ${stats.azules}</span>`);
                 if (stats.rojas > 0) pills.push(`<span class="stat-pill stat-roja">🟥 ${stats.rojas}</span>`);
                 if (esArquero && stats.golesRecibidos !== null) pills.push(`<span class="stat-pill stat-valla">${stats.golesRecibidos} GC</span>`);
+                // Toda la fila linkea al perfil del jugador
+                const href = `jugador.html?equipo=${id}&nombre=${encodeURIComponent(nombre)}`;
                 return `
-                  <div class="plantel-row ${esArquero ? 'arquero' : ''}">
+                  <a href="${href}" class="plantel-row ${esArquero ? 'arquero' : ''}" style="color: inherit; text-decoration: none;">
                     <div class="plantel-num">${esArquero ? 'ARQ' : (idx+1)}</div>
                     <div class="plantel-name">
                       ${nombre}
                       ${esArquero ? '<small>Arquero</small>' : ''}
                     </div>
                     <div class="plantel-stats">${pills.join('')}</div>
-                  </div>
+                  </a>
                 `;
               }).join('')}
             </div>

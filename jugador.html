@@ -1,0 +1,613 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Jugador · Papi Fútbol San José Morón</title>
+  <meta name="description" content="Perfil del jugador: estadísticas del torneo y partidos destacados.">
+  <meta property="og:type" content="profile">
+  <meta property="og:site_name" content="Papi Fútbol San José Morón">
+  <meta property="og:title" content="Jugador · Papi Fútbol San José Morón">
+  <meta property="og:description" content="Perfil del jugador: estadísticas y participación en el torneo.">
+  <meta property="og:url" content="https://jomuller11.github.io/futbol-reimagine/jugador.html">
+  <meta property="og:image" content="https://jomuller11.github.io/futbol-reimagine/logo.png">
+  <meta property="og:locale" content="es_AR">
+  <meta name="twitter:card" content="summary">
+  <link rel="icon" type="image/png" href="logo.png">
+  <link rel="stylesheet" href="styles.css">
+  <style>
+    /* -------- Hero del jugador -------- */
+    .jugador-hero {
+      background: var(--surface);
+      border: 0.5px solid var(--border);
+      border-radius: var(--radius-xl);
+      padding: 28px;
+      margin-bottom: 24px;
+      display: flex;
+      align-items: center;
+      gap: 24px;
+    }
+    .jugador-photo {
+      width: 128px;
+      height: 128px;
+      border-radius: 50%;
+      flex-shrink: 0;
+      position: relative;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      color: #fff;
+      overflow: hidden;
+      box-shadow: inset 0 0 0 4px rgba(255,255,255,0.12);
+    }
+    .jugador-photo .iniciales {
+      font-size: 44px;
+      font-weight: 700;
+      letter-spacing: -1px;
+      line-height: 1;
+    }
+    .jugador-photo .photo-hint {
+      position: absolute;
+      bottom: 10px;
+      left: 50%;
+      transform: translateX(-50%);
+      font-size: 9px;
+      text-transform: uppercase;
+      letter-spacing: 1px;
+      opacity: 0.65;
+      font-weight: 600;
+    }
+    .jugador-hero-info { flex: 1; min-width: 0; }
+    .jugador-hero-breadcrumb {
+      font-size: 11px;
+      color: var(--text-secondary);
+      text-transform: uppercase;
+      letter-spacing: 0.6px;
+      font-weight: 600;
+      margin-bottom: 6px;
+    }
+    .jugador-hero-breadcrumb a {
+      color: inherit;
+      text-decoration: none;
+    }
+    .jugador-hero-breadcrumb a:hover { text-decoration: underline; }
+    .jugador-hero-name {
+      font-size: 32px;
+      font-weight: 700;
+      line-height: 1.1;
+      margin: 0 0 12px 0;
+    }
+    .jugador-hero-meta {
+      display: flex;
+      gap: 10px;
+      align-items: center;
+      flex-wrap: wrap;
+    }
+    .team-chip {
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      padding: 6px 12px 6px 6px;
+      background: var(--bg);
+      border: 0.5px solid var(--border);
+      border-radius: 999px;
+      font-size: 13px;
+      font-weight: 600;
+      color: inherit;
+      text-decoration: none;
+    }
+    .team-chip:hover { background: var(--surface); }
+    .role-badge {
+      font-size: 11px;
+      font-weight: 700;
+      letter-spacing: 0.5px;
+      text-transform: uppercase;
+      padding: 4px 10px;
+      border-radius: 999px;
+      background: var(--primary);
+      color: #fff;
+    }
+
+    /* -------- Section heads -------- */
+    .section-head {
+      display: flex;
+      align-items: baseline;
+      justify-content: space-between;
+      margin: 24px 0 14px 0;
+    }
+    .section-title { margin: 0; font-size: 18px; font-weight: 700; }
+    .section-title small { color: var(--text-secondary); font-weight: 500; font-size: 13px; }
+
+    /* -------- Stat cards -------- */
+    .stat-cards {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(140px, 1fr));
+      gap: 12px;
+      margin-bottom: 24px;
+    }
+    .stat-card {
+      background: var(--surface);
+      border: 0.5px solid var(--border);
+      border-radius: var(--radius);
+      padding: 18px 16px;
+      display: flex;
+      flex-direction: column;
+      gap: 4px;
+    }
+    .stat-card .stat-value {
+      font-size: 32px;
+      font-weight: 700;
+      line-height: 1;
+      color: var(--text);
+    }
+    .stat-card .stat-label {
+      font-size: 12px;
+      color: var(--text-secondary);
+      font-weight: 600;
+      text-transform: uppercase;
+      letter-spacing: 0.4px;
+    }
+    .stat-card.goles .stat-value { color: var(--success); }
+    .stat-card.ranking .stat-value { color: var(--primary); }
+    .stat-card.amarillas .stat-value { color: #c69100; }
+    .stat-card.azules    .stat-value { color: #2f6fb8; }
+    .stat-card.rojas     .stat-value { color: var(--danger); }
+    .stat-card.valla     .stat-value { color: var(--primary); }
+    .stat-card.zero .stat-value { color: var(--text-tertiary); font-weight: 500; }
+
+    /* -------- Partidos tabla -------- */
+    .partidos-tabla {
+      background: var(--surface);
+      border: 0.5px solid var(--border);
+      border-radius: var(--radius-xl);
+      overflow: hidden;
+    }
+    .partidos-tabla .row {
+      display: grid;
+      grid-template-columns: 70px 1fr 70px auto 20px;
+      align-items: center;
+      gap: 14px;
+      padding: 12px 18px;
+      border-bottom: 0.5px solid var(--border);
+      color: inherit;
+      text-decoration: none;
+      transition: background 0.12s;
+    }
+    .partidos-tabla .row:last-child { border-bottom: 0; }
+    .partidos-tabla a.row:hover { background: var(--bg); }
+    .partidos-tabla .row.header {
+      background: var(--bg);
+      font-size: 11px;
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+      font-weight: 700;
+      color: var(--text-secondary);
+      padding-top: 10px;
+      padding-bottom: 10px;
+    }
+    .partidos-tabla .fecha {
+      font-size: 12px;
+      color: var(--text-secondary);
+      font-weight: 600;
+    }
+    .partidos-tabla .fecha small { color: var(--text-tertiary); font-weight: 500; }
+    .partidos-tabla .rival {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      font-weight: 600;
+      min-width: 0;
+    }
+    .partidos-tabla .rival span { overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+    .partidos-tabla .resultado {
+      font-weight: 700;
+      font-size: 15px;
+      text-align: center;
+      padding: 4px 8px;
+      border-radius: 6px;
+      font-variant-numeric: tabular-nums;
+    }
+    .partidos-tabla .resultado.win  { background: rgba(var(--success-rgb, 34,139,70),0.1); color: var(--success); }
+    .partidos-tabla .resultado.loss { background: rgba(var(--danger-rgb, 220,53,69),0.1); color: var(--danger); }
+    .partidos-tabla .resultado.draw { background: var(--bg); color: var(--text-secondary); }
+    .partidos-tabla .actuacion {
+      font-size: 16px;
+      letter-spacing: 2px;
+    }
+    .partidos-tabla .arrow {
+      color: var(--text-tertiary);
+      font-size: 14px;
+      text-align: right;
+    }
+
+    /* -------- Placeholder historial -------- */
+    .placeholder-section {
+      background: var(--surface);
+      border: 1px dashed var(--border);
+      border-radius: var(--radius-xl);
+      padding: 36px 28px;
+      text-align: center;
+      color: var(--text-secondary);
+    }
+    .placeholder-section .placeholder-icon {
+      font-size: 32px;
+      opacity: 0.5;
+      margin-bottom: 10px;
+    }
+    .placeholder-section h3 {
+      margin: 0 0 8px 0;
+      font-size: 16px;
+      color: var(--text);
+      font-weight: 700;
+    }
+    .placeholder-section p {
+      margin: 0 auto;
+      max-width: 460px;
+      font-size: 13px;
+      line-height: 1.5;
+    }
+
+    /* -------- Empty state -------- */
+    .empty-state {
+      padding: 24px;
+      text-align: center;
+      color: var(--text-secondary);
+      font-size: 14px;
+      background: var(--surface);
+      border: 0.5px solid var(--border);
+      border-radius: var(--radius);
+    }
+
+    /* -------- Error -------- */
+    .error-msg {
+      text-align: center;
+      padding: 60px 20px;
+      color: var(--text-secondary);
+    }
+
+    /* -------- Responsive -------- */
+    @media (max-width: 640px) {
+      .jugador-hero {
+        flex-direction: column;
+        text-align: center;
+        padding: 24px 20px;
+        gap: 16px;
+      }
+      .jugador-hero-meta { justify-content: center; }
+      .jugador-hero-name { font-size: 26px; }
+      .jugador-photo { width: 108px; height: 108px; }
+      .jugador-photo .iniciales { font-size: 38px; }
+
+      .partidos-tabla .row {
+        grid-template-columns: 56px 1fr 60px auto;
+        gap: 10px;
+        padding: 10px 14px;
+      }
+      .partidos-tabla .row > .arrow { display: none; }
+      .partidos-tabla .row.header > .actuacion { display: none; }
+      .partidos-tabla .actuacion { font-size: 14px; }
+    }
+  </style>
+</head>
+<body>
+
+  <header class="header">
+    <div class="container header-inner">
+      <a href="index.html" class="brand">
+        <div class="brand-logo"></div>
+        <div class="brand-text">
+          <div class="brand-name">Papi Fútbol</div>
+          <div class="brand-sub">Colegio Marista San José · Morón</div>
+        </div>
+      </a>
+      <nav class="nav" id="nav">
+        <a href="index.html" class="nav-primary">Inicio</a>
+        <a href="fixture.html" class="nav-primary">Fixture</a>
+        <a href="equipos.html" class="nav-primary">Equipos</a>
+        <a href="estadisticas.html" class="nav-primary">Estadísticas</a>
+        <a href="bracket.html" class="nav-primary">Copa Final</a>
+      </nav>
+      <button class="mobile-toggle" onclick="document.getElementById('nav').classList.toggle('open')">☰</button>
+    </div>
+  </header>
+
+  <main class="page">
+    <div class="container">
+
+      <div style="margin-bottom: 16px;">
+        <a href="javascript:history.back()" style="font-size: 13px; color: var(--text-secondary); text-decoration: none;">← Volver</a>
+      </div>
+
+      <div id="jugador-content">
+        <p style="text-align: center; padding: 40px; color: var(--text-secondary);">Cargando...</p>
+      </div>
+
+    </div>
+  </main>
+
+  <footer class="footer">
+    <div class="container footer-inner">
+      <div class="footer-brand">
+        <div class="brand-logo small"></div>
+        <div>
+          <div style="font-weight: 600; color: var(--text);">Papi Fútbol Morón</div>
+          <div>Colegio Marista San José</div>
+        </div>
+      </div>
+      <div class="footer-social">
+        <a href="https://www.facebook.com/papifutbolmoron" title="Facebook">f</a>
+      </div>
+    </div>
+  </footer>
+
+  <script src="data/torneo.js"></script>
+  <script src="js/site.js"></script>
+  <script>
+    // ===========================================
+    // RESOLUCIÓN DEL JUGADOR
+    // ===========================================
+    // El perfil se identifica por (equipoId, nombre). Mantenemos el nombre en la URL
+    // (no un slug) para que el link siga siendo legible al compartirlo.
+    //
+    // El match contra PLANTELES es case-insensitive y sin acentos — el papi suele
+    // escribir en mayúsculas sin tildes y nuestro parser aplica .title(), así que
+    // los nombres almacenados tienen tildes aunque la query no.
+    const params      = new URLSearchParams(window.location.search);
+    const equipoId    = params.get('equipo');
+    const nombreQuery = params.get('nombre') || '';
+
+    function normalizarNombre(s) {
+      return (s || '')
+        .toLowerCase()
+        .normalize('NFD')
+        .replace(/[̀-ͯ]/g, '')
+        .trim();
+    }
+
+    function encontrarJugador(equipoId, query) {
+      const plantel = PLANTELES[equipoId] || [];
+      const q = normalizarNombre(query);
+      if (!q) return null;
+      return plantel.find(n => normalizarNombre(n) === q) || null;
+    }
+
+    function escapeHtml(s) {
+      return (s || '').replace(/[<>&"]/g, c => ({'<':'&lt;','>':'&gt;','&':'&amp;','"':'&quot;'}[c]));
+    }
+
+    function iniciales(nombre) {
+      const palabras = (nombre || '').trim().split(/\s+/).filter(Boolean);
+      if (palabras.length === 0) return '?';
+      if (palabras.length === 1) return palabras[0].substring(0, 2).toUpperCase();
+      return (palabras[0][0] + palabras[palabras.length - 1][0]).toUpperCase();
+    }
+
+    // ===========================================
+    // PARTIDOS CON PARTICIPACIÓN
+    // ===========================================
+    // Lo único que podemos saber "partido por partido" es dónde el jugador anotó o
+    // fue amonestado. El papi no publica alineaciones completas, así que los
+    // "partidos jugados" totales no son derivables.
+    function partidosDelJugador(equipoId, nombre) {
+      const nombreUpper = (nombre || '').toUpperCase();
+      const out = [];
+      FIXTURE.forEach(f => {
+        if (f.estado !== 'jugada') return;
+        fechaPartidos(f).forEach(p => {
+          if (p.local !== equipoId && p.visitante !== equipoId) return;
+          const detallesEq = (p.detalles && p.detalles[equipoId]) || [];
+          const d = detallesEq.find(x => x.jugador.toUpperCase() === nombreUpper);
+          if (!d) return;
+          out.push({
+            fecha: f.fecha,
+            faseFecha: f.faseFecha,
+            fase: f.fase,
+            fechaTexto: f.fechaTexto,
+            local: p.local,
+            visitante: p.visitante,
+            golesL: p.golesL,
+            golesV: p.golesV,
+            esLocal: p.local === equipoId,
+            rival: p.local === equipoId ? p.visitante : p.local,
+            detalle: d
+          });
+        });
+      });
+      return out;
+    }
+
+    // ===========================================
+    // RENDER
+    // ===========================================
+    function renderJugador(equipoId, nombre) {
+      const equipo  = EQUIPOS[equipoId];
+      const plantel = PLANTELES[equipoId] || [];
+      const idx     = plantel.indexOf(nombre);
+      const esArquero = idx === 0;
+      const color   = getEquipoColor(equipoId);
+      const stats   = getStatsJugador(nombre, equipoId);
+
+      // Posición en la tabla de goleadores (si entró)
+      const posGoleadorIdx = GOLEADORES.findIndex(g =>
+        g.nombre.toUpperCase() === nombre.toUpperCase() && g.equipo === equipoId);
+      const posGoleador = posGoleadorIdx >= 0 ? (GOLEADORES[posGoleadorIdx].pos || (posGoleadorIdx + 1)) : null;
+
+      const partidos = partidosDelJugador(equipoId, nombre);
+
+      document.title = `${nombre} · ${equipo.nombre} · Papi Fútbol San José Morón`;
+
+      // --- Cards de stats ---
+      const statCards = [];
+      statCards.push(`
+        <div class="stat-card goles">
+          <div class="stat-value">${stats.goles}</div>
+          <div class="stat-label">⚽ Goles</div>
+        </div>
+      `);
+      if (posGoleador) {
+        statCards.push(`
+          <div class="stat-card ranking">
+            <div class="stat-value">#${posGoleador}</div>
+            <div class="stat-label">Tabla goleadores</div>
+          </div>
+        `);
+      }
+      statCards.push(`
+        <div class="stat-card amarillas ${stats.amarillas === 0 ? 'zero' : ''}">
+          <div class="stat-value">${stats.amarillas}</div>
+          <div class="stat-label">🟨 Amarillas</div>
+        </div>
+      `);
+      statCards.push(`
+        <div class="stat-card azules ${stats.azules === 0 ? 'zero' : ''}">
+          <div class="stat-value">${stats.azules}</div>
+          <div class="stat-label">🟦 Azules</div>
+        </div>
+      `);
+      statCards.push(`
+        <div class="stat-card rojas ${stats.rojas === 0 ? 'zero' : ''}">
+          <div class="stat-value">${stats.rojas}</div>
+          <div class="stat-label">🟥 Rojas</div>
+        </div>
+      `);
+      if (esArquero && stats.golesRecibidos !== null) {
+        statCards.push(`
+          <div class="stat-card valla">
+            <div class="stat-value">${stats.golesRecibidos}</div>
+            <div class="stat-label">Goles recibidos</div>
+          </div>
+        `);
+      }
+
+      // --- Tabla de partidos ---
+      const partidosHtml = partidos.length === 0
+        ? `<p class="empty-state">Todavía no registramos goles ni tarjetas de ${escapeHtml(nombre)} en el torneo.</p>`
+        : `
+          <div class="partidos-tabla">
+            <div class="row header">
+              <div>Fecha</div>
+              <div>Rival</div>
+              <div>Resultado</div>
+              <div>Actuación</div>
+              <div></div>
+            </div>
+            ${partidos.map(p => {
+              const golesP = p.esLocal ? p.golesL : p.golesV;
+              const golesR = p.esLocal ? p.golesV : p.golesL;
+              const resClass = golesP > golesR ? 'win' : (golesP < golesR ? 'loss' : 'draw');
+              const resTxt = `${golesP}-${golesR}`;
+              const iconosArr = [];
+              for (let g = 0; g < p.detalle.goles; g++) iconosArr.push('⚽');
+              p.detalle.tarjetas.forEach(t => {
+                if (t === 'amarilla') iconosArr.push('🟨');
+                else if (t === 'azul') iconosArr.push('🟦');
+                else if (t === 'roja') iconosArr.push('🟥');
+              });
+              return `
+                <a class="row" href="ficha.html?fecha=${p.fecha}&local=${p.local}">
+                  <div class="fecha">F${p.fase}·${p.faseFecha}<br><small>${p.fechaTexto.substring(0, 5)}</small></div>
+                  <div class="rival">
+                    ${teamAvatar(p.rival, 22)}
+                    <span>${getEquipoNombre(p.rival)}</span>
+                  </div>
+                  <div class="resultado ${resClass}">${resTxt}</div>
+                  <div class="actuacion">${iconosArr.join(' ')}</div>
+                  <div class="arrow">→</div>
+                </a>
+              `;
+            }).join('')}
+          </div>
+        `;
+
+      // --- HTML completo ---
+      const html = `
+        <!-- HERO -->
+        <div class="jugador-hero" style="border-top: 4px solid ${color};">
+          <!-- Placeholder de foto. Más adelante, reemplazar por <img src="..."> si existe foto. -->
+          <div class="jugador-photo" style="background: ${color};">
+            <span class="iniciales">${escapeHtml(iniciales(nombre))}</span>
+            <span class="photo-hint">foto</span>
+          </div>
+          <div class="jugador-hero-info">
+            <div class="jugador-hero-breadcrumb">
+              <a href="equipos.html">Equipos</a>
+              <span>›</span>
+              <a href="equipo.html?id=${equipoId}">${escapeHtml(equipo.nombre)}</a>
+            </div>
+            <h1 class="jugador-hero-name">${escapeHtml(nombre)}</h1>
+            <div class="jugador-hero-meta">
+              <a href="equipo.html?id=${equipoId}" class="team-chip">
+                ${teamAvatar(equipoId, 24)}
+                <span>${escapeHtml(equipo.nombre)}</span>
+              </a>
+              ${esArquero ? '<span class="role-badge">Arquero</span>' : ''}
+            </div>
+          </div>
+        </div>
+
+        <!-- STATS DEL TORNEO ACTIVO -->
+        <div class="section-head">
+          <h2 class="section-title">Torneo 2026 <small>· en curso</small></h2>
+        </div>
+        <div class="stat-cards">${statCards.join('')}</div>
+
+        <!-- PARTIDOS DESTACADOS -->
+        <div class="section-head">
+          <h2 class="section-title">
+            Partidos destacados
+            <small>· ${partidos.length} con participación</small>
+          </h2>
+        </div>
+        ${partidosHtml}
+
+        <!-- HISTORIAL ALL-TIME (placeholder) -->
+        <div class="section-head">
+          <h2 class="section-title">Historial all-time</h2>
+        </div>
+        <div class="placeholder-section">
+          <div class="placeholder-icon">📊</div>
+          <h3>Pendiente de habilitar</h3>
+          <p>
+            Las estadísticas acumuladas por temporada (goles, tarjetas, títulos
+            y partidos por torneo) se habilitan cuando cerremos el 2026 y
+            arranquemos el próximo torneo. El perfil mantiene su identidad
+            aunque el equipo del jugador cambie de ID entre temporadas.
+          </p>
+        </div>
+      `;
+
+      document.getElementById('jugador-content').innerHTML = html;
+    }
+
+    // ===========================================
+    // ARRANQUE
+    // ===========================================
+    (function init() {
+      const equipo = equipoId && EQUIPOS[equipoId];
+      if (!equipo) {
+        document.getElementById('jugador-content').innerHTML = `
+          <p class="error-msg">
+            Equipo no encontrado. <a href="equipos.html">Ver todos los equipos</a>
+          </p>
+        `;
+        return;
+      }
+      const jugador = encontrarJugador(equipoId, nombreQuery);
+      if (!jugador) {
+        document.getElementById('jugador-content').innerHTML = `
+          <p class="error-msg">
+            No encontramos a "${escapeHtml(nombreQuery)}" en el plantel de
+            ${escapeHtml(equipo.nombre)}.<br>
+            <a href="equipo.html?id=${equipoId}">Volver al equipo</a>
+          </p>
+        `;
+        return;
+      }
+      renderJugador(equipoId, jugador);
+    })();
+
+    renderTabBar('');
+  </script>
+
+</body>
+</html>

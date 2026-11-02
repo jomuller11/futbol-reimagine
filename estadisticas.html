@@ -649,10 +649,14 @@
         const equipoCell = g.equipo
           ? `<a href="equipo.html?id=${g.equipo}" class="team-cell">${teamAvatar(g.equipo, 22)}<span>${getEquipoNombre(g.equipo)}</span></a>`
           : '<span style="color: var(--text-tertiary);">Sin equipo</span>';
+        // El nombre linkea al perfil del jugador cuando sabemos su equipo
+        const nombreCell = g.equipo
+          ? `<a href="jugador.html?equipo=${g.equipo}&nombre=${encodeURIComponent(g.nombre)}" style="color: inherit; text-decoration: none; font-weight: 600;">${g.nombre}</a>`
+          : g.nombre;
         return `
           <tr>
             <td class="center"><strong>${g.pos}</strong></td>
-            <td>${g.nombre}</td>
+            <td>${nombreCell}</td>
             <td>${equipoCell}</td>
             <td class="pts">${g.goles}</td>
           </tr>
@@ -715,7 +719,7 @@
     const vallaBody = VALLA.map(v => `
       <tr ${v.pos===1?'class="top-row"':''}>
         <td class="center"><strong>${v.pos}</strong></td>
-        <td>${v.arquero}</td>
+        <td><a href="jugador.html?equipo=${v.equipo}&nombre=${encodeURIComponent(v.arquero)}" style="color: inherit; text-decoration: none; font-weight: 600;">${v.arquero}</a></td>
         <td>
           <a href="equipo.html?id=${v.equipo}" class="team-cell">
             ${teamAvatar(v.equipo, 22)}
@@ -749,7 +753,7 @@
 
       const body = rows.map(s => `
         <tr>
-          <td>${s.jugador}</td>
+          <td><a href="jugador.html?equipo=${s.equipo}&nombre=${encodeURIComponent(s.jugador)}" style="color: inherit; text-decoration: none; font-weight: 600;">${s.jugador}</a></td>
           <td>
             <a href="equipo.html?id=${s.equipo}" class="team-cell">
               ${teamAvatar(s.equipo, 22)}
