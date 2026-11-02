@@ -455,6 +455,7 @@
   </footer>
 
   <script src="data/torneo.js"></script>
+  <script src="data/penales.js"></script>
   <script src="js/site.js"></script>
   <script>
     // ===========================================
@@ -614,6 +615,18 @@
     }
 
     // ===========================================
+    // OVERRIDE: GANADOR POR PENALES (data/penales.js, editable a mano)
+    // ===========================================
+    // Si no está cargado el archivo, usamos un objeto vacío para no romper.
+    const PENALES_SAFE = (typeof PENALES === 'object' && PENALES) || { cuartos: {}, semis: {}, finales: {} };
+
+    function penalGanador(seccion, copa, cruceId) {
+      const key = `${copa}-${cruceId}`;
+      const entry = PENALES_SAFE[seccion] && PENALES_SAFE[seccion][key];
+      return entry ? entry.ganador : null;
+    }
+
+    // ===========================================
     // RESOLVER EL BRACKET COMPLETO PARA UNA COPA
     // ===========================================
     function resolverBracket(copa) {
@@ -633,15 +646,24 @@
         const equipoV = c.visitId;
         const res = findResultadoBracket(equipoL, equipoV);
         let ganador = null, perdedor = null;
+        let penales = false;
         if (res && res.completo) {
           if (res.agg.l > res.agg.v) { ganador = equipoL; perdedor = equipoV; }
           else if (res.agg.v > res.agg.l) { ganador = equipoV; perdedor = equipoL; }
-          // en caso de empate agregado se resuelve por penales; el scraper lo definirá
+          else {
+            // Empate agregado → consultar override de penales
+            const pen = penalGanador('cuartos', copa, c.id);
+            if (pen) {
+              ganador = pen;
+              perdedor = (pen === equipoL) ? equipoV : equipoL;
+              penales = true;
+            }
+          }
         }
         bracket.cuartos[c.id] = {
           id: c.id,
           equipoL, equipoV,
-          resultado: res, ganador, perdedor
+          resultado: res, ganador, perdedor, penales
         };
       });
 
@@ -655,15 +677,24 @@
                                                      : bracket.cuartos[c.visitFrom.partido].perdedor);
         const res = findResultadoUnico(equipoL, equipoV);
         let ganador = null, perdedor = null;
+        let penales = false;
         if (res) {
           if (res.l > res.v)      { ganador = equipoL; perdedor = equipoV; }
           else if (res.v > res.l) { ganador = equipoV; perdedor = equipoL; }
-          // empate: ganador/perdedor quedan null hasta que se cargue el resultado de penales
+          else {
+            // Empate → consultar override de penales
+            const pen = penalGanador('semis', copa, c.id);
+            if (pen) {
+              ganador = pen;
+              perdedor = (pen === equipoL) ? equipoV : equipoL;
+              penales = true;
+            }
+          }
         }
         bracket.semis[c.id] = {
           id: c.id,
           equipoL, equipoV,
-          resultado: res, ganador, perdedor,
+          resultado: res, ganador, perdedor, penales,
           rama: c.rama,
           localFrom: c.localFrom, visitFrom: c.visitFrom
         };
@@ -679,14 +710,20 @@
                                                      : bracket.semis[c.visitFrom.partido].perdedor);
         const res = findResultadoUnico(equipoL, equipoV);
         let ganador = null;
+        let penales = false;
         if (res) {
           if (res.l > res.v) ganador = equipoL;
           else if (res.v > res.l) ganador = equipoV;
+          else {
+            // Empate → consultar override de penales
+            const pen = penalGanador('finales', copa, c.id);
+            if (pen) { ganador = pen; penales = true; }
+          }
         }
         bracket.finales[c.id] = {
           id: c.id, puesto: c.puesto, puestoClass: c.puestoClass,
           equipoL, equipoV,
-          resultado: res, ganador,
+          resultado: res, ganador, penales,
           rama: c.rama
         };
       });
@@ -746,7 +783,7 @@
       `;
     }
 
-    // Card de partido de cuartos o semis (ida y vuelta)
+    // Card de partido de cuartos (ida y vuelta)
     function matchCardIdaVuelta(partido, opts) {
       opts = opts || {};
       const res = partido.resultado;
@@ -759,6 +796,10 @@
 
       const esGanadorL = partido.ganador === partido.equipoL;
       const esGanadorV = partido.ganador === partido.equipoV;
+      const empateAgg = res && res.completo && res.agg.l === res.agg.v;
+      const modeLabel = empateAgg
+        ? (partido.penales && partido.ganador ? 'Pasó por penales' : 'Empate · pendiente penales')
+        : 'Ida y vuelta';
 
       return `
         <div class="b-match">
@@ -767,7 +808,7 @@
               <span class="b-match-tag">${opts.tag || partido.id}</span>
               <span>${opts.title || ''}</span>
             </div>
-            <span class="b-match-mode">Ida y vuelta</span>
+            <span class="b-match-mode">${modeLabel}</span>
           </div>
           <div class="b-match-body">
             ${teamRow(partido.equipoL, scoreL, {
@@ -793,7 +834,12 @@
       const res = partido.resultado;
       const esGanadorL = partido.ganador === partido.equipoL;
       const esGanadorV = partido.ganador === partido.equipoV;
-      const empatePenales = res && res.l === res.v && !partido.ganador;
+      const empate = res && res.l === res.v;
+      const resueltoPenales = empate && partido.penales && partido.ganador;
+      const empatePendiente = empate && !partido.ganador;
+      const modeLabel = resueltoPenales ? 'Pasó por penales'
+                      : empatePendiente ? 'Empate · pendiente penales'
+                      : 'Partido único';
 
       return `
         <div class="b-match ${opts.puestoClass || ''}">
@@ -802,7 +848,7 @@
               <span class="b-match-tag">${opts.tag || partido.puesto}</span>
               <span>${opts.title || ''}</span>
             </div>
-            <span class="b-match-mode">${empatePenales ? 'Empate · penales' : 'Partido único'}</span>
+            <span class="b-match-mode">${modeLabel}</span>
           </div>
           <div class="b-match-body">
             ${teamRow(partido.equipoL, res ? res.l : null, {
