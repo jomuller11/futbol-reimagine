@@ -87,14 +87,17 @@ const TABBAR_ICONS = {
   fixture: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><rect x="4" y="6" width="16" height="14" rx="2"></rect><line x1="4" y1="10" x2="20" y2="10"></line><line x1="9" y1="4" x2="9" y2="7"></line><line x1="15" y1="4" x2="15" y2="7"></line></svg>',
   posiciones: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><line x1="4" y1="6" x2="20" y2="6"></line><line x1="4" y1="12" x2="20" y2="12"></line><line x1="4" y1="18" x2="20" y2="18"></line></svg>',
   stats: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><line x1="6" y1="20" x2="6" y2="12"></line><line x1="12" y1="20" x2="12" y2="6"></line><line x1="18" y1="20" x2="18" y2="15"></line></svg>',
+  // Trofeo de copa (bowl + handles + base) — para la pestaña Copa Final
+  copa: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M7 4 H17 V9 C17 12 14.5 14 12 14 C9.5 14 7 12 7 9 Z"></path><path d="M7 6 H4 V8 C4 10 5.5 11 7 11"></path><path d="M17 6 H20 V8 C20 10 18.5 11 17 11"></path><line x1="12" y1="14" x2="12" y2="18"></line><line x1="8" y1="20" x2="16" y2="20"></line><line x1="10" y1="18" x2="14" y2="18"></line></svg>',
 };
 
 function renderTabBar(active) {
   const tabs = [
-    { id: 'inicio',     label: 'Inicio',       href: 'index.html' },
-    { id: 'fixture',    label: 'Fixture',      href: 'fixture.html' },
-    { id: 'posiciones', label: 'Posiciones',   href: 'estadisticas.html' },
-    { id: 'stats',      label: 'Estadísticas', href: 'estadisticas.html?tab=goleadores' },
+    { id: 'inicio',     label: 'Inicio',   href: 'index.html' },
+    { id: 'fixture',    label: 'Fixture',  href: 'fixture.html' },
+    { id: 'posiciones', label: 'Tablas',   href: 'estadisticas.html' },
+    { id: 'stats',      label: 'Stats',    href: 'estadisticas.html?tab=goleadores' },
+    { id: 'copa',       label: 'Copa',     href: 'bracket.html' },
   ];
   const nav = document.createElement('nav');
   nav.className = 'tabbar';
