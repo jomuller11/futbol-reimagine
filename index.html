@@ -128,7 +128,9 @@
   </footer>
 
   <script src="data/torneo.js"></script>
+  <script src="data/penales.js"></script>
   <script src="js/site.js"></script>
+  <script src="js/bracket-logic.js"></script>
   <script>
     const proximaTxt = STATS_GLOBALES.proximaFecha
       ? `Próxima: Fecha ${STATS_GLOBALES.proximaFecha} · ${STATS_GLOBALES.proximaFechaTexto}`
@@ -346,7 +348,104 @@
       `;
     }
 
+    // ===========================================
+    // MINI-BRACKET DE COPA FINAL (para Fase 3)
+    // ===========================================
+    // Las "tablas" de Oro/Plata/Bronce no tienen sentido como tabla de posiciones
+    // (es un knockout, no una liga). En Fase 3 reemplazamos la vista de tabla por
+    // un card compacto por copa: los 4 cuartos con agregado + ganador, y un
+    // resumen del estado de semis y finales. CTA al bracket.html completo.
+    const COPAS_HOME = ['oro', 'plata', 'bronce'];
+    let homeCopa = 'oro';
+
+    function statusBadge(resumen) {
+      if (resumen.ganadorFinal) {
+        return `<span class="copa-status done">🏆 Campeón: ${getEquipoNombre(resumen.ganadorFinal)}</span>`;
+      }
+      if (resumen.semisTotal === 0 && resumen.finalesTotal === 0) {
+        return '<span class="copa-status pending">Pendiente</span>';
+      }
+      const pendientesSemi = resumen.semisTotal - resumen.semisJugadas;
+      const pendientesFinal = resumen.finalesTotal - resumen.finalesJugadas;
+      const parts = [];
+      if (pendientesSemi > 0) parts.push(`${pendientesSemi} semi${pendientesSemi > 1 ? 's' : ''}`);
+      if (pendientesFinal > 0) parts.push(`${pendientesFinal} final${pendientesFinal > 1 ? 'es' : ''}`);
+      if (parts.length === 0) return '<span class="copa-status done">Completa</span>';
+      return `<span class="copa-status pending">⏳ ${parts.join(' · ')} por jugar</span>`;
+    }
+
+    function miniBracketCard(copa) {
+      const meta = COPA_META[copa];
+      const resumen = resumenCopa(copa);
+      const cuartos = CRUCES_POR_COPA[copa].map(c => {
+        const b = resumen.bracket.cuartos[c.id];
+        const resuelto = !!b.ganador;
+        const idaStr    = b.resultado && b.resultado.ida    ? `${b.resultado.ida.l}-${b.resultado.ida.v}`       : '—';
+        const vueltaStr = b.resultado && b.resultado.vuelta ? `${b.resultado.vuelta.l}-${b.resultado.vuelta.v}` : '—';
+        const aggL = b.resultado && b.resultado.agg ? b.resultado.agg.l : null;
+        const aggV = b.resultado && b.resultado.agg ? b.resultado.agg.v : null;
+        const esL = b.ganador === b.equipoL;
+        const esV = b.ganador === b.equipoV;
+        return `
+          <div class="copa-cruce ${resuelto ? 'resuelto' : ''}">
+            <span class="copa-cruce-tag">${c.id}</span>
+            <div class="copa-cruce-equipos">
+              <div class="cruce-eq ${esL ? 'win' : (resuelto ? 'lose' : '')}">
+                ${teamAvatar(b.equipoL, 20)}
+                <span class="cruce-nombre">${getEquipoNombre(b.equipoL)}</span>
+                ${aggL !== null ? `<span class="cruce-agg">${aggL}</span>` : ''}
+              </div>
+              <div class="cruce-eq ${esV ? 'win' : (resuelto ? 'lose' : '')}">
+                ${teamAvatar(b.equipoV, 20)}
+                <span class="cruce-nombre">${getEquipoNombre(b.equipoV)}</span>
+                ${aggV !== null ? `<span class="cruce-agg">${aggV}</span>` : ''}
+              </div>
+            </div>
+            <div class="copa-cruce-detalle">
+              ida ${idaStr} · vuelta ${vueltaStr}
+              ${b.penales ? ' · <strong>penales</strong>' : ''}
+            </div>
+          </div>
+        `;
+      }).join('');
+
+      return `
+        <div class="copa-card">
+          <div class="copa-card-head" style="border-left: 4px solid ${meta.color};">
+            <div>
+              <div class="copa-card-title">${meta.label}</div>
+              <div class="copa-card-sub">
+                Cuartos: ${resumen.cuartosJugados}/${resumen.cuartosTotal}
+                · Semis: ${resumen.semisJugadas}/${resumen.semisTotal}
+                · Finales: ${resumen.finalesJugadas}/${resumen.finalesTotal}
+              </div>
+            </div>
+            ${statusBadge(resumen)}
+          </div>
+          <div class="copa-cruces">${cuartos}</div>
+          <a href="bracket.html?copa=${copa}" class="copa-link">Ver llaves completas →</a>
+        </div>
+      `;
+    }
+
+    function renderCopasHome() {
+      const row = document.getElementById('zones-row');
+      row.innerHTML = `<div class="copa-single-slot">${miniBracketCard(homeCopa)}</div>`;
+      // Reusamos el toolbar de "home-zona-tabs" para los selectores de copa
+      document.getElementById('home-zona-tabs').innerHTML = COPAS_HOME.map(c => {
+        const meta = COPA_META[c];
+        return `<button class="tab copa-tab ${c===homeCopa?'active':''}" data-copa="${c}">
+          <span class="copa-dot" style="background:${meta.color};"></span> ${meta.label}
+        </button>`;
+      }).join('');
+    }
+
     function renderZones() {
+      // En Fase 3 el toggle muestra un mini-bracket por copa, no una tabla.
+      if (homeFase === 3) {
+        renderCopasHome();
+        return;
+      }
       const zonas = FASES.find(f => f.id === homeFase).zonas;
       if (!homeZona || !zonas.includes(homeZona)) homeZona = zonas[0];
       // En desktop se muestran todas las zonas de la fase lado a lado; en mobile,
@@ -363,7 +462,8 @@
 
     function switchHomeFase(id) {
       homeFase = id;
-      homeZona = FASES.find(f => f.id === id).zonas[0];
+      const fase = FASES.find(f => f.id === id);
+      if (fase && fase.zonas.length) homeZona = fase.zonas[0];
       document.querySelectorAll('#home-fase-filter button').forEach(b =>
         b.classList.toggle('on', parseInt(b.dataset.fase) === id));
       renderZones();
@@ -378,6 +478,13 @@
     });
     document.getElementById('home-zona-tabs').addEventListener('click', e => {
       const b = e.target.closest('.tab'); if (!b) return;
+      // Fase 3 (bracket) usa data-copa, resto usa data-zona
+      if (b.dataset.copa) {
+        homeCopa = b.dataset.copa;
+        renderCopasHome();
+        return;
+      }
+      if (!b.dataset.zona) return;
       homeZona = b.dataset.zona;
       document.querySelectorAll('#zones-row .zone-block').forEach(blk =>
         blk.style.display = blk.dataset.zona === homeZona ? '' : 'none');
