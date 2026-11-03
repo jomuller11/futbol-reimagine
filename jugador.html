@@ -107,6 +107,49 @@
       background: var(--primary);
       color: #fff;
     }
+    /* Chips contextuales (goleador del equipo, top del torneo, etc.) */
+    .ctx-badges {
+      display: flex;
+      gap: 6px;
+      flex-wrap: wrap;
+      margin-top: 10px;
+    }
+    .ctx-badge {
+      display: inline-flex;
+      align-items: center;
+      gap: 4px;
+      font-size: 11px;
+      font-weight: 700;
+      padding: 4px 10px;
+      border-radius: 999px;
+      background: var(--surface);
+      border: 0.5px solid var(--border);
+    }
+    .ctx-badge.gold    { background: #FFF4D6; border-color: #F0D47A; color: #8A6400; }
+    .ctx-badge.success { background: rgba(34,139,70,0.08); border-color: rgba(34,139,70,0.25); color: #1E7A3B; }
+    .ctx-badge.primary { background: rgba(13,110,246,0.08); border-color: rgba(13,110,246,0.25); color: #0A58C7; }
+
+    /* Botón de compartir en el hero */
+    .share-btn {
+      position: absolute;
+      top: 14px;
+      right: 14px;
+      font-size: 12px;
+      font-weight: 600;
+      padding: 6px 12px;
+      border-radius: 999px;
+      background: var(--surface);
+      border: 0.5px solid var(--border);
+      color: var(--text-secondary);
+      cursor: pointer;
+      display: inline-flex;
+      align-items: center;
+      gap: 4px;
+      transition: background 0.12s, color 0.12s;
+    }
+    .share-btn:hover { background: var(--bg); color: var(--text); }
+    .share-btn.copied { color: var(--success); border-color: rgba(34,139,70,0.4); }
+    .jugador-hero { position: relative; }
 
     /* -------- Section heads -------- */
     .section-head {
@@ -154,6 +197,46 @@
     .stat-card.rojas     .stat-value { color: var(--danger); }
     .stat-card.valla     .stat-value { color: var(--primary); }
     .stat-card.zero .stat-value { color: var(--text-tertiary); font-weight: 500; }
+
+    /* Notas comparativas debajo de las stat cards */
+    .stat-notes {
+      display: flex;
+      gap: 20px;
+      flex-wrap: wrap;
+      margin: -8px 0 24px 0;
+      padding: 0 2px;
+      font-size: 13px;
+      color: var(--text-secondary);
+    }
+    .stat-note { line-height: 1.4; }
+    .stat-note strong { color: var(--text); font-weight: 700; }
+    .stat-note.dim { color: var(--text-tertiary); }
+
+    /* Lista de sugerencias en el fallback */
+    .suggestion-list {
+      list-style: none;
+      padding: 0;
+      margin: 16px 0 0 0;
+      display: flex;
+      flex-direction: column;
+      gap: 6px;
+      max-width: 320px;
+      margin-left: auto;
+      margin-right: auto;
+    }
+    .suggestion-list a {
+      display: block;
+      padding: 10px 14px;
+      background: var(--surface);
+      border: 0.5px solid var(--border);
+      border-radius: var(--radius);
+      color: var(--text);
+      text-decoration: none;
+      font-weight: 600;
+      font-size: 14px;
+      transition: background 0.12s;
+    }
+    .suggestion-list a:hover { background: var(--bg); }
 
     /* -------- Partidos tabla -------- */
     .partidos-tabla {
@@ -371,6 +454,28 @@
       return plantel.find(n => normalizarNombre(n) === q) || null;
     }
 
+    // Sugerencias para el fallback cuando el nombre no matchea exacto.
+    // Combina: match como substring + match por palabra individual.
+    function sugerenciasJugador(equipoId, query) {
+      const plantel = PLANTELES[equipoId] || [];
+      const q = normalizarNombre(query);
+      if (!q) return [];
+      const palabras = q.split(/\s+/).filter(Boolean);
+      const scored = plantel.map(n => {
+        const nn = normalizarNombre(n);
+        let score = 0;
+        if (nn.includes(q)) score += 20;
+        palabras.forEach(w => {
+          if (w.length >= 3 && nn.includes(w)) score += 5;
+        });
+        // bonus si comparten iniciales
+        if (nn[0] === q[0]) score += 1;
+        return { nombre: n, score };
+      }).filter(x => x.score > 0);
+      scored.sort((a, b) => b.score - a.score);
+      return scored.slice(0, 5).map(x => x.nombre);
+    }
+
     function escapeHtml(s) {
       return (s || '').replace(/[<>&"]/g, c => ({'<':'&lt;','>':'&gt;','&':'&amp;','"':'&quot;'}[c]));
     }
@@ -380,6 +485,45 @@
       if (palabras.length === 0) return '?';
       if (palabras.length === 1) return palabras[0].substring(0, 2).toUpperCase();
       return (palabras[0][0] + palabras[palabras.length - 1][0]).toUpperCase();
+    }
+
+    // ===========================================
+    // BADGES CONTEXTUALES
+    // ===========================================
+    // Chips chicos arriba del nombre para dar contexto rápido (goleador del equipo,
+    // top del torneo, valla menos vencida). Son derivados — no se persisten.
+    function badgesJugador(nombre, equipoId, stats, esArquero) {
+      const nU = nombre.toUpperCase();
+      const out = [];
+
+      if (esArquero) out.push({ icon: '🧤', label: 'Arquero', cls: 'primary' });
+
+      // Posición en la tabla de valla (si entró)
+      if (esArquero) {
+        const vIdx = VALLA.findIndex(v =>
+          v.arquero.toUpperCase() === nU && v.equipo === equipoId);
+        if (vIdx === 0) out.push({ icon: '🛡️', label: 'Valla menos vencida', cls: 'gold' });
+        else if (vIdx >= 1 && vIdx <= 2) out.push({ icon: '🛡️', label: `Valla #${vIdx + 1}`, cls: 'success' });
+      }
+
+      // Goleador del equipo (si tiene goles y es el máximo del plantel)
+      if (stats.goles > 0) {
+        const plantel = PLANTELES[equipoId] || [];
+        const golesPorJugador = plantel.map(n => getStatsJugador(n, equipoId).goles);
+        const maxEquipo = Math.max.apply(null, golesPorJugador);
+        if (stats.goles === maxEquipo) {
+          out.push({ icon: '⚽', label: 'Goleador del equipo', cls: 'success' });
+        }
+      }
+
+      // Posición en la tabla general de goleadores
+      const golIdx = GOLEADORES.findIndex(g =>
+        g.nombre.toUpperCase() === nU && g.equipo === equipoId);
+      if (golIdx === 0) out.push({ icon: '🏆', label: 'Goleador del torneo', cls: 'gold' });
+      else if (golIdx >= 1 && golIdx <= 4) out.push({ icon: '🎯', label: 'Top 5 del torneo', cls: 'gold' });
+      else if (golIdx >= 5 && golIdx <= 9) out.push({ icon: '🎯', label: 'Top 10 del torneo', cls: 'gold' });
+
+      return out;
     }
 
     // ===========================================
@@ -433,6 +577,15 @@
       const posGoleador = posGoleadorIdx >= 0 ? (GOLEADORES[posGoleadorIdx].pos || (posGoleadorIdx + 1)) : null;
 
       const partidos = partidosDelJugador(equipoId, nombre);
+      const badges = badgesJugador(nombre, equipoId, stats, esArquero);
+
+      // --- Comparativas con el equipo ---
+      // "Aporta X% de los Y goles del equipo" + ratio goles por partido con participación.
+      let totalGolesEquipo = 0;
+      plantel.forEach(n => { totalGolesEquipo += getStatsJugador(n, equipoId).goles; });
+      const pctEquipo = totalGolesEquipo > 0 ? Math.round((stats.goles / totalGolesEquipo) * 100) : 0;
+      const partidosConGol = partidos.filter(p => p.detalle.goles > 0).length;
+      const ratioGoles = partidosConGol > 0 ? (stats.goles / partidosConGol) : null;
 
       document.title = `${nombre} · ${equipo.nombre} · Papi Fútbol San José Morón`;
 
@@ -519,10 +672,33 @@
           </div>
         `;
 
+      // --- Nota comparativa debajo de los stat cards ---
+      const notasHtml = (() => {
+        const notas = [];
+        if (stats.goles > 0 && totalGolesEquipo > 0) {
+          notas.push(`<div class="stat-note">Aporta <strong>${pctEquipo}%</strong> de los <strong>${totalGolesEquipo}</strong> goles del equipo</div>`);
+        }
+        if (ratioGoles !== null) {
+          notas.push(`<div class="stat-note">Promedio: <strong>${ratioGoles.toFixed(1)}</strong> goles por partido con participación</div>`);
+        }
+        if (!stats.goles && !stats.amarillas && !stats.azules && !stats.rojas) {
+          notas.push(`<div class="stat-note dim">Sin goles ni tarjetas registrados en el torneo 2026.</div>`);
+        }
+        return notas.length ? `<div class="stat-notes">${notas.join('')}</div>` : '';
+      })();
+
+      // --- Badges contextuales ---
+      const badgesHtml = badges.length === 0 ? '' : `
+        <div class="ctx-badges">
+          ${badges.map(b => `<span class="ctx-badge ${b.cls}">${b.icon} ${escapeHtml(b.label)}</span>`).join('')}
+        </div>
+      `;
+
       // --- HTML completo ---
       const html = `
         <!-- HERO -->
         <div class="jugador-hero" style="border-top: 4px solid ${color};">
+          <button class="share-btn" onclick="compartirPerfil(this)" title="Copiar link del perfil">📋 Compartir</button>
           <!-- Placeholder de foto. Más adelante, reemplazar por <img src="..."> si existe foto. -->
           <div class="jugador-photo" style="background: ${color};">
             <span class="iniciales">${escapeHtml(iniciales(nombre))}</span>
@@ -540,8 +716,8 @@
                 ${teamAvatar(equipoId, 24)}
                 <span>${escapeHtml(equipo.nombre)}</span>
               </a>
-              ${esArquero ? '<span class="role-badge">Arquero</span>' : ''}
             </div>
+            ${badgesHtml}
           </div>
         </div>
 
@@ -550,6 +726,7 @@
           <h2 class="section-title">Torneo 2026 <small>· en curso</small></h2>
         </div>
         <div class="stat-cards">${statCards.join('')}</div>
+        ${notasHtml}
 
         <!-- PARTIDOS DESTACADOS -->
         <div class="section-head">
@@ -580,6 +757,40 @@
     }
 
     // ===========================================
+    // COMPARTIR LINK (clipboard)
+    // ===========================================
+    // Expuesta en window para que el onclick inline del botón la encuentre.
+    window.compartirPerfil = function (btn) {
+      const url = window.location.href;
+      const original = btn.textContent;
+      function marcarOk() {
+        btn.classList.add('copied');
+        btn.textContent = '✓ Link copiado';
+        setTimeout(() => {
+          btn.classList.remove('copied');
+          btn.textContent = original;
+        }, 1800);
+      }
+      // navigator.clipboard requiere contexto seguro (https); si falla usamos un textarea temporal.
+      if (navigator.clipboard && window.isSecureContext) {
+        navigator.clipboard.writeText(url).then(marcarOk).catch(fallback);
+      } else {
+        fallback();
+      }
+      function fallback() {
+        const ta = document.createElement('textarea');
+        ta.value = url;
+        ta.style.position = 'fixed';
+        ta.style.opacity = '0';
+        document.body.appendChild(ta);
+        ta.select();
+        try { document.execCommand('copy'); marcarOk(); }
+        catch (e) { btn.textContent = 'No pude copiar — probá a mano'; setTimeout(() => btn.textContent = original, 2200); }
+        document.body.removeChild(ta);
+      }
+    };
+
+    // ===========================================
     // ARRANQUE
     // ===========================================
     (function init() {
@@ -594,12 +805,22 @@
       }
       const jugador = encontrarJugador(equipoId, nombreQuery);
       if (!jugador) {
+        const sugs = sugerenciasJugador(equipoId, nombreQuery);
+        const sugHtml = sugs.length === 0 ? '' : `
+          <p style="margin-top: 24px; font-size: 13px;">¿Quisiste decir alguno de estos?</p>
+          <ul class="suggestion-list">
+            ${sugs.map(n => `
+              <li><a href="jugador.html?equipo=${equipoId}&nombre=${encodeURIComponent(n)}">${escapeHtml(n)}</a></li>
+            `).join('')}
+          </ul>
+        `;
         document.getElementById('jugador-content').innerHTML = `
           <p class="error-msg">
             No encontramos a "${escapeHtml(nombreQuery)}" en el plantel de
             ${escapeHtml(equipo.nombre)}.<br>
             <a href="equipo.html?id=${equipoId}">Volver al equipo</a>
           </p>
+          ${sugHtml}
         `;
         return;
       }
