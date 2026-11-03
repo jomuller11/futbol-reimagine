@@ -318,11 +318,18 @@ def parse_fixture(soup):
     fechas_dict = {}  # fecha_str -> {fechaTexto, fase, zonas: {zonaKey: [partidos]}}
 
     # Cada bloque: "ZONA ZONA X\nDD-MM-YYYY\n<partidos>" donde X = 1/2 (fase regular)
-    # o A/B/C (fase final). Para Fase 3 el sitio usa "ZONA COPA DE X" donde
-    # X = ORO/PLATA/BRONCE (cuartos, semis, finales de puesto).
+    # o A/B/C (fase final). Para Fase 3 el sitio etiqueta cada ronda y copa, por
+    # ejemplo:
+    #   "ZONA COPA DE ORO"       → cuartos de final (ida y vuelta)
+    #   "ZONA SEMI FINAL ORO"    → semifinales (partido único)
+    #   "ZONA FINAL ORO"         → final (partido único)
+    #   "ZONA <ETIQUETA> ORO"    → partidos por puestos u otras rondas
+    # Para el fixture agrupamos todo bajo la copa (Oro/Plata/Bronce) sin
+    # importar la ronda — el frontend usa el bracket para distinguir cuartos
+    # de semis y de finales.
     zona_pattern = re.compile(
-        r"ZONA (?:ZONA (\d|[ABC])|COPA DE (ORO|PLATA|BRONCE))\n+(\d{2}-\d{2}-\d{4})\n+(.+?)"
-        r"(?=\n+ZONA (?:ZONA (?:\d|[ABC])|COPA DE (?:ORO|PLATA|BRONCE))|\n+\* FASE|\n+!\[|\Z)",
+        r"ZONA (?:ZONA (\d|[ABC])|[A-ZÑÁÉÍÓÚÜ\d°º\s]+?\s(ORO|PLATA|BRONCE))\n+(\d{2}-\d{2}-\d{4})\n+(.+?)"
+        r"(?=\n+ZONA |\n+\* FASE|\n+!\[|\Z)",
         re.DOTALL
     )
 
