@@ -19,6 +19,9 @@ const PENALES = {
     // Copa de Plata, QF3: Iribarren 3-3 Resico (agregado). Pasó Iribarren.
     'plata-QF3': { ganador: '08', notas: 'Iribarren eliminó a Resico por penales' }
   },
-  semis: {},
+  semis: {
+    // Copa de Oro, SFG1 (rama ganadores): Funaro 2-2 Miguel. Pasó Funaro.
+    'oro-SFG1': { ganador: '05', notas: 'Funaro eliminó a Miguel por penales en la semi de la rama ganadores' }
+  },
   finales: {}
 };
