@@ -1,6 +1,6 @@
 // ============================================================
 // DATOS DEL TORNEO PAPI FÚTBOL SAN JOSÉ — Generado automáticamente
-// Última actualización: 2026-11-10 00:35 UTC
+// Última actualización: 2026-11-10 03:03 UTC
 // Fuente: papifutbolsanjosemoron.com.ar
 // NO EDITAR A MANO — este archivo lo regenera scraper/scrape.py
 // ============================================================
@@ -11194,14 +11194,14 @@ const GOLEADORES = [
   },
   {
     "pos": 13,
-    "nombre": "Leandro Florio Cantú",
-    "equipo": "20",
+    "nombre": "Gaston Eduardo Barreto",
+    "equipo": "19",
     "goles": 16
   },
   {
     "pos": 14,
-    "nombre": "Gaston Eduardo Barreto",
-    "equipo": "19",
+    "nombre": "Leandro Florio Cantú",
+    "equipo": "20",
     "goles": 16
   },
   {
@@ -11242,14 +11242,14 @@ const GOLEADORES = [
   },
   {
     "pos": 21,
-    "nombre": "Xavier Vidal",
-    "equipo": "16",
+    "nombre": "Federico Pistilli",
+    "equipo": "13",
     "goles": 14
   },
   {
     "pos": 22,
-    "nombre": "Federico Pistilli",
-    "equipo": "13",
+    "nombre": "Xavier Vidal",
+    "equipo": "16",
     "goles": 14
   },
   {
@@ -11326,26 +11326,26 @@ const GOLEADORES = [
   },
   {
     "pos": 35,
-    "nombre": "Daniel Leonardo Meyer",
-    "equipo": "03",
-    "goles": 10
-  },
-  {
-    "pos": 36,
     "nombre": "Eugenio Fresco",
     "equipo": "18",
     "goles": 10
   },
   {
+    "pos": 36,
+    "nombre": "Daniel Leonardo Meyer",
+    "equipo": "03",
+    "goles": 10
+  },
+  {
     "pos": 37,
-    "nombre": "Emiliano Martin Oliva Ruiz Diaz",
-    "equipo": "22",
+    "nombre": "Daniel Bettosini",
+    "equipo": "04",
     "goles": 10
   },
   {
     "pos": 38,
-    "nombre": "Daniel Bettosini",
-    "equipo": "04",
+    "nombre": "Emiliano Martin Oliva Ruiz Diaz",
+    "equipo": "22",
     "goles": 10
   },
   {
@@ -11392,14 +11392,14 @@ const GOLEADORES = [
   },
   {
     "pos": 46,
-    "nombre": "Fernando De La Vega",
-    "equipo": "02",
+    "nombre": "Maximiliano Fenner",
+    "equipo": "24",
     "goles": 8
   },
   {
     "pos": 47,
-    "nombre": "Maximiliano Fenner",
-    "equipo": "24",
+    "nombre": "Fernando De La Vega",
+    "equipo": "02",
     "goles": 8
   },
   {
@@ -11464,14 +11464,14 @@ const GOLEADORES = [
   },
   {
     "pos": 58,
-    "nombre": "William Cooke",
-    "equipo": "07",
+    "nombre": "Lucas Francisco Soriano",
+    "equipo": "19",
     "goles": 6
   },
   {
     "pos": 59,
-    "nombre": "Lucas Francisco Soriano",
-    "equipo": "19",
+    "nombre": "William Cooke",
+    "equipo": "07",
     "goles": 6
   },
   {
@@ -11500,14 +11500,14 @@ const GOLEADORES = [
   },
   {
     "pos": 64,
-    "nombre": "Pablo Patricio Pirito",
-    "equipo": "17",
+    "nombre": "Cristian Damian Pujales",
+    "equipo": "12",
     "goles": 6
   },
   {
     "pos": 65,
-    "nombre": "Cristian Damian Pujales",
-    "equipo": "12",
+    "nombre": "Pablo Patricio Pirito",
+    "equipo": "17",
     "goles": 6
   },
   {
@@ -11530,26 +11530,26 @@ const GOLEADORES = [
   },
   {
     "pos": 69,
-    "nombre": "Matias Jose Fenner",
-    "equipo": "24",
-    "goles": 5
-  },
-  {
-    "pos": 70,
     "nombre": "Gustavo Trovato",
     "equipo": "11",
     "goles": 5
   },
   {
-    "pos": 71,
+    "pos": 70,
     "nombre": "Daniel Jorge Creus",
     "equipo": "19",
     "goles": 5
   },
   {
-    "pos": 72,
+    "pos": 71,
     "nombre": "Nicolás Andrés Elia",
     "equipo": "16",
+    "goles": 5
+  },
+  {
+    "pos": 72,
+    "nombre": "Matias Jose Fenner",
+    "equipo": "24",
     "goles": 5
   },
   {
@@ -11638,38 +11638,38 @@ const GOLEADORES = [
   },
   {
     "pos": 87,
-    "nombre": "Rodrigo Hernan Granero",
-    "equipo": "06",
-    "goles": 5
-  },
-  {
-    "pos": 88,
     "nombre": "Diego Martin Medina",
     "equipo": "01",
     "goles": 5
   },
   {
-    "pos": 89,
-    "nombre": "Javier Alejandro Garcia",
-    "equipo": "04",
-    "goles": 4
+    "pos": 88,
+    "nombre": "Rodrigo Hernan Granero",
+    "equipo": "06",
+    "goles": 5
   },
   {
-    "pos": 90,
+    "pos": 89,
     "nombre": "Gaston Pringles",
     "equipo": "21",
     "goles": 4
   },
   {
-    "pos": 91,
+    "pos": 90,
     "nombre": "Mariano Federico Lopez",
     "equipo": "11",
     "goles": 4
   },
   {
-    "pos": 92,
+    "pos": 91,
     "nombre": "Federico Garbagnati",
     "equipo": "21",
+    "goles": 4
+  },
+  {
+    "pos": 92,
+    "nombre": "Javier Alejandro Garcia",
+    "equipo": "04",
     "goles": 4
   },
   {
@@ -11698,26 +11698,26 @@ const GOLEADORES = [
   },
   {
     "pos": 97,
-    "nombre": "Eduardo Gabriel Corvera",
-    "equipo": "03",
-    "goles": 4
-  },
-  {
-    "pos": 98,
-    "nombre": "Luciano Jose Loraschi",
-    "equipo": "20",
-    "goles": 4
-  },
-  {
-    "pos": 99,
     "nombre": "Alberto Hernan Bonaiuto",
     "equipo": "07",
     "goles": 4
   },
   {
-    "pos": 100,
+    "pos": 98,
     "nombre": "Martin Iribarne",
     "equipo": "11",
+    "goles": 4
+  },
+  {
+    "pos": 99,
+    "nombre": "Eduardo Gabriel Corvera",
+    "equipo": "03",
+    "goles": 4
+  },
+  {
+    "pos": 100,
+    "nombre": "Luciano Jose Loraschi",
+    "equipo": "20",
     "goles": 4
   },
   {
@@ -11728,20 +11728,20 @@ const GOLEADORES = [
   },
   {
     "pos": 102,
-    "nombre": "Fernando Ariel Torres",
-    "equipo": "14",
-    "goles": 4
-  },
-  {
-    "pos": 103,
     "nombre": "Nicolas Suarez",
     "equipo": "02",
     "goles": 4
   },
   {
-    "pos": 104,
+    "pos": 103,
     "nombre": "Ramiro Enrique Cason",
     "equipo": "12",
+    "goles": 4
+  },
+  {
+    "pos": 104,
+    "nombre": "Fernando Ariel Torres",
+    "equipo": "14",
     "goles": 4
   },
   {
@@ -11782,14 +11782,14 @@ const GOLEADORES = [
   },
   {
     "pos": 111,
-    "nombre": "Juan Ariel Figueroa",
-    "equipo": "14",
+    "nombre": "Luis Meade",
+    "equipo": "05",
     "goles": 4
   },
   {
     "pos": 112,
-    "nombre": "Luis Meade",
-    "equipo": "05",
+    "nombre": "Juan Ariel Figueroa",
+    "equipo": "14",
     "goles": 4
   },
   {
@@ -11818,26 +11818,26 @@ const GOLEADORES = [
   },
   {
     "pos": 117,
-    "nombre": "Juan Pablo Molina",
-    "equipo": "08",
-    "goles": 3
-  },
-  {
-    "pos": 118,
-    "nombre": "Leandro Ariel Maddaleno",
-    "equipo": "15",
-    "goles": 3
-  },
-  {
-    "pos": 119,
     "nombre": "Guido Ezequiel Oclander",
     "equipo": "10",
     "goles": 3
   },
   {
-    "pos": 120,
+    "pos": 118,
     "nombre": "Kevin Zanola",
     "equipo": "06",
+    "goles": 3
+  },
+  {
+    "pos": 119,
+    "nombre": "Juan Pablo Molina",
+    "equipo": "08",
+    "goles": 3
+  },
+  {
+    "pos": 120,
+    "nombre": "Leandro Ariel Maddaleno",
+    "equipo": "15",
     "goles": 3
   },
   {
@@ -11920,26 +11920,26 @@ const GOLEADORES = [
   },
   {
     "pos": 134,
-    "nombre": "Ignacio Berra",
-    "equipo": "",
-    "goles": 2
-  },
-  {
-    "pos": 135,
-    "nombre": "Hernan Marcelo Fabris",
-    "equipo": "24",
-    "goles": 2
-  },
-  {
-    "pos": 136,
     "nombre": "Mauricio Ezequiel Lazarte",
     "equipo": "",
     "goles": 2
   },
   {
-    "pos": 137,
+    "pos": 135,
     "nombre": "Savelli Gabriel",
     "equipo": "17",
+    "goles": 2
+  },
+  {
+    "pos": 136,
+    "nombre": "Ignacio Berra",
+    "equipo": "",
+    "goles": 2
+  },
+  {
+    "pos": 137,
+    "nombre": "Hernan Marcelo Fabris",
+    "equipo": "24",
     "goles": 2
   },
   {
@@ -11980,14 +11980,14 @@ const GOLEADORES = [
   },
   {
     "pos": 144,
-    "nombre": "Mariano Jesus Ferreño",
-    "equipo": "",
+    "nombre": "Llinares Diego",
+    "equipo": "07",
     "goles": 2
   },
   {
     "pos": 145,
-    "nombre": "Llinares Diego",
-    "equipo": "07",
+    "nombre": "Mariano Jesus Ferreño",
+    "equipo": "",
     "goles": 2
   },
   {
@@ -11998,26 +11998,26 @@ const GOLEADORES = [
   },
   {
     "pos": 147,
-    "nombre": "Roberto Ezequiel Ortega",
-    "equipo": "",
-    "goles": 2
-  },
-  {
-    "pos": 148,
     "nombre": "Walter Santini",
     "equipo": "07",
     "goles": 2
   },
   {
-    "pos": 149,
+    "pos": 148,
     "nombre": "Tomas Mc Cormack",
     "equipo": "09",
     "goles": 2
   },
   {
-    "pos": 150,
+    "pos": 149,
     "nombre": "Marcelo Gomez",
     "equipo": "18",
+    "goles": 2
+  },
+  {
+    "pos": 150,
+    "nombre": "Roberto Ezequiel Ortega",
+    "equipo": "",
     "goles": 2
   },
   {
@@ -12034,25 +12034,25 @@ const GOLEADORES = [
   },
   {
     "pos": 153,
-    "nombre": "Federico Saggese",
-    "equipo": "02",
-    "goles": 2
-  },
-  {
-    "pos": 154,
-    "nombre": "Juan Roncarolo",
-    "equipo": "02",
-    "goles": 2
-  },
-  {
-    "pos": 155,
     "nombre": "Gabriel Lena",
     "equipo": "",
     "goles": 2
   },
   {
-    "pos": 156,
+    "pos": 154,
     "nombre": "Fabricio Mauro Pontoriero",
+    "equipo": "02",
+    "goles": 2
+  },
+  {
+    "pos": 155,
+    "nombre": "Federico Saggese",
+    "equipo": "02",
+    "goles": 2
+  },
+  {
+    "pos": 156,
+    "nombre": "Juan Roncarolo",
     "equipo": "02",
     "goles": 2
   },
@@ -12070,32 +12070,32 @@ const GOLEADORES = [
   },
   {
     "pos": 159,
-    "nombre": "Sergio Silva",
-    "equipo": "16",
-    "goles": 2
-  },
-  {
-    "pos": 160,
     "nombre": "David Ripoll",
     "equipo": "05",
     "goles": 2
   },
   {
-    "pos": 161,
+    "pos": 160,
     "nombre": "Agustin Brignolo",
     "equipo": "05",
     "goles": 2
   },
   {
+    "pos": 161,
+    "nombre": "Sergio Silva",
+    "equipo": "16",
+    "goles": 2
+  },
+  {
     "pos": 162,
-    "nombre": "Omar Alejandro Diaz",
-    "equipo": "06",
+    "nombre": "Omar Eliceo Caraballo",
+    "equipo": "24",
     "goles": 2
   },
   {
     "pos": 163,
-    "nombre": "Omar Eliceo Caraballo",
-    "equipo": "24",
+    "nombre": "Omar Alejandro Diaz",
+    "equipo": "06",
     "goles": 2
   },
   {
@@ -12124,38 +12124,38 @@ const GOLEADORES = [
   },
   {
     "pos": 168,
-    "nombre": "Ariel Donnici",
-    "equipo": "08",
-    "goles": 1
-  },
-  {
-    "pos": 169,
     "nombre": "Victor Gabriel Da Costa Sa",
     "equipo": "04",
     "goles": 1
   },
   {
-    "pos": 170,
-    "nombre": "Federico Martino",
+    "pos": 169,
+    "nombre": "Ariel Donnici",
     "equipo": "08",
     "goles": 1
   },
   {
-    "pos": 171,
+    "pos": 170,
     "nombre": "Ignacio Eduardo Sanchez",
     "equipo": "",
     "goles": 1
   },
   {
-    "pos": 172,
+    "pos": 171,
     "nombre": "Javier Saiz",
     "equipo": "24",
     "goles": 1
   },
   {
-    "pos": 173,
+    "pos": 172,
     "nombre": "Martin Rocca",
     "equipo": "12",
+    "goles": 1
+  },
+  {
+    "pos": 173,
+    "nombre": "Federico Martino",
+    "equipo": "08",
     "goles": 1
   },
   {
@@ -12178,164 +12178,164 @@ const GOLEADORES = [
   },
   {
     "pos": 177,
-    "nombre": "Yair Owen Rego",
-    "equipo": "03",
-    "goles": 1
-  },
-  {
-    "pos": 178,
     "nombre": "Santiago Muñoz",
     "equipo": "23",
     "goles": 1
   },
   {
-    "pos": 179,
+    "pos": 178,
     "nombre": "Jorge Fernandez Menendez",
     "equipo": "10",
     "goles": 1
   },
   {
-    "pos": 180,
+    "pos": 179,
     "nombre": "Mariano Armando Dagostino",
     "equipo": "19",
     "goles": 1
   },
   {
-    "pos": 181,
+    "pos": 180,
     "nombre": "Luciano Di Paolo",
     "equipo": "13",
     "goles": 1
   },
   {
-    "pos": 182,
+    "pos": 181,
     "nombre": "Mariano Giasone",
     "equipo": "05",
     "goles": 1
   },
   {
-    "pos": 183,
+    "pos": 182,
     "nombre": "Facundo Da Cunha",
     "equipo": "06",
     "goles": 1
   },
   {
-    "pos": 184,
-    "nombre": "Patricio Tramontano",
-    "equipo": "20",
+    "pos": 183,
+    "nombre": "Yair Owen Rego",
+    "equipo": "03",
     "goles": 1
   },
   {
-    "pos": 185,
+    "pos": 184,
     "nombre": "Fabian Emanuel Calodolce",
     "equipo": "13",
     "goles": 1
   },
   {
-    "pos": 186,
+    "pos": 185,
     "nombre": "Diego Gomez",
     "equipo": "10",
     "goles": 1
   },
   {
-    "pos": 187,
-    "nombre": "Cristian Szczygiel",
-    "equipo": "16",
+    "pos": 186,
+    "nombre": "Patricio Tramontano",
+    "equipo": "20",
     "goles": 1
   },
   {
-    "pos": 188,
+    "pos": 187,
     "nombre": "Santiago Bonomi",
     "equipo": "19",
     "goles": 1
   },
   {
-    "pos": 189,
+    "pos": 188,
     "nombre": "Ariel Froloff",
     "equipo": "19",
     "goles": 1
   },
   {
-    "pos": 190,
+    "pos": 189,
     "nombre": "Ezequiel Rodriguez Achaval",
     "equipo": "22",
     "goles": 1
   },
   {
-    "pos": 191,
+    "pos": 190,
     "nombre": "Pablo Mattos",
     "equipo": "15",
     "goles": 1
   },
   {
-    "pos": 192,
-    "nombre": "Fabio Di Martino",
-    "equipo": "",
+    "pos": 191,
+    "nombre": "Cristian Szczygiel",
+    "equipo": "16",
     "goles": 1
   },
   {
-    "pos": 193,
+    "pos": 192,
     "nombre": "Federico Turconi",
     "equipo": "14",
     "goles": 1
   },
   {
-    "pos": 194,
+    "pos": 193,
     "nombre": "Pablo Nicolas Sonnante",
     "equipo": "07",
     "goles": 1
   },
   {
-    "pos": 195,
+    "pos": 194,
     "nombre": "Hernan Pinto",
     "equipo": "21",
     "goles": 1
   },
   {
-    "pos": 196,
-    "nombre": "Sebastián Lozupone",
-    "equipo": "03",
-    "goles": 1
-  },
-  {
-    "pos": 197,
-    "nombre": "Matías Espinola",
+    "pos": 195,
+    "nombre": "Fabio Di Martino",
     "equipo": "",
     "goles": 1
   },
   {
-    "pos": 198,
+    "pos": 196,
     "nombre": "Matias Eduardo Guirin",
     "equipo": "04",
     "goles": 1
   },
   {
-    "pos": 199,
+    "pos": 197,
     "nombre": "Fernando Palmas",
     "equipo": "",
     "goles": 1
   },
   {
-    "pos": 200,
+    "pos": 198,
     "nombre": "Leandro Ariel Rosciano",
     "equipo": "",
     "goles": 1
   },
   {
-    "pos": 201,
-    "nombre": "Pablo Reggio",
-    "equipo": "20",
+    "pos": 199,
+    "nombre": "Sebastián Lozupone",
+    "equipo": "03",
     "goles": 1
   },
   {
-    "pos": 202,
+    "pos": 200,
+    "nombre": "Matías Espinola",
+    "equipo": "",
+    "goles": 1
+  },
+  {
+    "pos": 201,
     "nombre": "Juan Manuel Ruiz Diaz",
     "equipo": "15",
     "goles": 1
   },
   {
-    "pos": 203,
+    "pos": 202,
     "nombre": "Hector Jose Raffaeli",
     "equipo": "10",
+    "goles": 1
+  },
+  {
+    "pos": 203,
+    "nombre": "Pablo Reggio",
+    "equipo": "20",
     "goles": 1
   },
   {
@@ -12376,44 +12376,44 @@ const GOLEADORES = [
   },
   {
     "pos": 210,
-    "nombre": "Maximiliano Campise",
-    "equipo": "",
-    "goles": 1
-  },
-  {
-    "pos": 211,
     "nombre": "Miguel Iniesta",
     "equipo": "07",
     "goles": 1
   },
   {
-    "pos": 212,
+    "pos": 211,
     "nombre": "German Ricardo Miguel",
     "equipo": "20",
     "goles": 1
   },
   {
-    "pos": 213,
+    "pos": 212,
     "nombre": "Federico Oviedo",
     "equipo": "18",
     "goles": 1
   },
   {
-    "pos": 214,
+    "pos": 213,
     "nombre": "Julio Orma Carrasco",
     "equipo": "07",
     "goles": 1
   },
   {
-    "pos": 215,
-    "nombre": "Lucas Matias Florio",
+    "pos": 214,
+    "nombre": "Maximiliano Campise",
     "equipo": "",
     "goles": 1
   },
   {
-    "pos": 216,
+    "pos": 215,
     "nombre": "Federico Sebastián Allan",
     "equipo": "19",
+    "goles": 1
+  },
+  {
+    "pos": 216,
+    "nombre": "Lucas Matias Florio",
+    "equipo": "",
     "goles": 1
   }
 ];
@@ -12802,14 +12802,6 @@ const SANCIONES = [
     "fechas": 0
   },
   {
-    "jugador": "Agustin Brignolo",
-    "equipo": "05",
-    "amarillas": 2,
-    "azules": 0,
-    "rojas": 1,
-    "fechas": 0
-  },
-  {
     "jugador": "Gustavo Trovato",
     "equipo": "11",
     "amarillas": 2,
@@ -12820,6 +12812,14 @@ const SANCIONES = [
   {
     "jugador": "Hernan Mario Bosco",
     "equipo": "13",
+    "amarillas": 2,
+    "azules": 0,
+    "rojas": 1,
+    "fechas": 0
+  },
+  {
+    "jugador": "Agustin Brignolo",
+    "equipo": "05",
     "amarillas": 2,
     "azules": 0,
     "rojas": 1,
@@ -12978,14 +12978,6 @@ const SANCIONES = [
     "fechas": 0
   },
   {
-    "jugador": "Federico Alvarez",
-    "equipo": "08",
-    "amarillas": 4,
-    "azules": 0,
-    "rojas": 0,
-    "fechas": 0
-  },
-  {
     "jugador": "Fabio Damian Aybar",
     "equipo": "11",
     "amarillas": 4,
@@ -12996,6 +12988,14 @@ const SANCIONES = [
   {
     "jugador": "Nicolas Suarez",
     "equipo": "02",
+    "amarillas": 4,
+    "azules": 0,
+    "rojas": 0,
+    "fechas": 0
+  },
+  {
+    "jugador": "Federico Alvarez",
+    "equipo": "08",
     "amarillas": 4,
     "azules": 0,
     "rojas": 0,
@@ -13016,14 +13016,6 @@ const SANCIONES = [
     "azules": 0,
     "rojas": 0,
     "fechas": 1
-  },
-  {
-    "jugador": "Daniel Leonardo Meyer",
-    "equipo": "03",
-    "amarillas": 3,
-    "azules": 0,
-    "rojas": 0,
-    "fechas": 0
   },
   {
     "jugador": "Pablo Ivica",
@@ -13058,8 +13050,8 @@ const SANCIONES = [
     "fechas": 0
   },
   {
-    "jugador": "Facundo Da Cunha",
-    "equipo": "06",
+    "jugador": "Daniel Leonardo Meyer",
+    "equipo": "03",
     "amarillas": 3,
     "azules": 0,
     "rojas": 0,
@@ -13076,6 +13068,14 @@ const SANCIONES = [
   {
     "jugador": "Martin Andreotta",
     "equipo": "23",
+    "amarillas": 3,
+    "azules": 0,
+    "rojas": 0,
+    "fechas": 0
+  },
+  {
+    "jugador": "Facundo Da Cunha",
+    "equipo": "06",
     "amarillas": 3,
     "azules": 0,
     "rojas": 0,
@@ -13100,14 +13100,6 @@ const SANCIONES = [
   {
     "jugador": "Juan Manuel Tuegols",
     "equipo": "06",
-    "amarillas": 3,
-    "azules": 0,
-    "rojas": 0,
-    "fechas": 0
-  },
-  {
-    "jugador": "Juan Manuel Ruiz Diaz",
-    "equipo": "15",
     "amarillas": 3,
     "azules": 0,
     "rojas": 0,
@@ -13146,6 +13138,14 @@ const SANCIONES = [
     "fechas": 0
   },
   {
+    "jugador": "Juan Manuel Ruiz Diaz",
+    "equipo": "15",
+    "amarillas": 3,
+    "azules": 0,
+    "rojas": 0,
+    "fechas": 0
+  },
+  {
     "jugador": "Marcelo Carlos Rodriguez",
     "equipo": "22",
     "amarillas": 2,
@@ -13176,38 +13176,6 @@ const SANCIONES = [
     "azules": 0,
     "rojas": 0,
     "fechas": 1
-  },
-  {
-    "jugador": "Pablo Barletta",
-    "equipo": "23",
-    "amarillas": 2,
-    "azules": 0,
-    "rojas": 0,
-    "fechas": 0
-  },
-  {
-    "jugador": "Daniel Gutiérrez",
-    "equipo": "20",
-    "amarillas": 2,
-    "azules": 0,
-    "rojas": 0,
-    "fechas": 0
-  },
-  {
-    "jugador": "German Luis Artola",
-    "equipo": "18",
-    "amarillas": 2,
-    "azules": 0,
-    "rojas": 0,
-    "fechas": 0
-  },
-  {
-    "jugador": "Rosendo Liffourrena",
-    "equipo": "07",
-    "amarillas": 2,
-    "azules": 0,
-    "rojas": 0,
-    "fechas": 0
   },
   {
     "jugador": "Martin Baretta",
@@ -13258,32 +13226,32 @@ const SANCIONES = [
     "fechas": 0
   },
   {
-    "jugador": "Leandro Ventricelli",
-    "equipo": "02",
+    "jugador": "Pablo Barletta",
+    "equipo": "23",
     "amarillas": 2,
     "azules": 0,
     "rojas": 0,
     "fechas": 0
   },
   {
-    "jugador": "Tomas Mc Cormack",
-    "equipo": "09",
+    "jugador": "Daniel Gutiérrez",
+    "equipo": "20",
     "amarillas": 2,
     "azules": 0,
     "rojas": 0,
     "fechas": 0
   },
   {
-    "jugador": "Diego Poterala",
-    "equipo": "15",
+    "jugador": "German Luis Artola",
+    "equipo": "18",
     "amarillas": 2,
     "azules": 0,
     "rojas": 0,
     "fechas": 0
   },
   {
-    "jugador": "Ariel Froloff",
-    "equipo": "19",
+    "jugador": "Rosendo Liffourrena",
+    "equipo": "07",
     "amarillas": 2,
     "azules": 0,
     "rojas": 0,
@@ -13370,16 +13338,32 @@ const SANCIONES = [
     "fechas": 0
   },
   {
-    "jugador": "Pablo Berard",
-    "equipo": "03",
+    "jugador": "Leandro Ventricelli",
+    "equipo": "02",
     "amarillas": 2,
     "azules": 0,
     "rojas": 0,
     "fechas": 0
   },
   {
-    "jugador": "Sebastian Ruegg",
-    "equipo": "05",
+    "jugador": "Tomas Mc Cormack",
+    "equipo": "09",
+    "amarillas": 2,
+    "azules": 0,
+    "rojas": 0,
+    "fechas": 0
+  },
+  {
+    "jugador": "Diego Poterala",
+    "equipo": "15",
+    "amarillas": 2,
+    "azules": 0,
+    "rojas": 0,
+    "fechas": 0
+  },
+  {
+    "jugador": "Ariel Froloff",
+    "equipo": "19",
     "amarillas": 2,
     "azules": 0,
     "rojas": 0,
@@ -13450,16 +13434,16 @@ const SANCIONES = [
     "fechas": 0
   },
   {
-    "jugador": "Alejandro Pedro Teodori",
-    "equipo": "13",
+    "jugador": "Pablo Berard",
+    "equipo": "03",
     "amarillas": 2,
     "azules": 0,
     "rojas": 0,
     "fechas": 0
   },
   {
-    "jugador": "Luciano Jose Loraschi",
-    "equipo": "20",
+    "jugador": "Sebastian Ruegg",
+    "equipo": "05",
     "amarillas": 2,
     "azules": 0,
     "rojas": 0,
@@ -13530,6 +13514,22 @@ const SANCIONES = [
     "fechas": 0
   },
   {
+    "jugador": "Alejandro Pedro Teodori",
+    "equipo": "13",
+    "amarillas": 2,
+    "azules": 0,
+    "rojas": 0,
+    "fechas": 0
+  },
+  {
+    "jugador": "Luciano Jose Loraschi",
+    "equipo": "20",
+    "amarillas": 2,
+    "azules": 0,
+    "rojas": 0,
+    "fechas": 0
+  },
+  {
     "jugador": "Gonzalo Raúl Rivas",
     "equipo": "22",
     "amarillas": 1,
@@ -13552,54 +13552,6 @@ const SANCIONES = [
     "azules": 0,
     "rojas": 0,
     "fechas": 1
-  },
-  {
-    "jugador": "Facundo Pusso",
-    "equipo": "22",
-    "amarillas": 1,
-    "azules": 0,
-    "rojas": 0,
-    "fechas": 0
-  },
-  {
-    "jugador": "Ariel Gallo",
-    "equipo": "23",
-    "amarillas": 1,
-    "azules": 0,
-    "rojas": 0,
-    "fechas": 0
-  },
-  {
-    "jugador": "Martin Fernando Bruzzese",
-    "equipo": "03",
-    "amarillas": 1,
-    "azules": 0,
-    "rojas": 0,
-    "fechas": 0
-  },
-  {
-    "jugador": "Juan Manuel Diego",
-    "equipo": "12",
-    "amarillas": 1,
-    "azules": 0,
-    "rojas": 0,
-    "fechas": 0
-  },
-  {
-    "jugador": "Federico Garbagnati",
-    "equipo": "21",
-    "amarillas": 1,
-    "azules": 0,
-    "rojas": 0,
-    "fechas": 0
-  },
-  {
-    "jugador": "Mariano Miron",
-    "equipo": "20",
-    "amarillas": 1,
-    "azules": 0,
-    "rojas": 0,
-    "fechas": 0
   },
   {
     "jugador": "Javier Saiz",
@@ -13730,8 +13682,48 @@ const SANCIONES = [
     "fechas": 0
   },
   {
-    "jugador": "Raul Malatini",
-    "equipo": "24",
+    "jugador": "Facundo Pusso",
+    "equipo": "22",
+    "amarillas": 1,
+    "azules": 0,
+    "rojas": 0,
+    "fechas": 0
+  },
+  {
+    "jugador": "Ariel Gallo",
+    "equipo": "23",
+    "amarillas": 1,
+    "azules": 0,
+    "rojas": 0,
+    "fechas": 0
+  },
+  {
+    "jugador": "Martin Fernando Bruzzese",
+    "equipo": "03",
+    "amarillas": 1,
+    "azules": 0,
+    "rojas": 0,
+    "fechas": 0
+  },
+  {
+    "jugador": "Juan Manuel Diego",
+    "equipo": "12",
+    "amarillas": 1,
+    "azules": 0,
+    "rojas": 0,
+    "fechas": 0
+  },
+  {
+    "jugador": "Federico Garbagnati",
+    "equipo": "21",
+    "amarillas": 1,
+    "azules": 0,
+    "rojas": 0,
+    "fechas": 0
+  },
+  {
+    "jugador": "Mariano Miron",
+    "equipo": "20",
     "amarillas": 1,
     "azules": 0,
     "rojas": 0,
@@ -13874,48 +13866,8 @@ const SANCIONES = [
     "fechas": 0
   },
   {
-    "jugador": "Nicolas Vernola",
+    "jugador": "Raul Malatini",
     "equipo": "24",
-    "amarillas": 1,
-    "azules": 0,
-    "rojas": 0,
-    "fechas": 0
-  },
-  {
-    "jugador": "Ronald Walter Bartolomei",
-    "equipo": "12",
-    "amarillas": 1,
-    "azules": 0,
-    "rojas": 0,
-    "fechas": 0
-  },
-  {
-    "jugador": "Nicolas Ottoboni",
-    "equipo": "14",
-    "amarillas": 1,
-    "azules": 0,
-    "rojas": 0,
-    "fechas": 0
-  },
-  {
-    "jugador": "Rodriguez Mariano",
-    "equipo": "18",
-    "amarillas": 1,
-    "azules": 0,
-    "rojas": 0,
-    "fechas": 0
-  },
-  {
-    "jugador": "Gaston Eduardo Barreto",
-    "equipo": "19",
-    "amarillas": 1,
-    "azules": 0,
-    "rojas": 0,
-    "fechas": 0
-  },
-  {
-    "jugador": "Pablo Nicolas Sonnante",
-    "equipo": "07",
     "amarillas": 1,
     "azules": 0,
     "rojas": 0,
@@ -14066,7 +14018,39 @@ const SANCIONES = [
     "fechas": 0
   },
   {
-    "jugador": "Santiago Bonomi",
+    "jugador": "Nicolas Vernola",
+    "equipo": "24",
+    "amarillas": 1,
+    "azules": 0,
+    "rojas": 0,
+    "fechas": 0
+  },
+  {
+    "jugador": "Ronald Walter Bartolomei",
+    "equipo": "12",
+    "amarillas": 1,
+    "azules": 0,
+    "rojas": 0,
+    "fechas": 0
+  },
+  {
+    "jugador": "Nicolas Ottoboni",
+    "equipo": "14",
+    "amarillas": 1,
+    "azules": 0,
+    "rojas": 0,
+    "fechas": 0
+  },
+  {
+    "jugador": "Rodriguez Mariano",
+    "equipo": "18",
+    "amarillas": 1,
+    "azules": 0,
+    "rojas": 0,
+    "fechas": 0
+  },
+  {
+    "jugador": "Gaston Eduardo Barreto",
     "equipo": "19",
     "amarillas": 1,
     "azules": 0,
@@ -14074,32 +14058,8 @@ const SANCIONES = [
     "fechas": 0
   },
   {
-    "jugador": "Claudio Fabian Aliano",
-    "equipo": "09",
-    "amarillas": 1,
-    "azules": 0,
-    "rojas": 0,
-    "fechas": 0
-  },
-  {
-    "jugador": "Walter Santini",
+    "jugador": "Pablo Nicolas Sonnante",
     "equipo": "07",
-    "amarillas": 1,
-    "azules": 0,
-    "rojas": 0,
-    "fechas": 0
-  },
-  {
-    "jugador": "Ernesto Daniel Iribarren",
-    "equipo": "08",
-    "amarillas": 1,
-    "azules": 0,
-    "rojas": 0,
-    "fechas": 0
-  },
-  {
-    "jugador": "Claudio Roberto Perez",
-    "equipo": "19",
     "amarillas": 1,
     "azules": 0,
     "rojas": 0,
@@ -14220,6 +14180,46 @@ const SANCIONES = [
   {
     "jugador": "Alejandro Ottoboni",
     "equipo": "14",
+    "amarillas": 1,
+    "azules": 0,
+    "rojas": 0,
+    "fechas": 0
+  },
+  {
+    "jugador": "Santiago Bonomi",
+    "equipo": "19",
+    "amarillas": 1,
+    "azules": 0,
+    "rojas": 0,
+    "fechas": 0
+  },
+  {
+    "jugador": "Claudio Fabian Aliano",
+    "equipo": "09",
+    "amarillas": 1,
+    "azules": 0,
+    "rojas": 0,
+    "fechas": 0
+  },
+  {
+    "jugador": "Walter Santini",
+    "equipo": "07",
+    "amarillas": 1,
+    "azules": 0,
+    "rojas": 0,
+    "fechas": 0
+  },
+  {
+    "jugador": "Ernesto Daniel Iribarren",
+    "equipo": "08",
+    "amarillas": 1,
+    "azules": 0,
+    "rojas": 0,
+    "fechas": 0
+  },
+  {
+    "jugador": "Claudio Roberto Perez",
+    "equipo": "19",
     "amarillas": 1,
     "azules": 0,
     "rojas": 0,
