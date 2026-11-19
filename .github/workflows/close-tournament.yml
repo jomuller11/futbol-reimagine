@@ -1,0 +1,66 @@
+name: Cerrar torneo (snapshot)
+
+# Dispara manualmente desde la pestaña Actions cuando el torneo activo terminó.
+# Corre scraper/snapshot.py, que:
+#   - Copia data/torneo.js + data/torneo.json a data/torneos/{slug}.{js,json}
+#   - Actualiza data/torneo-meta.json: mueve el torneo activo a 'cerrados'
+#     y deja 'activo' en null.
+# A partir de ahí el scraper (update.yml) queda en pausa hasta que un humano
+# edite torneo-meta.json con el 'activo' del torneo siguiente.
+
+on:
+  workflow_dispatch:
+    inputs:
+      confirmar:
+        description: "Escribí CERRAR para confirmar (evita disparos accidentales)"
+        required: true
+        type: string
+
+permissions:
+  contents: write
+
+jobs:
+  snapshot:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Validar confirmación
+        if: inputs.confirmar != 'CERRAR'
+        run: |
+          echo "❌ Confirmación inválida: '${{ inputs.confirmar }}'. Hay que escribir CERRAR."
+          exit 1
+
+      - name: Checkout código
+        uses: actions/checkout@v4
+
+      - name: Configurar Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+
+      - name: Ejecutar snapshot
+        run: python3 scraper/snapshot.py
+
+      - name: Mostrar meta actualizado
+        run: cat data/torneo-meta.json
+
+      - name: Detectar cambios
+        id: changes
+        run: |
+          if [[ -n "$(git status --porcelain data/)" ]]; then
+            echo "changed=true" >> "$GITHUB_OUTPUT"
+            echo "✓ Hay cambios para commitear"
+            git status --short data/
+          else
+            echo "changed=false" >> "$GITHUB_OUTPUT"
+            echo "ℹ Sin cambios (snapshot ya existía)"
+          fi
+
+      - name: Commit y push
+        if: steps.changes.outputs.changed == 'true'
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add data/
+          git commit -m "📦 Cerrar torneo: congelar snapshot ($(date -u +'%Y-%m-%d %H:%M UTC'))"
+          git push
