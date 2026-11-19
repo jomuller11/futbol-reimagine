@@ -23,5 +23,10 @@ const PENALES = {
     // Copa de Oro, SFG1 (rama ganadores): Funaro 2-2 Miguel. Pasó Funaro.
     'oro-SFG1': { ganador: '05', notas: 'Funaro eliminó a Miguel por penales en la semi de la rama ganadores' }
   },
-  finales: {}
+  finales: {
+    // Copa de Oro, F34 (3º/4º): Miguel 3-3 Da Costa. Ganó Miguel, se queda con el 3er puesto.
+    'oro-F34':   { ganador: '20', notas: 'Miguel se quedó con el 3er puesto de la Copa de Oro por penales' },
+    // Copa de Plata, F12 (1º/2º): Ahumada 2-2 Iribarren. Ganó Iribarren, campeón de la Copa de Plata.
+    'plata-F12': { ganador: '08', notas: 'Iribarren campeón de la Copa de Plata por penales' }
+  }
 };
