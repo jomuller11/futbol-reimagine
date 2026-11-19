@@ -1,11 +1,16 @@
 {
-  "activo": {
-    "año": 2026,
-    "slug": "2026",
-    "nombre": "Torneo Papi Fútbol San José Morón 2026",
-    "estado": "en-curso",
-    "inicio": "2026-03-14",
-    "cierre_previsto": "2026-11-28"
-  },
-  "cerrados": []
+  "activo": null,
+  "cerrados": [
+    {
+      "año": 2026,
+      "slug": "2026",
+      "nombre": "Torneo Papi Fútbol San José Morón 2026",
+      "estado": "finalizado",
+      "inicio": "2026-03-14",
+      "cierre_previsto": "2026-11-28",
+      "cerrado_el": "2026-11-19 13:59 UTC",
+      "archivo_js": "torneos/2026.js",
+      "archivo_json": "torneos/2026.json"
+    }
+  ]
 }
