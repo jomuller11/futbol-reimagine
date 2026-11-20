@@ -198,6 +198,63 @@
       .fixture-equipo-row { grid-template-columns: 50px 1fr auto 1fr; font-size: 12px; }
       .fixture-equipo-row > div:last-child { display: none; }
     }
+
+    /* Breakdown por fase (cards debajo del resumen) */
+    .fase-breakdown {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
+      gap: 12px;
+      margin-bottom: 24px;
+    }
+    .fase-stat-card {
+      background: var(--surface);
+      border: 0.5px solid var(--border);
+      border-radius: var(--radius);
+      padding: 14px 16px;
+    }
+    .fase-stat-head {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      margin-bottom: 10px;
+    }
+    .fase-stat-tag {
+      font-size: 10px;
+      font-weight: 700;
+      letter-spacing: 0.4px;
+      text-transform: uppercase;
+      padding: 2px 8px;
+      border-radius: 999px;
+      background: var(--bg);
+      color: var(--text-secondary);
+      border: 0.5px solid var(--border);
+    }
+    .fase-stat-label {
+      font-size: 13px;
+      font-weight: 700;
+      color: var(--text);
+    }
+    .fase-stat-row {
+      display: grid;
+      grid-template-columns: repeat(7, 1fr);
+      gap: 4px;
+      font-variant-numeric: tabular-nums;
+    }
+    .fase-stat-row .k {
+      font-size: 10px;
+      color: var(--text-tertiary);
+      font-weight: 600;
+      text-transform: uppercase;
+      letter-spacing: 0.3px;
+      text-align: center;
+    }
+    .fase-stat-row .v {
+      font-size: 16px;
+      font-weight: 700;
+      color: var(--text);
+      text-align: center;
+      line-height: 1.1;
+    }
   </style>
 </head>
 <body>
@@ -271,26 +328,46 @@
       const posicionData = POSICIONES['zona' + zona].find(p => p.id === id);
       const posIndex = POSICIONES['zona' + zona].findIndex(p => p.id === id);
       const fairplay = FAIRPLAY.find(f => f.equipo === id);
-      const dg = posicionData.gf - posicionData.gc;
-      const dgText = dg > 0 ? `+${dg}` : `${dg}`;
 
-      // Partidos del equipo
+      // Partidos del equipo + stats acumulados del torneo completo
+      //
+      // POSICIONES.zonaN solo trae los partidos de la Fase Regular (zona 1/2)
+      // y POSICIONES.zonaA/B/C solo los de la Fase Final. Ninguna incluye la
+      // Copa Final (Fase 3 — knockout sin tabla de puntos). Para que los stats
+      // del equipo reflejen TODO el torneo, los recalculamos desde FIXTURE,
+      // además de guardar el breakdown por fase para mostrarlo abajo.
       const partidosDelEquipo = [];
+      const stats = { pj: 0, pg: 0, pe: 0, pp: 0, gf: 0, gc: 0 };
+      const statsPorFase = {
+        1: { pj: 0, pg: 0, pe: 0, pp: 0, gf: 0, gc: 0, label: 'Regular' },
+        2: { pj: 0, pg: 0, pe: 0, pp: 0, gf: 0, gc: 0, label: 'Final' },
+        3: { pj: 0, pg: 0, pe: 0, pp: 0, gf: 0, gc: 0, label: 'Copa Final' }
+      };
       FIXTURE.forEach(f => {
         fechaPartidos(f).forEach(p => {
-          if (p.local === id || p.visitante === id) {
-            partidosDelEquipo.push({
-              ...p,
-              fecha: f.fecha,
-              faseFecha: f.faseFecha,
-              fase: f.fase,
-              fechaTexto: f.fechaTexto,
-              estado: f.estado,
-              esLocal: p.local === id
-            });
-          }
+          if (p.local !== id && p.visitante !== id) return;
+          partidosDelEquipo.push({
+            ...p,
+            fecha: f.fecha,
+            faseFecha: f.faseFecha,
+            fase: f.fase,
+            fechaTexto: f.fechaTexto,
+            estado: f.estado,
+            esLocal: p.local === id
+          });
+          if (f.estado !== 'jugada' || p.golesL === undefined) return;
+          const gp = p.local === id ? p.golesL : p.golesV;
+          const gr = p.local === id ? p.golesV : p.golesL;
+          const bucket = statsPorFase[f.fase]; if (!bucket) return;
+          stats.pj++; stats.gf += gp; stats.gc += gr;
+          bucket.pj++; bucket.gf += gp; bucket.gc += gr;
+          if (gp > gr)      { stats.pg++; bucket.pg++; }
+          else if (gp < gr) { stats.pp++; bucket.pp++; }
+          else              { stats.pe++; bucket.pe++; }
         });
       });
+      const dg = stats.gf - stats.gc;
+      const dgText = dg > 0 ? `+${dg}` : `${dg}`;
 
       // Título del documento
       document.title = `${equipo.nombre} · Papi Fútbol San José Morón`;
@@ -308,27 +385,63 @@
             </div>
             <div class="equipo-hero-name">${equipo.nombre}</div>
             <div class="equipo-hero-stats">
-              <span><strong>${posicionData.pts}</strong>pts</span>
-              <span><strong>${posicionData.pj}</strong>PJ</span>
-              <span><strong>${posicionData.pg}</strong>PG</span>
-              <span><strong>${posicionData.pe}</strong>PE</span>
-              <span><strong>${posicionData.pp}</strong>PP</span>
-              <span><strong>${posicionData.gf}:${posicionData.gc}</strong></span>
+              <span><strong>${stats.pj}</strong>PJ</span>
+              <span><strong>${stats.pg}</strong>PG</span>
+              <span><strong>${stats.pe}</strong>PE</span>
+              <span><strong>${stats.pp}</strong>PP</span>
+              <span><strong>${stats.gf}:${stats.gc}</strong></span>
               <span>DG <strong style="color:${dg>0?'var(--success)':(dg<0?'var(--danger)':'inherit')}">${dgText}</strong></span>
               <span style="display:inline-flex; align-items:center; gap:4px;">Últimos 5 ${formaDotsHtml(id)}</span>
             </div>
           </div>
         </div>
 
-        <!-- MINI STATS -->
+        <!-- MINI STATS (todo el torneo) -->
         <div class="equipo-stats-grid">
-          <div class="equipo-mini-stat"><div class="label">Puntos</div><div class="value">${posicionData.pts}</div></div>
-          <div class="equipo-mini-stat"><div class="label">Goles a favor</div><div class="value">${posicionData.gf}</div></div>
-          <div class="equipo-mini-stat"><div class="label">Goles en contra</div><div class="value">${posicionData.gc}</div></div>
+          <div class="equipo-mini-stat"><div class="label">Partidos jugados</div><div class="value">${stats.pj}</div></div>
+          <div class="equipo-mini-stat"><div class="label">Goles a favor</div><div class="value">${stats.gf}</div></div>
+          <div class="equipo-mini-stat"><div class="label">Goles en contra</div><div class="value">${stats.gc}</div></div>
           <div class="equipo-mini-stat"><div class="label">Dif. de gol</div><div class="value" style="color:${dg>0?'var(--success)':(dg<0?'var(--danger)':'inherit')}">${dgText}</div></div>
           <div class="equipo-mini-stat"><div class="label">Fair Play</div><div class="value">${fairplay ? fairplay.puntos : 0}</div></div>
           <div class="equipo-mini-stat"><div class="label">Jugadores</div><div class="value">${plantel.length}</div></div>
         </div>
+
+        <!-- BREAKDOWN POR FASE -->
+        <!-- Visible cuando el equipo jugó al menos una fase; cada card muestra los
+             mismos indicadores pero recortados a la fase. Da contexto de dónde
+             viene cada número del resumen total. -->
+        ${(() => {
+          const fasesJugadas = Object.entries(statsPorFase).filter(([_, s]) => s.pj > 0);
+          if (fasesJugadas.length === 0) return '';
+          return `
+            <div class="section-head" style="margin-top:28px;">
+              <h2 class="section-title">Stats por fase</h2>
+            </div>
+            <div class="fase-breakdown">
+              ${fasesJugadas.map(([fase, s]) => {
+                const sdg = s.gf - s.gc;
+                const sdgTxt = sdg > 0 ? `+${sdg}` : `${sdg}`;
+                return `
+                  <div class="fase-stat-card">
+                    <div class="fase-stat-head">
+                      <span class="fase-stat-tag">Fase ${fase}</span>
+                      <span class="fase-stat-label">${s.label}</span>
+                    </div>
+                    <div class="fase-stat-row">
+                      <div><div class="k">PJ</div><div class="v">${s.pj}</div></div>
+                      <div><div class="k">PG</div><div class="v">${s.pg}</div></div>
+                      <div><div class="k">PE</div><div class="v">${s.pe}</div></div>
+                      <div><div class="k">PP</div><div class="v">${s.pp}</div></div>
+                      <div><div class="k">GF</div><div class="v">${s.gf}</div></div>
+                      <div><div class="k">GC</div><div class="v">${s.gc}</div></div>
+                      <div><div class="k">DG</div><div class="v" style="color:${sdg>0?'var(--success)':(sdg<0?'var(--danger)':'inherit')}">${sdgTxt}</div></div>
+                    </div>
+                  </div>
+                `;
+              }).join('')}
+            </div>
+          `;
+        })()}
 
         <!-- PLANTEL + FIXTURE -->
         <div class="two-col-equipo">
